@@ -1,130 +1,111 @@
+"use client";
+
 /**
- * Shopping cart store using Zustand
- * Manages cart state with localStorage persistence
+ * Cart state.
+ *
+ * The cart now lives on the server; this store is a cache of it, not the cart
+ * itself. Every mutation round-trips and the response replaces local state, so
+ * stock limits, bulk pricing and availability are decided in one place.
+ *
+ * The previous store persisted the whole basket to `localStorage` and priced it
+ * client-side via `calculatePrice()`. That is why two customers could each buy
+ * the last crate, and why a basket could show a total the server would never
+ * have charged.
  */
 
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { CartStore, Product, CartItem } from '@/lib/types';
-import { calculatePrice, getCurrentUser } from '@/lib/utils';
-import { checkStockAvailability, createNotification } from '@/lib/features/inventory/inventory-manager';
+import { create } from "zustand";
 
-export const useCartStore = create<CartStore>()(
-  persist(
-    (set, get) => ({
-      items: [],
+import { ApiError } from "@/lib/api/client";
+import * as cartApi from "@/lib/api/cart";
+import type { Cart } from "@/lib/api/types";
 
-      addItem: (product: Product, category: string) => {
-        const existingItem = get().items.find((item) => item.id === product.id);
-        const requestedQuantity = existingItem ? existingItem.quantity + 1 : 1;
+interface CartState {
+  cart: Cart | null;
+  isLoading: boolean;
+  isMutating: boolean;
+  error: string | null;
 
-        // Check stock availability
-        const stockCheck = checkStockAvailability(product.id, requestedQuantity);
+  load: () => Promise<void>;
+  add: (productSlug: string, quantity?: number) => Promise<boolean>;
+  updateQuantity: (itemId: string, quantity: number) => Promise<boolean>;
+  remove: (itemId: string) => Promise<boolean>;
+  clear: () => Promise<void>;
+  reset: () => void;
 
-        if (!stockCheck.available) {
-          createNotification({
-            type: 'error',
-            title: 'Insufficient Stock',
-            message: `Only ${stockCheck.currentStock} units of ${product.name} available. You're trying to add ${requestedQuantity}.`,
-          });
-          return;
-        }
+  itemCount: () => number;
+  subtotal: () => string;
+}
 
-        set((state) => {
-          const existingItem = state.items.find(
-            (item) => item.id === product.id
-          );
+export const useCartStore = create<CartState>()((set, get) => ({
+  cart: null,
+  isLoading: false,
+  isMutating: false,
+  error: null,
 
-          if (existingItem) {
-            // If item exists, increase quantity
-            return {
-              items: state.items.map((item) =>
-                item.id === product.id
-                  ? { ...item, quantity: item.quantity + 1 }
-                  : item
-              ),
-            };
-          }
-
-          // Add new item with quantity 1
-          const newItem: CartItem = {
-            ...product,
-            category,
-            quantity: 1,
-          };
-
-          return {
-            items: [...state.items, newItem],
-          };
-        });
-
-        // Show success notification
-        createNotification({
-          type: 'success',
-          title: 'Added to Cart',
-          message: `${product.name} has been added to your cart.`,
-        });
-      },
-
-      removeItem: (productId: number) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== productId),
-        }));
-      },
-
-      updateQuantity: (productId: number, quantity: number) => {
-        if (quantity <= 0) {
-          get().removeItem(productId);
-          return;
-        }
-
-        // Check stock availability
-        const stockCheck = checkStockAvailability(productId, quantity);
-
-        if (!stockCheck.available) {
-          const item = get().items.find((item) => item.id === productId);
-          createNotification({
-            type: 'warning',
-            title: 'Stock Limit Reached',
-            message: `Only ${stockCheck.currentStock} units of ${item?.name || 'this product'} available.`,
-          });
-          // Set to maximum available stock
-          set((state) => ({
-            items: state.items.map((item) =>
-              item.id === productId ? { ...item, quantity: stockCheck.currentStock } : item
-            ),
-          }));
-          return;
-        }
-
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.id === productId ? { ...item, quantity } : item
-          ),
-        }));
-      },
-
-      clearCart: () => {
-        set({ items: [] });
-      },
-
-      getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
-      },
-
-      getTotalPrice: () => {
-        const user = getCurrentUser();
-        const userType = user?.userType || 'retail';
-
-        return get().items.reduce((total, item) => {
-          // Calculate price based on quantity and user type
-          const pricePerUnit = calculatePrice(item, item.quantity, userType);
-          return total + pricePerUnit * item.quantity;
-        }, 0);
-      },
-    }),
-    {
-      name: 'kuyash-cart-storage', // localStorage key
+  load: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      set({ cart: await cartApi.getCart(), isLoading: false });
+    } catch (error) {
+      set({ isLoading: false, error: messageFor(error) });
     }
-  )
-);
+  },
+
+  add: async (productSlug, quantity = 1) => {
+    set({ isMutating: true, error: null });
+    try {
+      // The server clamps to available stock and re-prices for this user, so
+      // the response is authoritative — we replace rather than merge.
+      set({ cart: await cartApi.addToCart(productSlug, quantity), isMutating: false });
+      return true;
+    } catch (error) {
+      set({ isMutating: false, error: messageFor(error) });
+      return false;
+    }
+  },
+
+  updateQuantity: async (itemId, quantity) => {
+    set({ isMutating: true, error: null });
+    try {
+      set({ cart: await cartApi.updateCartItem(itemId, quantity), isMutating: false });
+      return true;
+    } catch (error) {
+      set({ isMutating: false, error: messageFor(error) });
+      return false;
+    }
+  },
+
+  remove: async (itemId) => {
+    set({ isMutating: true, error: null });
+    try {
+      set({ cart: await cartApi.removeCartItem(itemId), isMutating: false });
+      return true;
+    } catch (error) {
+      set({ isMutating: false, error: messageFor(error) });
+      return false;
+    }
+  },
+
+  clear: async () => {
+    set({ isMutating: true, error: null });
+    try {
+      await cartApi.clearCart();
+      set({ cart: null, isMutating: false });
+      await get().load();
+    } catch (error) {
+      set({ isMutating: false, error: messageFor(error) });
+    }
+  },
+
+  /** Drop cached state without a round-trip — used on sign-out. */
+  reset: () => set({ cart: null, error: null }),
+
+  itemCount: () => get().cart?.item_count ?? 0,
+  subtotal: () => get().cart?.subtotal ?? "0.00",
+}));
+
+function messageFor(error: unknown): string {
+  if (error instanceof ApiError) return error.message;
+  if (error instanceof Error) return error.message;
+  return "Something went wrong. Please try again.";
+}

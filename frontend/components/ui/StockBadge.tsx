@@ -1,77 +1,43 @@
 /**
- * Stock Badge Component
- * Displays product stock status with appropriate styling
+ * Stock indicator.
+ *
+ * Takes the server's `stock_status` verbatim rather than deriving it from a
+ * quantity. The threshold that separates "low" from "in stock" is configured
+ * per product on the server; duplicating that rule here would let the two
+ * disagree.
  */
 
-import { Product } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import type { StockStatus } from "@/lib/api/types";
 
-interface StockBadgeProps {
-  product: Product;
+interface Props {
+  status: StockStatus;
+  available: number;
   showQuantity?: boolean;
   className?: string;
 }
 
-export function StockBadge({ product, showQuantity = true, className = "" }: StockBadgeProps) {
-  const { stock, lowStockThreshold } = product;
+const PRESENTATION: Record<StockStatus, { label: string; classes: string }> = {
+  IN_STOCK: { label: "In stock", classes: "bg-green-100 text-green-800" },
+  LOW_STOCK: { label: "Low stock", classes: "bg-amber-100 text-amber-800" },
+  OUT_OF_STOCK: { label: "Out of stock", classes: "bg-gray-200 text-gray-700" },
+};
 
-  // Out of Stock
-  if (stock === 0) {
-    return (
-      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 border border-gray-300 ${className}`}>
-        <span className="w-2 h-2 rounded-full bg-gray-500"></span>
-        <span className="text-xs font-medium text-gray-700">Out of Stock</span>
-      </div>
-    );
-  }
-
-  // Low Stock
-  if (stock <= lowStockThreshold) {
-    return (
-      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 ${className}`}>
-        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-        <span className="text-xs font-medium text-amber-700">
-          {showQuantity ? `Only ${stock} left!` : 'Low Stock'}
-        </span>
-      </div>
-    );
-  }
-
-  // In Stock
-  return (
-    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 border border-green-200 ${className}`}>
-      <span className="w-2 h-2 rounded-full bg-green-500"></span>
-      <span className="text-xs font-medium text-green-700">
-        {showQuantity ? `${stock} in stock` : 'In Stock'}
-      </span>
-    </div>
-  );
-}
-
-/**
- * Simple stock status indicator (just the dot and text)
- */
-export function StockIndicator({ product }: { product: Product }) {
-  const { stock, lowStockThreshold } = product;
-
-  if (stock === 0) {
-    return (
-      <span className="text-sm text-gray-600">
-        ⚠️ Out of Stock
-      </span>
-    );
-  }
-
-  if (stock <= lowStockThreshold) {
-    return (
-      <span className="text-sm text-amber-600">
-        ⚠️ Only {stock} left in stock!
-      </span>
-    );
-  }
+export function StockBadge({ status, available, showQuantity = true, className }: Props) {
+  const { label, classes } = PRESENTATION[status] ?? PRESENTATION.OUT_OF_STOCK;
+  const showCount = showQuantity && status === "LOW_STOCK" && available > 0;
 
   return (
-    <span className="text-sm text-green-600">
-      ✓ In Stock ({stock} available)
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+        classes,
+        className,
+      )}
+    >
+      {showCount ? `Only ${available} left` : label}
     </span>
   );
 }
+
+export default StockBadge;

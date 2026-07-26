@@ -1,306 +1,210 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { cn, getCurrentUser } from "@/lib/utils";
-import { NAV_LINKS, SITE_CONFIG } from "@/lib/constants";
-import { AuthModal } from "@/components/auth/AuthModal";
+/**
+ * Navigation.
+ *
+ * Rewritten. The previous version read identity from `localStorage`, opened a
+ * modal that fabricated a session without contacting the server, and "signed
+ * out" by deleting a localStorage key while leaving the JWT valid (audit
+ * §3.1). Sign-in now goes to the real `/login` route and the session comes
+ * from `useAuth()`.
+ *
+ * Nav links that point at homepage anchors are rendered as links back to the
+ * homepage when we are not on it — previously they were dead on every other
+ * page.
+ */
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { LogOut, Package, Settings, ShieldCheck, User as UserIcon } from "lucide-react";
+
 import CartButton from "@/components/cart/CartButton";
 import CartDrawer from "@/components/cart/CartDrawer";
-import { User, LogOut, Settings, Package, Truck } from "lucide-react";
-import Link from "next/link";
-import type { User as UserType } from "@/lib/types";
-import { getTierDisplayName, getTierBadgeColor } from "@/lib/features/distributor/distributor-utils";
+import { NAV_LINKS, SITE_CONFIG } from "@/lib/constants";
+import { useAuth } from "@/lib/context/AuthContext";
+import { useCartStore } from "@/lib/store/useCartStore";
+import { cn } from "@/lib/utils";
 
-/**
- * Responsive Navbar with scroll effect
- */
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [user, setUser] = useState<UserType | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Check user authentication status
-  useEffect(() => {
-    const currentUser = getCurrentUser();
-    setUser(currentUser);
-
-    // Listen for user changes (login/logout)
-    const handleStorageChange = () => {
-      setUser(getCurrentUser());
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  const { user, isAuthenticated, isBackOffice, logout } = useAuth();
+  const resetCart = useCartStore((state) => state.reset);
+  const loadCart = useCartStore((state) => state.load);
+  const router = useRouter();
+  const pathname = usePathname();
+  const onHomepage = pathname === "/";
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
+  // The cart follows the session: a signed-in user has a server cart keyed to
+  // their account, an anonymous visitor one keyed to their session id.
+  useEffect(() => {
+    void loadCart();
+  }, [isAuthenticated, loadCart]);
+
+  async function handleSignOut() {
     setIsUserMenuOpen(false);
-    window.location.href = '/';
+    setIsMobileMenuOpen(false);
+    await logout();
+    resetCart();
+    router.push("/");
+    router.refresh();
+  }
+
+  /** Anchor links only work on the homepage; elsewhere send people back to it. */
+  const hrefFor = (link: { label: string; href: string }) => {
+    if (link.label === "Home") return "/";
+    if (link.href.startsWith("#")) return onHomepage ? link.href : `/${link.href}`;
+    return link.href;
   };
 
   return (
     <>
       <nav
         className={cn(
-          "fixed top-0 left-0 right-0 z-40 transition-all duration-300",
-          isScrolled
-            ? "bg-[#2d5f3f]/95 backdrop-blur-md shadow-md"
-            : "bg-[#2d5f3f]"
+          "fixed left-0 right-0 top-0 z-40 transition-all duration-300",
+          isScrolled ? "bg-[#2d5f3f]/95 shadow-md backdrop-blur-md" : "bg-[#2d5f3f]",
         )}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <a
-              href="/"
-              className="font-serif text-2xl font-bold text-white transition-colors duration-300"
-            >
+            <Link href="/" className="font-serif text-2xl font-bold text-white">
               {SITE_CONFIG.name}
-            </a>
+            </Link>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex md:items-center md:space-x-8">
               {NAV_LINKS.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.label === "Home" ? "/" : link.href}
-                  className={`font-sans text-sm font-medium transition-colors duration-300 hover:text-white ${
+                  href={hrefFor(link)}
+                  className={cn(
+                    "font-sans text-sm font-medium transition-colors duration-300",
                     link.label === "Academy"
-                      ? "bg-[#e8d5a3] text-[#1a3d2b] px-4 py-2 rounded-full font-semibold hover:bg-[#dfc98a]"
-                      : "text-white/90"
-                  }`}
+                      ? "rounded-full bg-[#e8d5a3] px-4 py-2 font-semibold text-[#1a3d2b] hover:bg-[#dfc98a]"
+                      : "text-white/90 hover:text-white",
+                  )}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
+
               <CartButton onClick={() => setIsCartOpen(true)} />
 
-              {/* User Menu or Sign In */}
-              {user ? (
+              {isAuthenticated ? (
                 <div className="relative">
                   <button
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 font-medium text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/30"
+                    type="button"
+                    onClick={() => setIsUserMenuOpen((open) => !open)}
+                    aria-expanded={isUserMenuOpen}
+                    aria-haspopup="menu"
+                    className="flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30"
                   >
-                    <User className="w-4 h-4" />
-                    <span>{user.name || 'Account'}</span>
+                    <UserIcon className="h-4 w-4" />
+                    <span>{user?.full_name?.split(" ")[0] || "Account"}</span>
                   </button>
 
-                  {/* Dropdown Menu */}
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50">
-                      <Link
-                        href="/profile"
-                        className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <User className="w-4 h-4" />
-                        <span>My Profile</span>
+                    <div role="menu" className="absolute right-0 z-50 mt-2 w-60 rounded-lg bg-white py-2 shadow-lg">
+                      <div className="border-b px-4 pb-2">
+                        <p className="truncate text-sm font-medium text-gray-900">{user?.email}</p>
+                        {user?.gets_bulk_pricing && (
+                          <p className="text-xs font-medium text-green-700">
+                            Wholesale pricing active
+                          </p>
+                        )}
+                        {!user?.is_email_verified && (
+                          <p className="text-xs text-amber-600">Email not verified</p>
+                        )}
+                      </div>
+
+                      <Link href="/profile" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <UserIcon className="h-4 w-4" /> My profile
                       </Link>
-                      <Link
-                        href="/orders"
-                        className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <Package className="w-4 h-4" />
-                        <span>My Orders</span>
+                      <Link href="/orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <Package className="h-4 w-4" /> My orders
+                      </Link>
+                      <Link href="/profile?tab=settings" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <Settings className="h-4 w-4" /> Settings
                       </Link>
 
-                      {/* Become a Distributor - Only show if not already a distributor */}
-                      {user.userType !== 'distributor_pending' && user.userType !== 'distributor_verified' && (
-                        <>
-                          <hr className="my-2" />
-                          <Link
-                            href="/become-distributor"
-                            onClick={() => setIsUserMenuOpen(false)}
-                            className="flex items-center gap-2 px-4 py-2 text-primary hover:bg-green-50 transition-colors"
-                          >
-                            <Truck className="w-4 h-4" />
-                            <span>Become a Distributor</span>
-                          </Link>
-                        </>
-                      )}
-
-                      {/* Show distributor status if applicable */}
-                      {user.userType === 'distributor_pending' && (
-                        <div className="px-4 py-2 text-sm text-amber-600 bg-amber-50 mx-2 my-1 rounded">
-                          Distributor application pending
-                        </div>
-                      )}
-                      {user.userType === 'distributor_verified' && (
-                        <div className="px-4 py-2 mx-2 my-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-green-600">✓ Verified Distributor</span>
-                          </div>
-                          {user.distributorInfo?.tier && (
-                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getTierBadgeColor(user.distributorInfo.tier)}`}>
-                              {getTierDisplayName(user.distributorInfo.tier)}
-                            </span>
-                          )}
-                        </div>
+                      {/* Shown only when the server says so. Hiding this link is
+                          presentation; the API refuses regardless. */}
+                      {isBackOffice && (
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:8000/admin/"}`}
+                          className="flex items-center gap-2 px-4 py-2 text-primary hover:bg-green-50"
+                        >
+                          <ShieldCheck className="h-4 w-4" /> Back office
+                        </a>
                       )}
 
                       <hr className="my-2" />
-                      <Link
-                        href="/profile?tab=settings"
-                        className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <Settings className="w-4 h-4" />
-                        <span>Settings</span>
-                      </Link>
                       <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors w-full text-left"
+                        type="button"
+                        onClick={handleSignOut}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-red-600 hover:bg-red-50"
                       >
-                        <LogOut className="w-4 h-4" />
-                        <span>Sign Out</span>
+                        <LogOut className="h-4 w-4" /> Sign out
                       </button>
                     </div>
                   )}
                 </div>
               ) : (
-                <button
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="rounded-full bg-white/20 px-6 py-2 font-medium text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/30"
+                <Link
+                  href="/login"
+                  className="rounded-full bg-white/20 px-6 py-2 font-medium text-white backdrop-blur-sm transition-all hover:bg-white/30"
                 >
-                  Sign In
-                </button>
+                  Sign in
+                </Link>
               )}
             </div>
 
-            {/* Mobile Menu and Cart Buttons */}
-            <div className="md:hidden flex items-center gap-2">
+            <div className="flex items-center gap-2 md:hidden">
               <CartButton onClick={() => setIsCartOpen(true)} />
               <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-3 rounded-md text-white transition-colors min-w-11 min-h-11 flex items-center justify-center"
+                type="button"
+                onClick={() => setIsMobileMenuOpen((open) => !open)}
                 aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+                className="flex min-h-11 min-w-11 items-center justify-center rounded-md p-3 text-white"
               >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  {isMobileMenuOpen ? (
-                    <path d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path d="M4 6h16M4 12h16M4 18h16" />
-                  )}
+                <svg className="h-6 w-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                  {isMobileMenuOpen ? <path d="M6 18L18 6M6 6l12 12" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
                 </svg>
               </button>
             </div>
           </div>
 
-          {/* Mobile Menu */}
           {isMobileMenuOpen && (
-            <div className="md:hidden border-t border-white/20 bg-[#2d5f3f] py-4">
+            <div className="border-t border-white/20 bg-[#2d5f3f] py-4 md:hidden">
               <div className="flex flex-col space-y-4">
                 {NAV_LINKS.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.label === "Home" ? "/" : link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`font-sans text-sm font-medium transition-colors ${
-                      link.label === "Academy"
-                        ? "inline-block bg-[#e8d5a3] text-[#1a3d2b] px-4 py-2 rounded-full font-semibold hover:bg-[#dfc98a] w-fit"
-                        : "text-white/90 hover:text-white"
-                    }`}
-                  >
+                  <Link key={link.label} href={hrefFor(link)} onClick={() => setIsMobileMenuOpen(false)} className="font-sans text-sm font-medium text-white/90 hover:text-white">
                     {link.label}
-                  </a>
+                  </Link>
                 ))}
 
-                {/* Mobile User Menu */}
-                {user ? (
+                {isAuthenticated ? (
                   <>
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-2 font-sans text-sm font-medium text-white/90 hover:text-white transition-colors"
-                    >
-                      <User className="w-4 h-4" />
-                      <span>My Profile</span>
-                    </Link>
-                    <Link
-                      href="/orders"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-2 font-sans text-sm font-medium text-white/90 hover:text-white transition-colors"
-                    >
-                      <Package className="w-4 h-4" />
-                      <span>My Orders</span>
-                    </Link>
-
-                    {/* Become a Distributor - Only show if not already a distributor */}
-                    {user.userType !== 'distributor_pending' && user.userType !== 'distributor_verified' && (
-                      <Link
-                        href="/become-distributor"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-2 font-sans text-sm font-medium text-green-300 hover:text-green-200 transition-colors"
-                      >
-                        <Truck className="w-4 h-4" />
-                        <span>Become a Distributor</span>
-                      </Link>
-                    )}
-
-                    {/* Show distributor status if applicable */}
-                    {user.userType === 'distributor_pending' && (
-                      <div className="px-3 py-2 text-xs text-amber-300 bg-white/10 rounded">
-                        Distributor application pending
-                      </div>
-                    )}
-                    {user.userType === 'distributor_verified' && (
-                      <div className="px-3 py-2 bg-white/10 rounded space-y-2">
-                        <div className="text-xs text-green-300 font-medium">
-                          ✓ Verified Distributor
-                        </div>
-                        {user.distributorInfo?.tier && (
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${getTierBadgeColor(user.distributorInfo.tier)}`}>
-                            {getTierDisplayName(user.distributorInfo.tier)}
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="flex items-center gap-2 font-sans text-sm font-medium text-red-300 hover:text-red-200 transition-colors text-left"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign Out</span>
+                    <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-white/90">My profile</Link>
+                    <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-white/90">My orders</Link>
+                    <button type="button" onClick={handleSignOut} className="text-left text-sm font-medium text-red-300">
+                      Sign out
                     </button>
                   </>
                 ) : (
-                  <button
-                    onClick={() => {
-                      setIsAuthModalOpen(true);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full rounded-full bg-white/20 px-6 py-2 text-white font-medium hover:bg-white/30 transition-colors backdrop-blur-sm"
-                  >
-                    Sign In
-                  </button>
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full rounded-full bg-white/20 px-6 py-2 text-center font-medium text-white">
+                    Sign in
+                  </Link>
                 )}
               </div>
             </div>
@@ -308,18 +212,9 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        onSuccess={() => {
-          setUser(getCurrentUser());
-          setIsAuthModalOpen(false);
-        }}
-      />
-
-      {/* Cart Drawer */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 }
+
+export default Navbar;

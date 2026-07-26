@@ -1,162 +1,256 @@
 /**
- * API Client
- * Axios-based HTTP client for backend API communication
+ * HTTP client for the Kuyash Farm API.
+ *
+ * Rewritten because the previous version could never have worked. It called
+ * `/auth/login` while the API serves `/auth/login/`, and Django cannot redirect
+ * a POST to add a slash without discarding the body — so every authenticated
+ * request returned 500. It also read `data.accessToken` while the server sends
+ * `access_token`, so the token was always `undefined`.
+ *
+ * Three deliberate choices:
+ *
+ * 1. **The access token lives in memory, not localStorage.** localStorage is
+ *    readable by any script on the origin, so an XSS could previously steal a
+ *    token that outlives the page. Now the only long-lived credential is the
+ *    refresh token, which sits in an HttpOnly cookie JavaScript cannot read.
+ *    The cost is one `/auth/refresh/` round-trip on page load; the benefit is
+ *    that a stolen token dies with the tab.
+ *
+ * 2. **Refreshes are single-flight.** Ten parallel requests hitting 401 at once
+ *    trigger one refresh, not ten. Without this, concurrent refreshes race and
+ *    rotation blacklists the winner's token — signing the user out at random.
+ *
+ * 3. **Trailing slashes are enforced.** A missing slash is a 500, not a 404, so
+ *    it is easy to misdiagnose. The client normalises rather than trusting
+ *    every call site to remember.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+import type { ApiEnvelope } from "./types";
 
-interface ApiResponse<T = any> {
-  success: boolean;
-  message: string;
-  data?: T;
-  errors?: any[];
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+
+/** A request that reached the server and came back with an error envelope. */
+export class ApiError extends Error {
+  readonly status: number;
+  readonly fieldErrors: Record<string, string[]>;
+
+  constructor(message: string, status: number, fieldErrors: Record<string, string[]> = {}) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.fieldErrors = fieldErrors;
+  }
+
+  /** First message for a field, for rendering next to an input. */
+  fieldError(field: string): string | undefined {
+    return this.fieldErrors[field]?.[0];
+  }
+}
+
+/** The request never reached the server. Worth distinguishing when retrying. */
+export class NetworkError extends Error {
+  constructor(message = "Could not reach the server. Check your connection.") {
+    super(message);
+    this.name = "NetworkError";
+  }
+}
+
+type Json = Record<string, unknown> | unknown[] | null;
+
+interface RequestOptions {
+  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+  body?: Json;
+  /** Extra headers, e.g. Idempotency-Key. */
+  headers?: Record<string, string>;
+  /** Skip the 401-refresh-retry. Used by the refresh call itself. */
+  skipRefresh?: boolean;
 }
 
 class ApiClient {
-  private baseURL: string;
+  private baseUrl: string;
   private accessToken: string | null = null;
+  private refreshInFlight: Promise<boolean> | null = null;
+  private onUnauthenticated: (() => void) | null = null;
 
-  constructor(baseURL: string) {
-    this.baseURL = baseURL;
-
-    // Load token from localStorage on initialization (client-side only)
-    if (typeof window !== 'undefined') {
-      this.accessToken = localStorage.getItem('accessToken');
-    }
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl.replace(/\/$/, "");
   }
 
-  /**
-   * Set access token
-   */
   setAccessToken(token: string | null): void {
     this.accessToken = token;
-    if (typeof window !== 'undefined') {
-      if (token) {
-        localStorage.setItem('accessToken', token);
-      } else {
-        localStorage.removeItem('accessToken');
-      }
-    }
   }
 
-  /**
-   * Get access token
-   */
   getAccessToken(): string | null {
     return this.accessToken;
   }
 
+  /** Lets AuthContext clear its state when a refresh finally fails. */
+  setUnauthenticatedHandler(handler: (() => void) | null): void {
+    this.onUnauthenticated = handler;
+  }
+
   /**
-   * Make HTTP request
+   * Django serves every route with a trailing slash. Without one a POST hits
+   * APPEND_SLASH, which cannot redirect a body-carrying request and 500s.
    */
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`;
+  private buildUrl(path: string): string {
+    const [pathname, query] = path.split("?");
+    const normalised = pathname.endsWith("/") ? pathname : `${pathname}/`;
+    return `${this.baseUrl}${normalised}${query ? `?${query}` : ""}`;
+  }
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...(options.headers as Record<string, string> || {}),
-    };
+  private async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    const { method = "GET", body, headers = {}, skipRefresh = false } = options;
 
-    // Add authorization header if token exists
-    if (this.accessToken) {
-      headers['Authorization'] = `Bearer ${this.accessToken}`;
-    }
+    const requestHeaders: Record<string, string> = { ...headers };
+    if (body !== undefined) requestHeaders["Content-Type"] = "application/json";
+    if (this.accessToken) requestHeaders["Authorization"] = `Bearer ${this.accessToken}`;
 
-    const config: RequestInit = {
-      ...options,
-      headers,
-      credentials: 'include', // Include cookies for refresh token
-    };
-
+    let response: Response;
     try {
-      const response = await fetch(url, config);
-      const data: ApiResponse<T> = await response.json();
-
-      if (!response.ok) {
-        // Handle 401 Unauthorized - try to refresh token
-        if (response.status === 401 && endpoint !== '/auth/refresh') {
-          const refreshed = await this.refreshAccessToken();
-          if (refreshed) {
-            // Retry the original request with new token
-            return this.request<T>(endpoint, options);
-          }
-        }
-
-        throw new Error(data.message || 'Request failed');
-      }
-
-      return data;
-    } catch (error: any) {
-      throw new Error(error.message || 'Network error');
-    }
-  }
-
-  /**
-   * GET request
-   */
-  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'GET' });
-  }
-
-  /**
-   * POST request
-   */
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  /**
-   * PUT request
-   */
-  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  }
-
-  /**
-   * DELETE request
-   */
-  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
-  }
-
-  /**
-   * Refresh access token
-   */
-  private async refreshAccessToken(): Promise<boolean> {
-    try {
-      const response = await fetch(`${this.baseURL}/auth/refresh`, {
-        method: 'POST',
-        credentials: 'include',
+      response = await fetch(this.buildUrl(path), {
+        method,
+        headers: requestHeaders,
+        body: body === undefined ? undefined : JSON.stringify(body),
+        // Sends the HttpOnly refresh cookie. Required for /auth/refresh/.
+        credentials: "include",
       });
-
-      if (response.ok) {
-        const data: ApiResponse = await response.json();
-        if (data.success && data.data?.accessToken) {
-          this.setAccessToken(data.data.accessToken);
-          return true;
-        }
-      }
-
-      // Refresh failed, clear token
-      this.setAccessToken(null);
-      return false;
-    } catch (error) {
-      this.setAccessToken(null);
-      return false;
+    } catch {
+      throw new NetworkError();
     }
+
+    if (response.status === 401 && !skipRefresh) {
+      const refreshed = await this.refreshAccessToken();
+      if (refreshed) {
+        return this.request<T>(path, { ...options, skipRefresh: true });
+      }
+      this.accessToken = null;
+      this.onUnauthenticated?.();
+    }
+
+    return this.unwrap<T>(response);
+  }
+
+  private async unwrap<T>(response: Response): Promise<T> {
+    if (response.status === 204) return undefined as T;
+
+    let envelope: ApiEnvelope<T>;
+    try {
+      envelope = (await response.json()) as ApiEnvelope<T>;
+    } catch {
+      throw new ApiError(
+        response.ok
+          ? "The server returned an unreadable response."
+          : `Request failed (${response.status}).`,
+        response.status,
+      );
+    }
+
+    if (!response.ok || envelope.success === false) {
+      throw new ApiError(
+        envelope.message || `Request failed (${response.status}).`,
+        response.status,
+        collectFieldErrors(envelope),
+      );
+    }
+
+    return envelope.data;
+  }
+
+  /**
+   * Exchange the refresh cookie for a new access token.
+   *
+   * Single-flight: concurrent callers await the same promise. Rotation
+   * blacklists a refresh token on use, so two simultaneous refreshes would
+   * invalidate each other and sign the user out unpredictably.
+   */
+  private refreshAccessToken(): Promise<boolean> {
+    if (this.refreshInFlight) return this.refreshInFlight;
+
+    this.refreshInFlight = (async () => {
+      try {
+        const data = await this.request<{ access_token: string }>("/auth/refresh/", {
+          method: "POST",
+          skipRefresh: true,
+        });
+        this.accessToken = data.access_token;
+        return true;
+      } catch {
+        this.accessToken = null;
+        return false;
+      } finally {
+        // Cleared on the next tick so every awaiting caller sees the same
+        // result before a fresh refresh can begin.
+        setTimeout(() => {
+          this.refreshInFlight = null;
+        }, 0);
+      }
+    })();
+
+    return this.refreshInFlight;
+  }
+
+  get<T>(path: string, options?: Omit<RequestOptions, "method" | "body">): Promise<T> {
+    return this.request<T>(path, { ...options, method: "GET" });
+  }
+
+  post<T>(path: string, body?: Json, options?: Omit<RequestOptions, "method" | "body">): Promise<T> {
+    return this.request<T>(path, { ...options, method: "POST", body });
+  }
+
+  patch<T>(
+    path: string,
+    body?: Json,
+    options?: Omit<RequestOptions, "method" | "body">,
+  ): Promise<T> {
+    return this.request<T>(path, { ...options, method: "PATCH", body });
+  }
+
+  delete<T>(path: string, options?: Omit<RequestOptions, "method" | "body">): Promise<T> {
+    return this.request<T>(path, { ...options, method: "DELETE" });
   }
 }
 
-// Create singleton instance
+function collectFieldErrors(envelope: ApiEnvelope<unknown>): Record<string, string[]> {
+  const result: Record<string, string[]> = {};
+  for (const entry of envelope.errors ?? []) {
+    if (typeof entry?.field === "string" && Array.isArray(entry.messages)) {
+      result[entry.field] = entry.messages.map(String);
+    }
+  }
+  return result;
+}
+
 export const apiClient = new ApiClient(API_BASE_URL);
+
+/**
+ * Fetch public data from a Server Component.
+ *
+ * Deliberately separate from `apiClient`: that singleton holds a token in
+ * module scope, and on the server module scope is shared across every
+ * concurrent request. Using it for user data would leak one visitor's session
+ * into another visitor's page. This helper sends no credentials and is for
+ * public data only.
+ */
+export async function fetchPublic<T>(
+  path: string,
+  init?: { revalidate?: number; tags?: string[] },
+): Promise<T> {
+  const base = API_BASE_URL.replace(/\/$/, "");
+  const [pathname, query] = path.split("?");
+  const normalised = pathname.endsWith("/") ? pathname : `${pathname}/`;
+
+  const response = await fetch(`${base}${normalised}${query ? `?${query}` : ""}`, {
+    headers: { Accept: "application/json" },
+    next: { revalidate: init?.revalidate ?? 60, tags: init?.tags },
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Request failed (${response.status}).`, response.status);
+  }
+
+  const envelope = (await response.json()) as ApiEnvelope<T>;
+  return envelope.data;
+}
 
 export default apiClient;

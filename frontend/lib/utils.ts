@@ -1,6 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { User, UserType } from "./types";
 
 /**
  * Utility function to merge Tailwind CSS classes
@@ -26,60 +25,30 @@ export const CURRENCY = {
  * @returns Formatted price string with ₦ symbol
  * @example formatPrice(5000) => "₦5,000.00"
  */
-export function formatPrice(amount: number): string {
+export function formatPrice(amount: number | string): string {
+  // The API sends money as exact decimal strings ("7500.00"). Number() here is
+  // for display only — no arithmetic is ever done on the result, because a
+  // float cannot represent ₦0.10 exactly.
+  const value = typeof amount === "string" ? Number(amount) : amount;
+  if (Number.isNaN(value)) return "—";
+
   return new Intl.NumberFormat('en-NG', {
     style: 'currency',
     currency: 'NGN',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount);
+  }).format(value);
 }
 
 /**
- * Calculate price based on quantity and user verification status
- * Retail users always see retail price
- * Verified wholesale and distributor users get bulk pricing when quantity qualifies
+ * Currency formatting only.
+ *
+ * `calculatePrice()` and `getCurrentUser()` used to live here. Both are gone:
+ *
+ * - Pricing is decided by the server and arrives pre-computed for the calling
+ *   user. Recomputing it here is what produced line items that did not sum to
+ *   the subtotal for wholesale customers (audit §3.7).
+ * - Identity came from `localStorage.user`, an object the browser owned, which
+ *   is how typing an email address granted admin access (audit §3.1). Use
+ *   `useAuth()` instead.
  */
-export function calculatePrice(
-  product: {
-    price: number;
-    bulkPricing?: readonly { readonly minQuantity: number; readonly pricePerUnit: number }[]
-  },
-  quantity: number,
-  userType: UserType
-): number {
-  // Retail and pending users always get retail price
-  if (userType !== 'wholesale_verified' && userType !== 'distributor_verified') {
-    return product.price;
-  }
-
-  // No bulk pricing available
-  if (!product.bulkPricing || product.bulkPricing.length === 0) {
-    return product.price;
-  }
-
-  // Find applicable bulk price tier (highest tier that user qualifies for)
-  let applicablePrice = product.price;
-  for (const tier of product.bulkPricing) {
-    if (quantity >= tier.minQuantity) {
-      applicablePrice = tier.pricePerUnit;
-    }
-  }
-
-  return applicablePrice;
-}
-
-/**
- * Get current user from localStorage
- */
-export function getCurrentUser(): User | null {
-  if (typeof window === 'undefined') return null;
-
-  try {
-    const userStr = localStorage.getItem('user');
-    if (!userStr) return null;
-    return JSON.parse(userStr);
-  } catch {
-    return null;
-  }
-}

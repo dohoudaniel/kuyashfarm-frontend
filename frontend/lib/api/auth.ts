@@ -1,107 +1,99 @@
 /**
- * Authentication API
- * API methods for authentication operations
+ * Authentication.
+ *
+ * Payloads match the server exactly. The previous version sent `name` where
+ * the API expects `full_name`, omitted the required `password_confirm`, and
+ * used PUT where the API offers PATCH — on top of the missing trailing slashes
+ * that made every one of these calls a 500.
  */
 
-import { apiClient } from './client';
+import { apiClient } from "./client";
+import type { Address, AuthResult, User } from "./types";
 
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string | null;
-  phone: string | null;
-  userType: string;
-  role: string;
-  isEmailVerified: boolean;
-}
-
-export interface RegisterData {
+export interface RegisterInput {
   email: string;
   password: string;
-  name: string;
+  password_confirm: string;
+  full_name?: string;
   phone?: string;
 }
 
-export interface LoginData {
-  email: string;
-  password: string;
+export async function register(input: RegisterInput): Promise<AuthResult> {
+  const result = await apiClient.post<AuthResult>("/auth/register/", { ...input });
+  apiClient.setAccessToken(result.access_token);
+  return result;
 }
 
-export interface UpdateProfileData {
-  name?: string;
-  phone?: string;
-}
-
-export interface ChangePasswordData {
-  currentPassword: string;
-  newPassword: string;
+export async function login(email: string, password: string): Promise<AuthResult> {
+  const result = await apiClient.post<AuthResult>("/auth/login/", { email, password });
+  apiClient.setAccessToken(result.access_token);
+  return result;
 }
 
 /**
- * Register new user
+ * Sign out.
+ *
+ * The server blacklists the refresh token, so it is genuinely dead afterwards.
+ * The prototype deleted a localStorage key and left the JWT valid.
  */
-export const register = async (data: RegisterData) => {
-  const response = await apiClient.post<{ user: AuthUser; accessToken: string }>(
-    '/auth/register',
-    data
-  );
-
-  if (response.success && response.data) {
-    apiClient.setAccessToken(response.data.accessToken);
+export async function logout(): Promise<void> {
+  try {
+    await apiClient.post<null>("/auth/logout/");
+  } finally {
+    apiClient.setAccessToken(null);
   }
+}
 
-  return response;
-};
+export function getCurrentUser(): Promise<User> {
+  return apiClient.get<User>("/auth/me/");
+}
 
-/**
- * Login user
- */
-export const login = async (data: LoginData) => {
-  const response = await apiClient.post<{ user: AuthUser; accessToken: string }>(
-    '/auth/login',
-    data
-  );
+export function updateProfile(input: { full_name?: string; phone?: string }): Promise<User> {
+  return apiClient.patch<User>("/auth/me/", { ...input });
+}
 
-  if (response.success && response.data) {
-    apiClient.setAccessToken(response.data.accessToken);
-  }
+export function changePassword(input: {
+  current_password: string;
+  new_password: string;
+  new_password_confirm: string;
+}): Promise<null> {
+  return apiClient.post<null>("/auth/change-password/", { ...input });
+}
 
-  return response;
-};
+export function verifyEmail(uid: string, token: string): Promise<User> {
+  return apiClient.post<User>("/auth/verify-email/", { uid, token });
+}
 
-/**
- * Logout user
- */
-export const logout = async () => {
-  const response = await apiClient.post('/auth/logout');
-  apiClient.setAccessToken(null);
-  return response;
-};
+export function resendVerification(): Promise<null> {
+  return apiClient.post<null>("/auth/resend-verification/");
+}
 
-/**
- * Get current user profile
- */
-export const getProfile = async () => {
-  return await apiClient.get<AuthUser>('/auth/me');
-};
+export function requestPasswordReset(email: string): Promise<null> {
+  return apiClient.post<null>("/auth/password-reset/", { email });
+}
 
-/**
- * Update user profile
- */
-export const updateProfile = async (data: UpdateProfileData) => {
-  return await apiClient.put<AuthUser>('/auth/me', data);
-};
+export function confirmPasswordReset(input: {
+  uid: string;
+  token: string;
+  new_password: string;
+  new_password_confirm: string;
+}): Promise<null> {
+  return apiClient.post<null>("/auth/password-reset/confirm/", { ...input });
+}
 
-/**
- * Change password
- */
-export const changePassword = async (data: ChangePasswordData) => {
-  return await apiClient.put('/auth/change-password', data);
-};
+// ── Saved addresses ─────────────────────────────────────────────────────────
+export function listAddresses(): Promise<{ results: Address[]; count: number }> {
+  return apiClient.get("/auth/addresses/");
+}
 
-/**
- * Refresh access token
- */
-export const refreshToken = async () => {
-  return await apiClient.post<{ accessToken: string }>('/auth/refresh');
-};
+export function createAddress(input: Omit<Address, "id" | "created_at">): Promise<Address> {
+  return apiClient.post<Address>("/auth/addresses/", { ...input });
+}
+
+export function updateAddress(id: string, input: Partial<Address>): Promise<Address> {
+  return apiClient.patch<Address>(`/auth/addresses/${id}/`, { ...input });
+}
+
+export function deleteAddress(id: string): Promise<null> {
+  return apiClient.delete<null>(`/auth/addresses/${id}/`);
+}

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Bot, User as UserIcon } from "lucide-react";
-import { getCurrentUser } from "@/lib/utils";
+import { useAuth } from "@/lib/context/AuthContext";
 
 interface Message {
   id: string;
@@ -27,6 +27,7 @@ export function ChatWidget() {
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -37,8 +38,7 @@ export function ChatWidget() {
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    const currentUser = getCurrentUser();
-    const userName = currentUser?.name || "Customer";
+    const userName = user?.full_name?.split(" ")[0] || "Customer";
 
     // Add user message
     const userMessage: Message = {

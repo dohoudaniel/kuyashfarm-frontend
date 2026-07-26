@@ -34,11 +34,15 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
+      // Field names match the API exactly. The previous version sent `name`
+      // where the server expects `full_name` and omitted the required
+      // `password_confirm`, so registration could never have succeeded.
       await register({
-        name: formData.name,
         email: formData.email,
-        phone: formData.phone || undefined,
         password: formData.password,
+        password_confirm: formData.confirmPassword,
+        full_name: formData.name,
+        phone: formData.phone || undefined,
       });
       router.push("/");
     } catch (err: any) {

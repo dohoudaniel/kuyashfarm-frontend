@@ -1,194 +1,159 @@
-/**
- * Authentication Context
- * Provides authentication state and methods throughout the app
- */
-
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import * as authApi from '@/lib/api/auth';
-import { AuthUser } from '@/lib/api/auth';
-import { apiClient } from '@/lib/api/client';
+/**
+ * Session state.
+ *
+ * Rewritten. The previous version mirrored the API user into
+ * `localStorage.user` "for backward compatibility", and the rest of the app
+ * read identity from there rather than from React. That mirror is what made
+ * `AuthModal` able to fabricate a session — write the object, and every
+ * `getCurrentUser()` in the codebase believed it (audit §3.1).
+ *
+ * There is now exactly one source of truth: this context, populated from
+ * `/auth/me/`. Nothing about identity is written to browser storage.
+ */
 
-interface AuthContextType {
-  user: AuthUser | null;
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { apiClient } from "@/lib/api/client";
+import * as authApi from "@/lib/api/auth";
+import { mergeCart } from "@/lib/api/cart";
+import type { User } from "@/lib/api/types";
+
+interface AuthContextValue {
+  user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: authApi.RegisterData) => Promise<void>;
+  /** Server-computed entitlement. Never inferred from account_type here. */
+  getsBulkPricing: boolean;
+  isBackOffice: boolean;
+  login: (email: string, password: string) => Promise<User>;
+  register: (input: authApi.RegisterInput) => Promise<User>;
   logout: () => Promise<void>;
-  updateProfile: (data: authApi.UpdateProfileData) => Promise<void>;
-  changePassword: (data: authApi.ChangePasswordData) => Promise<void>;
-  refreshUser: () => Promise<void>;
+  refresh: () => Promise<void>;
+  updateProfile: (input: { full_name?: string; phone?: string }) => Promise<User>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const bootstrapped = useRef(false);
 
   /**
-   * Load user profile on mount
+   * Restore the session on load.
+   *
+   * The access token lives in memory only, so a page refresh starts with
+   * nothing. The HttpOnly refresh cookie is what proves we are still signed
+   * in; `/auth/me/` triggers the client's silent refresh and returns the user
+   * if that cookie is still good.
    */
-  const loadUser = useCallback(async () => {
+  const bootstrap = useCallback(async () => {
     try {
-      const token = apiClient.getAccessToken();
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await authApi.getProfile();
-      if (response.success && response.data) {
-        setUser(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to load user:', error);
-      apiClient.setAccessToken(null);
+      setUser(await authApi.getCurrentUser());
+    } catch {
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadUser();
-  }, [loadUser]);
+    if (bootstrapped.current) return;
+    bootstrapped.current = true;
 
-  /**
-   * Login user
-   */
-  const login = async (email: string, password: string): Promise<void> => {
+    // When a refresh finally fails, drop the session rather than leaving a
+    // stale user on screen with a dead token.
+    apiClient.setUnauthenticatedHandler(() => setUser(null));
+    void bootstrap();
+
+    return () => apiClient.setUnauthenticatedHandler(null);
+  }, [bootstrap]);
+
+  const afterSignIn = useCallback(async (signedIn: User) => {
+    setUser(signedIn);
+    // Carry the anonymous basket across. Failure here must not block sign-in.
     try {
-      const response = await authApi.login({ email, password });
-      if (response.success && response.data) {
-        setUser(response.data.user);
-
-        // Sync with localStorage for backward compatibility
-        localStorage.setItem('user', JSON.stringify({
-          id: response.data.user.id,
-          email: response.data.user.email,
-          name: response.data.user.name,
-          userType: response.data.user.userType,
-          isAdmin: response.data.user.role === 'ADMIN' || response.data.user.role === 'SUPER_ADMIN',
-        }));
-      } else {
-        throw new Error(response.message || 'Login failed');
-      }
-    } catch (error: any) {
-      throw new Error(error.message || 'Login failed');
+      await mergeCart();
+    } catch {
+      /* the basket merge is best-effort */
     }
-  };
+  }, []);
 
-  /**
-   * Register new user
-   */
-  const register = async (data: authApi.RegisterData): Promise<void> => {
-    try {
-      const response = await authApi.register(data);
-      if (response.success && response.data) {
-        setUser(response.data.user);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const { user: signedIn } = await authApi.login(email, password);
+      await afterSignIn(signedIn);
+      return signedIn;
+    },
+    [afterSignIn],
+  );
 
-        // Sync with localStorage for backward compatibility
-        localStorage.setItem('user', JSON.stringify({
-          id: response.data.user.id,
-          email: response.data.user.email,
-          name: response.data.user.name,
-          userType: response.data.user.userType,
-          isAdmin: response.data.user.role === 'ADMIN' || response.data.user.role === 'SUPER_ADMIN',
-        }));
-      } else {
-        throw new Error(response.message || 'Registration failed');
-      }
-    } catch (error: any) {
-      throw new Error(error.message || 'Registration failed');
-    }
-  };
+  const register = useCallback(
+    async (input: authApi.RegisterInput) => {
+      const { user: created } = await authApi.register(input);
+      await afterSignIn(created);
+      return created;
+    },
+    [afterSignIn],
+  );
 
-  /**
-   * Logout user
-   */
-  const logout = async (): Promise<void> => {
+  const logout = useCallback(async () => {
+    // Always clear locally, even if the server call fails — otherwise a
+    // network blip leaves someone looking signed in when they are not.
     try {
       await authApi.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
     } finally {
       setUser(null);
-      apiClient.setAccessToken(null);
-      localStorage.removeItem('user');
     }
-  };
+  }, []);
 
-  /**
-   * Update user profile
-   */
-  const updateProfile = async (data: authApi.UpdateProfileData): Promise<void> => {
+  const refresh = useCallback(async () => {
     try {
-      const response = await authApi.updateProfile(data);
-      if (response.success && response.data) {
-        setUser(response.data);
-
-        // Sync with localStorage
-        const localUser = JSON.parse(localStorage.getItem('user') || '{}');
-        localStorage.setItem('user', JSON.stringify({
-          ...localUser,
-          name: response.data.name,
-          phone: response.data.phone,
-        }));
-      } else {
-        throw new Error(response.message || 'Update failed');
-      }
-    } catch (error: any) {
-      throw new Error(error.message || 'Update failed');
+      setUser(await authApi.getCurrentUser());
+    } catch {
+      setUser(null);
     }
-  };
+  }, []);
 
-  /**
-   * Change password
-   */
-  const changePassword = async (data: authApi.ChangePasswordData): Promise<void> => {
-    try {
-      const response = await authApi.changePassword(data);
-      if (!response.success) {
-        throw new Error(response.message || 'Password change failed');
-      }
-    } catch (error: any) {
-      throw new Error(error.message || 'Password change failed');
-    }
-  };
+  const updateProfile = useCallback(async (input: { full_name?: string; phone?: string }) => {
+    const updated = await authApi.updateProfile(input);
+    setUser(updated);
+    return updated;
+  }, []);
 
-  /**
-   * Refresh user data
-   */
-  const refreshUser = async (): Promise<void> => {
-    await loadUser();
-  };
-
-  const value: AuthContextType = {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
-    login,
-    register,
-    logout,
-    updateProfile,
-    changePassword,
-    refreshUser,
-  };
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      isLoading,
+      isAuthenticated: user !== null,
+      getsBulkPricing: user?.gets_bulk_pricing ?? false,
+      isBackOffice: user?.is_back_office ?? false,
+      login,
+      register,
+      logout,
+      refresh,
+      updateProfile,
+    }),
+    [user, isLoading, login, register, logout, refresh, updateProfile],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-/**
- * Hook to use auth context
- */
-export const useAuth = (): AuthContextType => {
+export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
-};
+}
 
 export default AuthContext;

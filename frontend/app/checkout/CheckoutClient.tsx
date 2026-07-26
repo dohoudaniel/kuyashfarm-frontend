@@ -1,0 +1,330 @@
+"use client";
+
+/**
+ * Checkout.
+ *
+ * Two things are deliberately absent, and both were present before:
+ *
+ * 1. **No card fields.** The prototype collected full card numbers, expiry
+ *    dates and CVVs, validated them client-side, and displayed "Secure
+ *    checkout powered by SSL encryption" — with no payment processor behind it
+ *    at all (audit §3.5). Payment now happens on Paystack's hosted page, so
+ *    card details never touch this application or its server.
+ *
+ * 2. **No arithmetic.** Every figure comes from `/checkout/quote/`. The
+ *    prototype rendered line items at retail price while totalling at bulk
+ *    price, so a wholesale customer's own basket did not add up (audit §3.7),
+ *    and it hardcoded a free-shipping threshold that contradicted the one the
+ *    chatbot quoted.
+ */
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Banknote, Loader2, Lock, Wallet } from "lucide-react";
+
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { FormField } from "@/components/ui/FormField";
+import { FormTextarea } from "@/components/ui/FormTextarea";
+import { ApiError } from "@/lib/api/client";
+import { getQuote, getStoreConfig, placeOrder } from "@/lib/api/cart";
+import { startPayment } from "@/lib/api/orders";
+import { useAuth } from "@/lib/context/AuthContext";
+import { useCartStore } from "@/lib/store/useCartStore";
+import type { CheckoutQuote, PaymentMethod, StoreConfig } from "@/lib/api/types";
+import { formatPrice } from "@/lib/utils";
+
+const EMPTY_ADDRESS = {
+  recipient_name: "",
+  street: "",
+  city: "",
+  state: "",
+  postal_code: "",
+  country: "NG",
+  phone: "",
+};
+
+export default function CheckoutClient() {
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
+  const { cart, load: loadCart } = useCartStore();
+
+  const [address, setAddress] = useState(EMPTY_ADDRESS);
+  const [email, setEmail] = useState("");
+  const [notes, setNotes] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("PAYSTACK");
+
+  const [config, setConfig] = useState<StoreConfig | null>(null);
+  const [quote, setQuote] = useState<CheckoutQuote | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+
+  /**
+   * One key per checkout attempt, reused across retries.
+   *
+   * A double-clicked button or a dropped connection then returns the original
+   * order rather than creating a second one and reserving stock twice.
+   */
+  const idempotencyKey = useMemo(() => crypto.randomUUID(), []);
+
+  useEffect(() => {
+    void loadCart();
+    getStoreConfig().then(setConfig).catch(() => undefined);
+  }, [loadCart]);
+
+  useEffect(() => {
+    if (user) setEmail((current) => current || user.email);
+  }, [user]);
+
+  // Re-quote whenever the delivery state changes: shipping is per-state, and
+  // the threshold for free delivery can be overridden per rule.
+  const refreshQuote = useCallback(async () => {
+    setQuoting(true);
+    try {
+      setQuote(await getQuote(address.state));
+      setError(null);
+    } catch (err) {
+      setQuote(null);
+      if (err instanceof ApiError && err.status !== 400) setError(err.message);
+    } finally {
+      setQuoting(false);
+    }
+  }, [address.state]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => void refreshQuote(), 300);
+    return () => clearTimeout(timer);
+  }, [refreshQuote, cart?.updated_at]);
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    setFieldErrors({});
+
+    try {
+      const order = await placeOrder(
+        {
+          email: isAuthenticated ? undefined : email,
+          shipping_address: address,
+          payment_method: paymentMethod,
+          customer_notes: notes,
+        },
+        idempotencyKey,
+      );
+
+      if (paymentMethod === "COD") {
+        router.push(`/orders/${order.order_number}?placed=1`);
+        return;
+      }
+
+      // Hand off to Paystack. We never see the card.
+      const payment = await startPayment(order.order_number);
+      window.location.href = payment.authorization_url;
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message);
+        setFieldErrors(err.fieldErrors);
+      } else {
+        setError("Something went wrong placing your order. Please try again.");
+      }
+      setSubmitting(false);
+    }
+  }
+
+  const items = cart?.items ?? [];
+
+  if (items.length === 0) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-gray-50 pt-24 pb-16">
+          <div className="mx-auto max-w-3xl px-4 text-center">
+            <h1 className="mb-4 text-3xl font-bold text-gray-900">Your cart is empty</h1>
+            <p className="mb-8 text-gray-600">Add something before checking out.</p>
+            <Link href="/categories" className="rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-secondary">
+              Browse products
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-gray-50 pt-24 pb-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Link href="/categories" className="mb-8 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
+            <ArrowLeft className="h-5 w-5" /> Continue shopping
+          </Link>
+
+          <h1 className="mb-8 text-3xl font-bold text-gray-900 sm:text-4xl">Checkout</h1>
+
+          {error && (
+            <div role="alert" className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
+              <section className="rounded-2xl bg-white p-6 shadow-sm">
+                <h2 className="mb-6 text-xl font-bold text-gray-900">Delivery</h2>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <FormField label="Recipient name" name="recipient_name" value={address.recipient_name}
+                    onChange={(e) => setAddress({ ...address, recipient_name: e.target.value })}
+                    error={fieldErrors.recipient_name?.[0]} required className="md:col-span-2" />
+
+                  <FormField label="Email" name="email" type="email" value={email}
+                    onChange={(e) => setEmail(e.target.value)} error={fieldErrors.email?.[0]}
+                    required disabled={isAuthenticated} className="md:col-span-2"
+                    autoComplete="email" />
+
+                  <FormField label="Street address" name="street" value={address.street}
+                    onChange={(e) => setAddress({ ...address, street: e.target.value })}
+                    error={fieldErrors.street?.[0]} required className="md:col-span-2"
+                    autoComplete="street-address" />
+
+                  <FormField label="City" name="city" value={address.city}
+                    onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                    error={fieldErrors.city?.[0]} required autoComplete="address-level2" />
+
+                  <FormField label="State" name="state" value={address.state}
+                    onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                    error={fieldErrors.state?.[0]} required autoComplete="address-level1"
+                    placeholder="Lagos" />
+
+                  <FormField label="Postal code (optional)" name="postal_code" value={address.postal_code}
+                    onChange={(e) => setAddress({ ...address, postal_code: e.target.value })}
+                    autoComplete="postal-code" />
+
+                  <FormField label="Phone" name="phone" type="tel" value={address.phone}
+                    onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+                    error={fieldErrors.phone?.[0]} required autoComplete="tel"
+                    placeholder="+234 800 000 0000" />
+                </div>
+              </section>
+
+              <section className="rounded-2xl bg-white p-6 shadow-sm">
+                <h2 className="mb-6 text-xl font-bold text-gray-900">Payment</h2>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <button type="button" onClick={() => setPaymentMethod("PAYSTACK")}
+                    className={`rounded-lg border-2 p-4 text-left transition-all ${paymentMethod === "PAYSTACK" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
+                    <Wallet className={`mb-2 h-6 w-6 ${paymentMethod === "PAYSTACK" ? "text-green-600" : "text-gray-400"}`} />
+                    <p className="font-semibold">Card or transfer</p>
+                    <p className="text-xs text-gray-600">Secured by Paystack</p>
+                  </button>
+
+                  {config?.cod_enabled && (
+                    <button type="button" onClick={() => setPaymentMethod("COD")}
+                      className={`rounded-lg border-2 p-4 text-left transition-all ${paymentMethod === "COD" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
+                      <Banknote className={`mb-2 h-6 w-6 ${paymentMethod === "COD" ? "text-green-600" : "text-gray-400"}`} />
+                      <p className="font-semibold">Cash on delivery</p>
+                      <p className="text-xs text-gray-600">Pay when it arrives</p>
+                    </button>
+                  )}
+                </div>
+
+                {paymentMethod === "PAYSTACK" && (
+                  <p className="mt-4 flex items-start gap-2 rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+                    You will be taken to Paystack to pay. Your card details are entered there and
+                    never reach Kuyash Farm.
+                  </p>
+                )}
+              </section>
+
+              <section className="rounded-2xl bg-white p-6 shadow-sm">
+                <FormTextarea label="Order notes (optional)" name="notes" value={notes}
+                  onChange={(e) => setNotes(e.target.value)} rows={3} maxLength={500}
+                  placeholder="Anything the driver should know?" />
+              </section>
+            </div>
+
+            <aside className="lg:col-span-1">
+              <div className="sticky top-24 rounded-2xl bg-white p-6 shadow-sm">
+                <h2 className="mb-6 text-xl font-bold text-gray-900">Order summary</h2>
+
+                <ul className="mb-6 max-h-64 space-y-3 overflow-y-auto">
+                  {(quote?.lines ?? []).map((line) => (
+                    <li key={line.product_slug} className="flex justify-between gap-3 text-sm">
+                      <span className="min-w-0">
+                        <span className="block truncate font-medium text-gray-900">{line.product_name}</span>
+                        <span className="text-xs text-gray-500">
+                          {line.quantity} × {formatPrice(line.unit_price)}
+                        </span>
+                      </span>
+                      <span className="font-semibold">{formatPrice(line.line_total)}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {quote ? (
+                  <>
+                    <dl className="space-y-3 border-b pb-4 text-sm">
+                      <div className="flex justify-between">
+                        <dt className="text-gray-600">Subtotal</dt>
+                        <dd className="font-semibold">{formatPrice(quote.subtotal)}</dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-gray-600">Delivery</dt>
+                        <dd className="font-semibold">
+                          {Number(quote.shipping_total) === 0 ? (
+                            <span className="text-green-600">FREE</span>
+                          ) : (
+                            formatPrice(quote.shipping_total)
+                          )}
+                        </dd>
+                      </div>
+                      {Number(quote.amount_to_free_shipping) > 0 && (
+                        <p className="text-xs text-amber-600">
+                          Add {formatPrice(quote.amount_to_free_shipping)} more for free delivery.
+                        </p>
+                      )}
+                      <div className="flex justify-between">
+                        <dt className="text-gray-600">
+                          VAT ({(Number(quote.tax_rate) * 100).toFixed(1)}%)
+                        </dt>
+                        <dd className="font-semibold">{formatPrice(quote.tax_total)}</dd>
+                      </div>
+                    </dl>
+
+                    <div className="mb-6 flex items-center justify-between pt-4">
+                      <span className="text-lg font-bold text-gray-900">Total</span>
+                      <span className="text-2xl font-bold text-green-600">
+                        {formatPrice(quote.grand_total)}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <p className="mb-6 flex items-center gap-2 text-sm text-gray-500">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Calculating…
+                  </p>
+                )}
+
+                <button type="submit" disabled={submitting || quoting || !quote}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-semibold text-white hover:bg-secondary disabled:opacity-60">
+                  {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {submitting ? "Placing order…" : paymentMethod === "COD" ? "Place order" : "Pay with Paystack"}
+                </button>
+
+                <p className="mt-4 text-center text-xs text-gray-500">
+                  Totals are calculated by Kuyash Farm and confirmed before payment.
+                </p>
+              </div>
+            </aside>
+          </form>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
