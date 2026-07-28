@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the example is documentation, not configuration. It contains no
+# secrets, and without it a fresh clone has no record of which variables the
+# build requires.
+!.env.example
 
 # vercel
 .vercel

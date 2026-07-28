@@ -57,6 +57,15 @@ export interface User {
   /** Server-computed. Never derive entitlement on the client. */
   gets_bulk_pricing: boolean;
   is_back_office: boolean;
+  /**
+   * Where the back office lives, or null.
+   *
+   * Served only to back-office users. It used to be a NEXT_PUBLIC_ADMIN_URL,
+   * which Next.js inlines at build time — so the path shipped inside the
+   * JavaScript bundle served to every anonymous visitor, publishing the exact
+   * thing an unguessable admin URL exists to keep quiet.
+   */
+  admin_url: string | null;
   date_joined: string;
 }
 

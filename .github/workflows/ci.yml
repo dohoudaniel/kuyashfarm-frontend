@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dohoudaniel]
+  pull_request:
+
+jobs:
+  quality:
+    name: Lint, types, tests, build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Tests
+        run: npm test
+
+      # The build is a real gate, not a formality: it is where Server Component
+      # errors and bad `generateStaticParams` surface. It needs an API URL
+      # because the client now refuses to guess one in production — a silent
+      # localhost default means a misconfigured deploy fails in front of a
+      # customer instead of here.
+      #
+      # No API is reachable in CI, so the catalogue and academy pages cannot
+      # prerender. NEXT_PRERENDER_OFFLINE lets those pages fall back to an empty
+      # state rather than failing the build; it is never set in a real deploy,
+      # where an unreachable API *should* stop the release.
+      - name: Build
+        env:
+          NEXT_PUBLIC_API_URL: https://api.example.invalid/api/v1
+          NEXT_PRERENDER_OFFLINE: "1"
+        run: npm run build
+
+      # NEXT_PUBLIC_* is inlined into the bundle and served to every visitor.
+      # A secret placed there is public the moment it ships, and the mistake is
+      # invisible in review — so it is checked mechanically.
+      - name: No secrets in the client bundle
+        run: node scripts/check-bundle-secrets.mjs
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

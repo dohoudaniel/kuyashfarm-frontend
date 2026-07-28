@@ -62,6 +62,7 @@ export function subscribeToRestock(slug: string, email?: string): Promise<null> 
 
 export function fetchProductsPublic(filters: ProductFilters = {}): Promise<Paginated<Product>> {
   return fetchPublic<Paginated<Product>>(`/products/${toQuery(filters)}`, {
+    offlineFallback: { results: [], count: 0, page: 1, pages: 0, next: null, previous: null },
     revalidate: 60,
     tags: ["products"],
   });
@@ -75,7 +76,11 @@ export function fetchProductPublic(slug: string): Promise<ProductDetail> {
 }
 
 export function fetchCategoriesPublic(): Promise<Category[]> {
-  return fetchPublic<Category[]>("/categories/", { revalidate: 300, tags: ["categories"] });
+  return fetchPublic<Category[]>("/categories/", {
+    revalidate: 300,
+    tags: ["categories"],
+    offlineFallback: [],
+  });
 }
 
 export function fetchCategoryPublic(slug: string): Promise<Category> {

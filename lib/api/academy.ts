@@ -95,7 +95,7 @@ export interface RegistrationInput {
 // ── Public reads (safe from Server Components) ───────────────────────────────
 /** Unpaginated by design: `pagination_class = None` server-side. */
 export function fetchProgramsPublic(): Promise<Program[]> {
-  return fetchPublic<Program[]>("/academy/programs/");
+  return fetchPublic<Program[]>("/academy/programs/", { offlineFallback: [] });
 }
 
 export function fetchClassesPublic(params?: {
@@ -106,7 +106,9 @@ export function fetchClassesPublic(params?: {
   const query = new URLSearchParams(
     Object.entries(params ?? {}).filter(([, value]) => Boolean(value)) as [string, string][],
   ).toString();
-  return fetchPublic<AcademyClass[]>(`/academy/classes/${query ? `?${query}` : ""}`);
+  return fetchPublic<AcademyClass[]>(`/academy/classes/${query ? `?${query}` : ""}`, {
+    offlineFallback: [],
+  });
 }
 
 export function fetchClassPublic(slug: string): Promise<AcademyClassDetail> {

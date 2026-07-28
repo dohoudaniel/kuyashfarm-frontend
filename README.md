@@ -11,11 +11,13 @@ Express + Mongoose backend used to live in this repo; it has been removed.
 ## Quick start
 
 ```bash
-cd frontend
 npm install
-cp .env.example .env.local     # set NEXT_PUBLIC_API_URL
+cp .env.example .env.local     # NEXT_PUBLIC_API_URL is required
 npm run dev                    # http://localhost:3000
 ```
+
+The app lives at the repo root. It used to sit in a `frontend/` subdirectory;
+that was flattened on 2026-07-28.
 
 **The API must be running first.** Beyond the obvious — nothing loads without
 it — `/categories` and the academy class pages are prerendered at build time,
@@ -32,7 +34,10 @@ backend, then build.
 | `npm run lint` | eslint — currently 0 errors, 0 warnings |
 | `npm test` | Vitest, 35 specs |
 | `npm run test:watch` | Vitest in watch mode |
+| `npm run check:bundle` | After a build: fails if anything secret-shaped reached the client JS |
 | `npx tsc --noEmit` | Typecheck |
+
+All of these run on every push — see `.github/workflows/ci.yml`.
 
 ## How it talks to the API
 
@@ -56,6 +61,19 @@ carts, orders, applications and bookings all live on the server.
 Things the client must not do, because the server already does them: compute a
 price, add up a cart, decide whether stock is available, or decide what a user
 is entitled to. `unit_price` in a response is already what *that* caller pays.
+
+### Environment
+
+`NEXT_PUBLIC_API_URL` is required for a production build — there is no fallback,
+because a silent default to localhost means a misconfigured deploy boots happily
+and fails in front of a customer. Development keeps the convenience default.
+
+Nothing secret belongs in a `NEXT_PUBLIC_*` variable. Next.js inlines them into
+the JavaScript every visitor downloads, regardless of which component reads the
+value or who that component renders for. `npm run check:bundle` enforces this
+after a build; it exists because `NEXT_PUBLIC_ADMIN_URL` once shipped the
+back-office path to every anonymous visitor, even though the link itself was
+rendered only for staff.
 
 ### Money
 
@@ -134,10 +152,8 @@ reach production. That gap is tracked in the PRD.
 
 ## Known gaps
 
-- No Playwright suite and no CI workflow; the gates above are local commands.
+- No Playwright suite. A broken checkout would still pass CI, because nothing
+  drives a real browser through it.
 - 103 product images are Unsplash hotlinks awaiting owned photography.
-- `NEXT_PUBLIC_API_URL` still falls back to `http://localhost:8000/api/v1`.
-  Removing the fallback would make a misconfigured build fail loudly, which is
-  the intent.
 - There is no staff UI. Back-office work runs through Django Admin — see PRD
   §13 Q4, which is still an open decision.

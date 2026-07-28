@@ -27,7 +27,34 @@
 
 import type { ApiEnvelope } from "./types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+/**
+ * Where the API lives.
+ *
+ * There is deliberately no production fallback. A silent default to localhost
+ * means a misconfigured deployment builds and boots happily, then fails on the
+ * first request in front of a customer — with a browser console error nobody
+ * is watching. Failing at build time instead turns a silent outage into a
+ * loud, obvious misconfiguration.
+ *
+ * Development keeps the convenience default, because there the localhost guess
+ * is almost always right and the cost of being wrong is a page refresh.
+ */
+function resolveApiBaseUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_API_URL;
+  if (configured) return configured;
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "NEXT_PUBLIC_API_URL is not set. It must be defined at build time — " +
+        "Next.js inlines NEXT_PUBLIC_* variables, so setting it only at runtime " +
+        "has no effect.",
+    );
+  }
+
+  return "http://localhost:8000/api/v1";
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 /** A request that reached the server and came back with an error envelope. */
 export class ApiError extends Error {
@@ -271,16 +298,33 @@ export const apiClient = new ApiClient(API_BASE_URL);
  */
 export async function fetchPublic<T>(
   path: string,
-  init?: { revalidate?: number; tags?: string[] },
+  init?: { revalidate?: number; tags?: string[]; offlineFallback?: T },
 ): Promise<T> {
   const base = API_BASE_URL.replace(/\/$/, "");
   const [pathname, query] = path.split("?");
   const normalised = pathname.endsWith("/") ? pathname : `${pathname}/`;
 
-  const response = await fetch(`${base}${normalised}${query ? `?${query}` : ""}`, {
-    headers: { Accept: "application/json" },
-    next: { revalidate: init?.revalidate ?? 60, tags: init?.tags },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${base}${normalised}${query ? `?${query}` : ""}`, {
+      headers: { Accept: "application/json" },
+      next: { revalidate: init?.revalidate ?? 60, tags: init?.tags },
+    });
+  } catch (error) {
+    // CI builds the app with no API reachable, to check that it compiles and
+    // renders — not to check the data. `NEXT_PRERENDER_OFFLINE` lets those
+    // pages prerender empty instead of failing the build.
+    //
+    // It is deliberately narrow: it applies only when the caller supplied a
+    // fallback, only when the request could not be made at all, and only when
+    // the variable is set — which it never is in a real deployment, where an
+    // unreachable API *should* stop the release rather than quietly shipping an
+    // empty shop.
+    if (process.env.NEXT_PRERENDER_OFFLINE && init && "offlineFallback" in init) {
+      return init.offlineFallback as T;
+    }
+    throw error;
+  }
 
   if (!response.ok) {
     throw new ApiError(`Request failed (${response.status}).`, response.status);

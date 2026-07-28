@@ -10,7 +10,7 @@ should go.
 ## Layout
 
 ```
-frontend/
+kuyashfarm-frontend/                  # the app lives at the repo root
 ├── app/                              # App Router. One directory per route.
 │   ├── layout.tsx                    # Root layout: fonts, metadata, providers
 │   ├── page.tsx                      # Landing page
@@ -57,6 +57,9 @@ frontend/
 │   └── utils.ts                      # cn(), formatPrice()
 │
 ├── tests/                            # Vitest specs
+├── scripts/                          # check-bundle-secrets.mjs
+├── docs/                             # back office, cart, wholesale guides
+├── .github/workflows/ci.yml          # lint, types, tests, build, bundle scan
 └── public/
 ```
 

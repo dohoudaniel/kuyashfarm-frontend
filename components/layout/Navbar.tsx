@@ -138,9 +138,9 @@ export function Navbar() {
 
                       {/* Shown only when the server says so. Hiding this link is
                           presentation; the API refuses regardless. */}
-                      {isBackOffice && (
+                      {isBackOffice && user?.admin_url && (
                         <a
-                          href={`${process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:8000/admin/"}`}
+                          href={user.admin_url}
                           className="flex items-center gap-2 px-4 py-2 text-primary hover:bg-green-50"
                         >
                           <ShieldCheck className="h-4 w-4" /> Back office

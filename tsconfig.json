@@ -30,5 +30,10 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  // vitest.config.ts is build tooling, not application code. It imports
+  // `defineConfig` from "vitest/config", whose type entry re-exports itself by
+  // package name — which "moduleResolution": "bundler" cannot resolve from this
+  // tsconfig. Vitest validates its own config at startup, so excluding it here
+  // costs nothing: a mistake in it fails `npm test` immediately.
+  "exclude": ["node_modules", "vitest.config.ts"]
 }
