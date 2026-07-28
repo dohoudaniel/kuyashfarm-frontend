@@ -70,7 +70,7 @@ export function AcademyHero() {
               className="mt-10 flex flex-wrap gap-4"
             >
               <Link
-                href="/academy/classes/1"
+                href="/academy#classes"
                 className="group inline-flex items-center gap-3 bg-[#2d5f3f] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#4a7c59] transition-all duration-300"
                 style={{ fontSize: "clamp(0.875rem, 1vw, 1rem)" }}
               >

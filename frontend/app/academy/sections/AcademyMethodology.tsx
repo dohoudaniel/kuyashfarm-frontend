@@ -87,7 +87,7 @@ export function AcademyMethodology() {
           className="mt-16 text-center"
         >
           <a
-            href="/academy/classes/1"
+            href="/academy#classes"
             className="inline-flex items-center gap-3 bg-[#2d5f3f] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#4a7c59] transition-colors duration-300 text-base"
           >
             Start Your Application

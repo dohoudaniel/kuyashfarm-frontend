@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube, MessageCircle } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export function Footer() {
-  const [email, setEmail] = useState("");
   const currentYear = new Date().getFullYear();
 
   return (
@@ -57,6 +55,7 @@ export function Footer() {
                 { label: "Our Services", href: "#services" },
                 { label: "Blog & News", href: "#blog" },
                 { label: "Kuyash Academy", href: "/academy" },
+                { label: "Wholesale Pricing", href: "/become-wholesaler" },
                 { label: "Become a Distributor", href: "/become-distributor" },
               ].map((link) => (
                 <li key={link.label}>

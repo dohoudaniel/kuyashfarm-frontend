@@ -40,11 +40,21 @@ export function startPayment(orderNumber: string): Promise<PaymentStart> {
   return apiClient.post<PaymentStart>(`/payments/paystack/${orderNumber}/initialize/`);
 }
 
-/** Confirm after the redirect. The webhook is authoritative; this is the UX path. */
-export function verifyPayment(reference: string): Promise<{
+/**
+ * Confirm after the redirect. The webhook is authoritative; this is the UX path.
+ *
+ * Guests must pass the email the order was placed with — the API checks
+ * ownership before confirming, because order numbers are guessable. Without it
+ * a guest gets a 403 on their own thank-you page.
+ */
+export function verifyPayment(
+  reference: string,
+  email?: string,
+): Promise<{
   order_number: string;
   status: string;
   payment_status: string;
 }> {
-  return apiClient.get(`/payments/${reference}/verify/`);
+  const query = email ? `?email=${encodeURIComponent(email)}` : "";
+  return apiClient.get(`/payments/${reference}/verify/${query}`);
 }

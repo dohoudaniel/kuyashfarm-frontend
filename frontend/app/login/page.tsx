@@ -26,8 +26,8 @@ export default function LoginPage() {
     try {
       await login(formData.email, formData.password);
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Login failed. Please check your credentials.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
@@ -93,12 +93,20 @@ export default function LoginPage() {
 
               {/* Password Field */}
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Password
-                </label>
+                <div className="mb-2 flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Password
+                  </label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm font-medium text-green-600 hover:text-green-700"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -129,7 +137,7 @@ export default function LoginPage() {
             {/* Divider */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link
                   href="/register"
                   className="font-semibold text-green-600 hover:text-green-700"
@@ -140,13 +148,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Admin Demo Info */}
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
-              <strong>Demo:</strong> Use any email and a password that meets the
-              requirements to create an account.
-            </p>
-          </div>
         </div>
       </main>
       <Footer />

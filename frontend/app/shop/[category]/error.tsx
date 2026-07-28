@@ -21,7 +21,7 @@ export default function ShopError({
           <ShoppingBasket className="h-7 w-7 text-[#2d5f3f]" />
         </div>
         <h2 className="mb-3 font-serif text-2xl font-bold text-gray-900">
-          Couldn't load products
+          Couldn&apos;t load products
         </h2>
         <p className="mb-8 font-sans text-sm leading-relaxed text-gray-500">
           We had trouble loading this category. Please try again or browse our other products.

@@ -84,7 +84,7 @@ export function AcademyTestimonials() {
           className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6 text-center sm:text-left"
         >
           <div className="flex -space-x-3">
-            {TESTIMONIALS.map((t, i) => (
+            {TESTIMONIALS.map((t) => (
               <div key={t.name} className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow">
                 <Image src={t.image} alt={t.name} fill className="object-cover" sizes="40px" />
               </div>

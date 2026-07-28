@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect } from "react";
 import { Leaf, RotateCcw } from "lucide-react";
 
@@ -21,7 +23,7 @@ export default function ServiceError({
           <Leaf className="h-7 w-7 text-[#2d5f3f]" />
         </div>
         <h2 className="mb-3 font-serif text-2xl font-bold text-gray-900">
-          Couldn't load this service
+          Couldn&apos;t load this service
         </h2>
         <p className="mb-8 font-sans text-sm leading-relaxed text-gray-500">
           We had trouble loading this page. Please try again or explore our other services.
@@ -34,12 +36,12 @@ export default function ServiceError({
             <RotateCcw className="h-4 w-4" />
             Try again
           </button>
-          <a
+          <Link
             href="/#services"
             className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-6 py-2.5 font-sans text-sm font-semibold text-gray-700 transition-colors hover:border-[#2d5f3f] hover:text-[#2d5f3f]"
           >
             All Services
-          </a>
+          </Link>
         </div>
       </div>
     </div>

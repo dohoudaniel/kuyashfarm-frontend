@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { fetchClassesPublic } from "@/lib/api/academy";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AcademyHero } from "./sections/AcademyHero";
@@ -26,7 +28,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AcademyPage() {
+export default async function AcademyPage() {
+  // Classes come from the API. If it is unreachable the page still renders —
+  // the schedule section shows an honest empty state rather than crashing the
+  // whole academy landing page, which is what SSR against a hardcoded array
+  // hid until now.
+  const classes = await fetchClassesPublic().then(
+    (list) => list,
+    () => [],
+  );
+
   return (
     <>
       <Navbar />
@@ -35,7 +46,7 @@ export default function AcademyPage() {
         <AcademyStats />
         <WhyAcademy />
         <AcademyPrograms />
-        <UpcomingClasses />
+        <UpcomingClasses classes={classes} />
         <LearningExperience />
         <AcademyMethodology />
         <AcademyInstructors />

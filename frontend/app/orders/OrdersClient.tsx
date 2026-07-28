@@ -34,15 +34,13 @@ const STATUS_STYLES: Record<OrderStatus, string> = {
 export default function OrdersClient() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [orders, setOrders] = useState<OrderSummary[]>([]);
+  // Nothing to load when signed out, so this is derived rather than switched
+  // off from inside an effect.
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!isAuthenticated) {
-      setLoading(false);
-      return;
-    }
+    if (authLoading || !isAuthenticated) return;
 
     listOrders()
       .then((page) => setOrders(page.results))

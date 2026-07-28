@@ -15,7 +15,8 @@ import { CheckCircle2, Loader2, Truck } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ApiError } from "@/lib/api/client";
-import { cancelOrder, getOrder, reorder } from "@/lib/api/orders";
+import { cancelOrder, getGuestOrder, getOrder, reorder } from "@/lib/api/orders";
+import { guestEmailFor } from "@/lib/api/guest-order";
 import { useCartStore } from "@/lib/store/useCartStore";
 import type { Order } from "@/lib/api/types";
 import { formatPrice } from "@/lib/utils";
@@ -29,12 +30,17 @@ export default function OrderDetailClient({ orderNumber }: { orderNumber: string
 
   const load = useCallback(async () => {
     try {
-      setOrder(await getOrder(orderNumber));
+      // A guest who just checked out has no session. The API will still show
+      // them the order if they supply the email it was placed with, which we
+      // held on to at checkout — otherwise they get a 403 for their own
+      // receipt, seconds after paying for it.
+      const asGuest = guestEmailFor(orderNumber);
+      setOrder(asGuest ? await getGuestOrder(orderNumber, asGuest) : await getOrder(orderNumber));
       setError(null);
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 403
-          ? "This order belongs to another account."
+          ? "This order belongs to another account. Sign in with the email it was placed under."
           : "We couldn't load that order.",
       );
     } finally {

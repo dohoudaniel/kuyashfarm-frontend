@@ -15,7 +15,7 @@ export function Goals() {
             Our Goals
           </h2>
           <p className="mx-auto max-w-2xl font-sans text-lg text-gray-600">
-            We're making a measurable impact on sustainable farming worldwide
+            We&apos;re making a measurable impact on sustainable farming worldwide
           </p>
         </div>
 

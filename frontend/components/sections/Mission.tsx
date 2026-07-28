@@ -23,7 +23,7 @@ export function Mission() {
                 At Kuyash Farms, we operate a fully integrated farming system that includes poultry production, cattle and sheep rearing, fish farming, vegetable cultivation, oil palm plantations, and food processing. By connecting every aspect of agriculture — from crop production to livestock management — we maximize efficiency, reduce waste, and deliver fresh, high-quality products to our customers.
               </p>
               <p className="italic text-gray-600">
-                "Driven by innovation and sustainability, Kuyash Farms is shaping the future of agribusiness — one harvest at a time."
+                &ldquo;Driven by innovation and sustainability, Kuyash Farms is shaping the future of agribusiness — one harvest at a time.&rdquo;
               </p>
             </div>
           </div>

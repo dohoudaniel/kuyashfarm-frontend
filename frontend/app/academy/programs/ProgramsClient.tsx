@@ -34,9 +34,6 @@ const ALL_STATUS = ["Any Status", "Open", "Closing Soon", "Coming Soon"];
 const ALL_CERT = ["Any Certification", "NABTEB", "NAFDAC", "Industry", "Organic"];
 
 /* brand tokens */
-const BRAND = "#2d5f3f";
-const BRAND_BG = "#eef5f1";
-const BRAND_BORDER = "#c6dece";
 
 /* ─── animated counter ─── */
 function Counter({ to, suffix }: { to: number; suffix: string }) {
@@ -63,7 +60,7 @@ function Counter({ to, suffix }: { to: number; suffix: string }) {
 /* ─── program card ─── */
 function ProgramCard({ program, index }: { program: CatalogProgram; index: number }) {
   const Icon = ICON_MAP[program.icon] ?? Leaf;
-  const href = program.classId ? `/academy/classes/${program.classId}` : "#";
+  const href = "/academy#classes";
   const isAvailable = program.enrollmentStatus === "Open" || program.enrollmentStatus === "Closing Soon";
 
   const statusStyle: Record<string, string> = {
@@ -225,7 +222,11 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
 }
 
 /* ─── filter pill ─── */
-function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function FilterPill({ label, active, onClick }: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
@@ -241,7 +242,7 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
 }
 
 /* ─── select filter ─── */
-function SelectFilter({ label, options, value, onChange }: {
+function SelectFilter({ options, value, onChange }: {
   label: string; options: string[]; value: string; onChange: (v: string) => void;
 }) {
   return (
@@ -433,7 +434,7 @@ export function ProgramsClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               {featured.map((program, i) => {
                 const Icon = ICON_MAP[program.icon] ?? Leaf;
-                const href = program.classId ? `/academy/classes/${program.classId}` : "#";
+                const href = "/academy#classes";
                 return (
                   <motion.div
                     key={program.id}
@@ -626,7 +627,7 @@ export function ProgramsClient() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <Link
-                href="/academy/classes/1"
+                href="/academy#classes"
                 className="inline-flex items-center gap-2 bg-[#e8d5a3] text-[#1a3d2b] font-semibold px-7 py-3.5 rounded-full hover:bg-[#dfc98a] transition-colors text-sm"
               >
                 Apply Now <ArrowRight className="w-4 h-4" />

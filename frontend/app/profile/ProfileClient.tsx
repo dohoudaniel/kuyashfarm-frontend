@@ -11,7 +11,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, MapPin, Settings, Trash2, User as UserIcon } from "lucide-react";
+import {
+  Briefcase,
+  GraduationCap,
+  Loader2,
+  MapPin,
+  Settings,
+  Trash2,
+  User as UserIcon,
+} from "lucide-react";
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -20,8 +28,27 @@ import { ApiError } from "@/lib/api/client";
 import * as authApi from "@/lib/api/auth";
 import { useAuth } from "@/lib/context/AuthContext";
 import type { Address } from "@/lib/api/types";
+import { myApplications, type Application } from "@/lib/api/applications";
+import { myRegistrations, type Registration } from "@/lib/api/academy";
+import { formatPrice } from "@/lib/utils";
 
-type Tab = "profile" | "addresses" | "settings";
+type Tab = "profile" | "addresses" | "applications" | "academy" | "settings";
+
+const APPLICATION_TONE: Record<string, string> = {
+  PENDING: "bg-amber-100 text-amber-800",
+  UNDER_REVIEW: "bg-blue-100 text-blue-800",
+  APPROVED: "bg-green-100 text-green-800",
+  REJECTED: "bg-red-100 text-red-800",
+  WITHDRAWN: "bg-gray-200 text-gray-700",
+};
+
+const REGISTRATION_TONE: Record<string, string> = {
+  PENDING_PAYMENT: "bg-amber-100 text-amber-800",
+  CONFIRMED: "bg-green-100 text-green-800",
+  ATTENDED: "bg-blue-100 text-blue-800",
+  CANCELLED: "bg-gray-200 text-gray-700",
+  NO_SHOW: "bg-gray-200 text-gray-700",
+};
 
 export default function ProfileClient() {
   const { user, isAuthenticated, isLoading, updateProfile } = useAuth();
@@ -35,6 +62,12 @@ export default function ProfileClient() {
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [passwords, setPasswords] = useState({ current: "", next: "", confirm: "" });
+
+  // An applicant used to have no way to see whether their application had been
+  // looked at — approvals were written into the reviewer's own browser and
+  // never surfaced anywhere the applicant could reach (audit §3.5).
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -53,7 +86,10 @@ export default function ProfileClient() {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated) void loadAddresses();
+    if (!isAuthenticated) return;
+    void loadAddresses();
+    void myApplications().then(setApplications, () => setApplications([]));
+    void myRegistrations().then(setRegistrations, () => setRegistrations([]));
   }, [isAuthenticated, loadAddresses]);
 
   async function handleSaveProfile(event: React.FormEvent) {
@@ -126,6 +162,8 @@ export default function ProfileClient() {
   const tabs: { id: Tab; label: string; icon: typeof UserIcon }[] = [
     { id: "profile", label: "Profile", icon: UserIcon },
     { id: "addresses", label: "Addresses", icon: MapPin },
+    { id: "applications", label: "Applications", icon: Briefcase },
+    { id: "academy", label: "Academy", icon: GraduationCap },
     { id: "settings", label: "Security", icon: Settings },
   ];
 
@@ -200,6 +238,143 @@ export default function ProfileClient() {
                           <button type="button" aria-label={`Delete ${address.label}`} onClick={() => handleDeleteAddress(address.id)} className="rounded p-2 text-red-600 hover:bg-red-50">
                             <Trash2 className="h-4 w-4" />
                           </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+
+              {tab === "applications" && (
+                <div className="rounded-2xl bg-white p-6 shadow-sm">
+                  <h2 className="mb-1 text-lg font-bold text-gray-900">
+                    Wholesale &amp; distributor applications
+                  </h2>
+                  <p className="mb-5 text-sm text-gray-500">
+                    The status here is the real one, read from our records — not from this
+                    browser.
+                  </p>
+
+                  {applications.length === 0 ? (
+                    <div className="rounded-lg bg-gray-50 p-6 text-center">
+                      <p className="mb-4 text-gray-600">You haven&apos;t applied yet.</p>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                        <Link
+                          href="/become-wholesaler"
+                          className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-secondary"
+                        >
+                          Apply for wholesale
+                        </Link>
+                        <Link
+                          href="/become-distributor"
+                          className="rounded-full border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                        >
+                          Become a distributor
+                        </Link>
+                      </div>
+                    </div>
+                  ) : (
+                    <ul className="divide-y">
+                      {applications.map((application) => (
+                        <li key={application.id} className="py-4">
+                          <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                            <span className="font-semibold text-gray-900">
+                              {application.business_name}
+                            </span>
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                APPLICATION_TONE[application.status] ?? "bg-gray-200 text-gray-700"
+                              }`}
+                            >
+                              {application.status.replace(/_/g, " ").toLowerCase()}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-500">
+                            {application.application_type === "DISTRIBUTOR"
+                              ? "Distributor"
+                              : "Wholesale"}
+                            {application.computed_tier ? ` · ${application.computed_tier.name}` : ""}
+                            {application.states.length > 0
+                              ? ` · ${application.states.length} ${
+                                  application.states.length === 1 ? "state" : "states"
+                                }`
+                              : ""}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-400">
+                            Submitted{" "}
+                            {new Date(application.submitted_at).toLocaleDateString("en-NG", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })}
+                            {application.reviewed_at
+                              ? ` · reviewed ${new Date(
+                                  application.reviewed_at,
+                                ).toLocaleDateString("en-NG", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })}`
+                              : " · not yet reviewed"}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+
+              {tab === "academy" && (
+                <div className="rounded-2xl bg-white p-6 shadow-sm">
+                  <h2 className="mb-1 text-lg font-bold text-gray-900">Your class bookings</h2>
+                  <p className="mb-5 text-sm text-gray-500">
+                    Bookings are held on our system, so they survive clearing your browser.
+                  </p>
+
+                  {registrations.length === 0 ? (
+                    <div className="rounded-lg bg-gray-50 p-6 text-center">
+                      <p className="mb-4 text-gray-600">No bookings yet.</p>
+                      <Link
+                        href="/academy#classes"
+                        className="inline-block rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-secondary"
+                      >
+                        Browse upcoming classes
+                      </Link>
+                    </div>
+                  ) : (
+                    <ul className="divide-y">
+                      {registrations.map((registration) => (
+                        <li
+                          key={registration.id}
+                          className="flex flex-wrap items-center justify-between gap-3 py-4"
+                        >
+                          <div>
+                            <Link
+                              href={`/academy/registrations/${registration.reference}`}
+                              className="font-semibold text-gray-900 hover:text-primary"
+                            >
+                              {registration.class_title}
+                            </Link>
+                            <p className="text-sm text-gray-500">
+                              {new Date(registration.scheduled_date).toLocaleDateString("en-NG", {
+                                weekday: "short",
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                              {" · "}
+                              {Number(registration.price) === 0
+                                ? "Free"
+                                : formatPrice(Number(registration.price))}
+                            </p>
+                          </div>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                              REGISTRATION_TONE[registration.status] ?? "bg-gray-200 text-gray-700"
+                            }`}
+                          >
+                            {registration.status.replace(/_/g, " ").toLowerCase()}
+                          </span>
                         </li>
                       ))}
                     </ul>

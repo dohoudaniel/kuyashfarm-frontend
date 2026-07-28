@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect } from "react";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 
@@ -35,12 +37,12 @@ export default function Error({
             <RotateCcw className="h-4 w-4" />
             Try again
           </button>
-          <a
+          <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-6 py-2.5 font-sans text-sm font-semibold text-gray-700 transition-colors hover:border-[#2d5f3f] hover:text-[#2d5f3f]"
           >
             Go home
-          </a>
+          </Link>
         </div>
       </div>
     </div>

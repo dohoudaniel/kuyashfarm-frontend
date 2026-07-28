@@ -70,7 +70,7 @@ function ProgramCard({ program, index }: { program: AcademyProgram; index: numbe
         </ul>
         {program.classId ? (
           <Link
-            href={`/academy/classes/${program.classId}`}
+            href="/academy#classes"
             className="text-sm font-semibold text-[#2d5f3f] flex items-center gap-2 group/link"
           >
             <span className="group-hover/link:underline underline-offset-2">Enrol in this program</span>

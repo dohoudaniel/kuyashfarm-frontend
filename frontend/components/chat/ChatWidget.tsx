@@ -3,6 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Bot, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
+import { getStoreConfig } from "@/lib/api/cart";
+import type { StoreConfig } from "@/lib/api/types";
+import { formatPrice } from "@/lib/utils";
 
 interface Message {
   id: string;
@@ -28,6 +31,15 @@ export function ChatWidget() {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const { user } = useAuth();
+
+  // The widget used to quote a ₦200,000 free-shipping threshold, PayPal as a
+  // payment method and a flat ₦15,000 delivery fee — none of which were true.
+  // Store facts come from /config/ now, so the bot and the checkout cannot
+  // disagree about the same number.
+  const [config, setConfig] = useState<StoreConfig | null>(null);
+  useEffect(() => {
+    void getStoreConfig().then(setConfig, () => setConfig(null));
+  }, []);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -56,7 +68,7 @@ export function ChatWidget() {
     await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 1000));
 
     // Generate bot response based on user input
-    const botResponse = generateBotResponse(inputMessage, userName);
+    const botResponse = generateBotResponse(inputMessage, userName, config);
 
     const botMessage: Message = {
       id: `bot_${Date.now()}`,
@@ -233,7 +245,11 @@ const quickActions = [
 /**
  * Generate contextual bot responses based on user input
  */
-function generateBotResponse(userInput: string, userName: string): string {
+function generateBotResponse(
+  userInput: string,
+  userName: string,
+  config: StoreConfig | null,
+): string {
   const input = userInput.toLowerCase();
 
   // Order status queries
@@ -248,17 +264,26 @@ function generateBotResponse(userInput: string, userName: string): string {
 
   // Wholesale queries
   if (input.includes("wholesale") || input.includes("bulk")) {
-    return `Great question! We offer wholesale pricing for verified business customers:\n\n✅ Minimum quantities: 10-49 units or 50+ units\n✅ Discounted prices for bulk orders\n✅ Priority customer support\n\nTo apply for wholesale access:\n1. Click "Wholesale" in the navigation menu\n2. Fill out the business application form\n3. Our team will review (typically 1-2 business days)\n4. Once approved, you'll see wholesale prices automatically!\n\nWould you like me to guide you through the application?`;
+    return `We offer wholesale pricing to approved business customers:\n\n✅ Bulk price breaks that apply automatically\n✅ Distributor tiers for multi-state coverage\n✅ Priority support\n\nTo apply, head to /become-wholesaler (or /become-distributor if you supply retailers). You'll need an account, since approval upgrades your account's pricing. We usually review within two business days.`;
   }
 
   // Shipping queries
   if (input.includes("ship") || input.includes("delivery") || input.includes("deliver")) {
-    return `Our shipping details:\n\n📦 Free shipping on orders over ₦200,000\n🚚 Standard shipping: ₦15,000\n⏱️ Delivery time: 2-5 business days\n🌍 We deliver across Nigeria\n\nYou can track your order in real-time after checkout. We also offer Cash on Delivery for your convenience!`;
+    {
+      const threshold = config
+        ? formatPrice(Number(config.free_shipping_threshold))
+        : null;
+      return `Our shipping details:\n\n${
+        threshold ? `📦 Free delivery on orders over ${threshold}\n` : ""
+      }🚚 Delivery is calculated at checkout from your address\n⏱️ Delivery time: 2-5 business days\n🌍 We deliver across Nigeria\n\nYou'll see the exact delivery cost before you pay, and you can follow your order from the Orders page.`;
+    }
   }
 
   // Payment queries
   if (input.includes("payment") || input.includes("pay")) {
-    return `We accept multiple payment methods:\n\n💳 Credit/Debit Cards\n🌐 PayPal\n💵 Cash on Delivery\n\nAll online payments are secured with SSL encryption. Choose your preferred method at checkout!`;
+    return `We accept:\n\n💳 Cards, bank transfer and USSD — securely through Paystack${
+      config && !config.cod_enabled ? "" : "\\n💵 Cash on delivery"
+    }\n\nWe never see or store your card details — Paystack handles that side entirely. Choose your method at checkout.`;
   }
 
   // Price queries

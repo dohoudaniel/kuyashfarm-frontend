@@ -30,6 +30,7 @@ import { FormTextarea } from "@/components/ui/FormTextarea";
 import { ApiError } from "@/lib/api/client";
 import { getQuote, getStoreConfig, placeOrder } from "@/lib/api/cart";
 import { startPayment } from "@/lib/api/orders";
+import { rememberGuestOrder } from "@/lib/api/guest-order";
 import { useAuth } from "@/lib/context/AuthContext";
 import { useCartStore } from "@/lib/store/useCartStore";
 import type { CheckoutQuote, PaymentMethod, StoreConfig } from "@/lib/api/types";
@@ -115,6 +116,14 @@ export default function CheckoutClient() {
         },
         idempotencyKey,
       );
+
+      // A guest has no session, and the API checks ownership before it will
+      // show or confirm an order — so remember the email the order was placed
+      // with. sessionStorage, not localStorage: this dies with the tab, and it
+      // is never needed again.
+      if (!isAuthenticated) {
+        rememberGuestOrder(order.order_number, email);
+      }
 
       if (paymentMethod === "COD") {
         router.push(`/orders/${order.order_number}?placed=1`);

@@ -66,7 +66,9 @@ interface RequestOptions {
   skipRefresh?: boolean;
 }
 
-class ApiClient {
+// Exported so tests can construct an isolated instance; application code
+// should use the `apiClient` singleton below, never a second client.
+export class ApiClient {
   private baseUrl: string;
   private accessToken: string | null = null;
   private refreshInFlight: Promise<boolean> | null = null;
@@ -208,6 +210,41 @@ class ApiClient {
 
   delete<T>(path: string, options?: Omit<RequestOptions, "method" | "body">): Promise<T> {
     return this.request<T>(path, { ...options, method: "DELETE" });
+  }
+
+  /**
+   * POST a file upload.
+   *
+   * Kept apart from `post` because multipart cannot go through the JSON path:
+   * `JSON.stringify(formData)` yields `{}`, and setting `Content-Type`
+   * ourselves omits the boundary the browser generates, so the server sees an
+   * unparseable body. It still refreshes on 401 like every other call.
+   */
+  async postForm<T>(path: string, body: FormData, retrying = false): Promise<T> {
+    const headers: Record<string, string> = {};
+    if (this.accessToken) headers["Authorization"] = `Bearer ${this.accessToken}`;
+
+    let response: Response;
+    try {
+      response = await fetch(this.buildUrl(path), {
+        method: "POST",
+        headers,
+        body,
+        credentials: "include",
+      });
+    } catch {
+      throw new NetworkError();
+    }
+
+    if (response.status === 401 && !retrying) {
+      if (await this.refreshAccessToken()) {
+        return this.postForm<T>(path, body, true);
+      }
+      this.accessToken = null;
+      this.onUnauthenticated?.();
+    }
+
+    return this.unwrap<T>(response);
   }
 }
 

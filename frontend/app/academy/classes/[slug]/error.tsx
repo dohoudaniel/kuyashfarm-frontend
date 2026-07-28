@@ -21,7 +21,7 @@ export default function ClassError({
           <BookOpen className="h-7 w-7 text-[#2d5f3f]" />
         </div>
         <h2 className="mb-3 font-serif text-2xl font-bold text-gray-900">
-          Couldn't load this class
+          Couldn&apos;t load this class
         </h2>
         <p className="mb-8 font-sans text-sm leading-relaxed text-gray-500">
           We had trouble loading this lesson. Please try again or go back to the Academy.
