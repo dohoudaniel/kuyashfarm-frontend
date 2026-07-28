@@ -36,7 +36,8 @@ interface AuthContextValue {
   getsBulkPricing: boolean;
   isBackOffice: boolean;
   login: (email: string, password: string) => Promise<User>;
-  register: (input: authApi.RegisterInput) => Promise<User>;
+  /** Resolves when the request is accepted. Does not sign in — see below. */
+  register: (input: authApi.RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   updateProfile: (input: { full_name?: string; phone?: string }) => Promise<User>;
@@ -98,14 +99,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [afterSignIn],
   );
 
-  const register = useCallback(
-    async (input: authApi.RegisterInput) => {
-      const { user: created } = await authApi.register(input);
-      await afterSignIn(created);
-      return created;
-    },
-    [afterSignIn],
-  );
+  /**
+   * Create an account. Deliberately does not sign the user in.
+   *
+   * The API returns no tokens, because a signed-in response would reveal that
+   * the address was new — the whole point of the endpoint answering identically
+   * either way. The caller shows "check your email" and sends them to sign in
+   * once they have followed the link.
+   */
+  const register = useCallback(async (input: authApi.RegisterInput) => {
+    await authApi.register(input);
+  }, []);
 
   const logout = useCallback(async () => {
     // Always clear locally, even if the server call fails — otherwise a

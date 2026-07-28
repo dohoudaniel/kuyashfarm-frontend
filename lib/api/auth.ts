@@ -18,10 +18,17 @@ export interface RegisterInput {
   phone?: string;
 }
 
-export async function register(input: RegisterInput): Promise<AuthResult> {
-  const result = await apiClient.post<AuthResult>("/auth/register/", { ...input });
-  apiClient.setAccessToken(result.access_token);
-  return result;
+/**
+ * Create an account.
+ *
+ * Returns nothing and does **not** sign you in. The API answers identically
+ * whether or not the address was already registered — telling them apart would
+ * turn signup into an account-enumeration oracle, which is exactly what login
+ * and password reset already go out of their way to avoid. The next step is
+ * always the same: open the emailed link, then sign in.
+ */
+export async function register(input: RegisterInput): Promise<void> {
+  await apiClient.post<null>("/auth/register/", { ...input });
 }
 
 export async function login(email: string, password: string): Promise<AuthResult> {

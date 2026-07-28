@@ -1,168 +1,143 @@
-#  - Farming for a Future
+# Kuyash Integrated Farm — Frontend
 
-A modern, professional farming website landing page built with Next.js 16, TypeScript, and Tailwind CSS.
+The customer-facing web app: shop, checkout, orders, wholesale and distributor
+applications, and the Kuyash Academy. Next.js 16 (App Router), React 19,
+TypeScript and Tailwind v4.
 
-## 🌟 Features
+This repository is **frontend only**. The API is a separate Django project in
+[`kuyashfarm-backend`](https://github.com/dohoudaniel/kuyashfarm-backend). An
+Express + Mongoose backend used to live in this repo; it has been removed.
 
-- **Fully Responsive**: Optimized for mobile, tablet, and desktop
-- **Modern Design**: Clean, elegant, nature-oriented aesthetic
-- **Performance Optimized**: Built with Next.js 16 and Turbopack
-- **Type Safe**: Full TypeScript implementation
-- **SEO Ready**: Semantic HTML and proper metadata
-- **Smooth Animations**: Hover effects and transitions throughout
-- **Professional Structure**: Modular, maintainable codebase
-
-## 🎨 Design Highlights
-
-### Color Palette
-- Primary Green: `#2d5f3f`
-- Secondary Green: `#4a7c59`
-- Accent Green: `#6b9d7a`
-- Earth Brown: `#8b6f47`
-- Cream: `#faf8f5`
-
-### Typography
-- **Headings**: Playfair Display (Serif)
-- **Body**: Inter (Sans-serif)
-
-## 📁 Project Structure
-
-```
-frontend/
-├── app/                    # Next.js App Router
-├── components/
-│   ├── ui/                # Reusable UI components
-│   ├── layout/            # Navbar, Footer
-│   └── sections/          # Page sections
-├── lib/                   # Utils and constants
-├── types/                 # TypeScript definitions
-└── public/                # Static assets
-```
-
-See [PROJECT_STRUCTURE.md](frontend/PROJECT_STRUCTURE.md) for detailed documentation.
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-
-### Installation
+## Quick start
 
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-
-# Navigate to frontend
-cd kuyashfarm/frontend
-
-# Install dependencies
+cd frontend
 npm install
-
-# Start development server
-npm run dev
+cp .env.example .env.local     # set NEXT_PUBLIC_API_URL
+npm run dev                    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+**The API must be running first.** Beyond the obvious — nothing loads without
+it — `/categories` and the academy class pages are prerendered at build time,
+so `npm run build` fails with `ECONNREFUSED` if the backend is down. Start the
+backend, then build.
 
-## 📦 Built With
+## Scripts
 
-- **Next.js 16** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS v4** - Styling
-- **Playfair Display & Inter** - Typography
-- **clsx & tailwind-merge** - Class management
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server with Turbopack |
+| `npm run build` | Production build (needs the API up) |
+| `npm start` | Serve the production build |
+| `npm run lint` | eslint — currently 0 errors, 0 warnings |
+| `npm test` | Vitest, 35 specs |
+| `npm run test:watch` | Vitest in watch mode |
+| `npx tsc --noEmit` | Typecheck |
 
-## 🎯 Sections
+## How it talks to the API
 
-1. **Hero** - Full-screen hero with background image
-2. **Stats** - Key metrics grid
-3. **Mission** - Two-column mission statement
-4. **Services** - Services grid with hover effects
-5. **Collaboration** - Full-width collaboration section
-6. **Blog** - Blog preview cards
-7. **Goals** - Impact metrics
-8. **Footer** - Links and social media
+Everything goes through `lib/api/`. There is no second data plane — products,
+carts, orders, applications and bookings all live on the server.
 
-## 🛠️ Development
+- **`client.ts`** is the only place that calls `fetch` for authenticated
+  traffic. It holds the access token **in memory** (never `localStorage`, which
+  any injected script can read), appends the trailing slash Django requires,
+  unwraps the `{success, message, data, errors}` envelope, and refreshes
+  **single-flight** on a 401 — refresh tokens rotate and blacklist on use, so
+  two concurrent refreshes would invalidate each other and sign the user out at
+  random.
+- **`fetchPublic()`** is what Server Components use. It is deliberately separate:
+  the `apiClient` singleton lives in module scope, and on the server module
+  scope is shared across concurrent requests, so using it for user data would
+  leak one visitor's session into another visitor's page.
+- The refresh token is an **HttpOnly cookie**, so every request sends
+  `credentials: 'include'`.
 
-### Available Scripts
+Things the client must not do, because the server already does them: compute a
+price, add up a cart, decide whether stock is available, or decide what a user
+is entitled to. `unit_price` in a response is already what *that* caller pays.
 
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
+### Money
+
+Amounts arrive as decimal strings (`"7500.00"`) because a float cannot
+represent ₦0.10. Render with `formatPrice()`; never sum them as numbers.
+
+### Guest storage
+
+Only three keys are written, and each earns its place:
+
+| Key | Store | Why |
+|---|---|---|
+| `kuyash-cart-storage` | local | zustand cache of the server cart, so the badge paints instantly |
+| `kuyash_guest_order` | **session** | a guest returning from Paystack has no session; the API needs the email to prove the order is theirs |
+| `kuyash_guest_registration` | **session** | the same, for an academy booking |
+
+The two guest keys are `sessionStorage` on purpose — they die with the tab
+rather than leaving an email address on a shared machine.
+
+## Routes
+
+```
+/                                    landing
+/categories                          category index
+/shop/[category]                     product listing (SSR)
+/shop/[category]/[product]           product detail
+/checkout                            quote-driven; no card fields ever
+/checkout/confirm                    where Paystack returns the customer
+/orders  ·  /orders/[orderNumber]    history and detail (guests use ?email=)
+/login  ·  /register                 
+/forgot-password  ·  /reset-password verified against the API, not the client
+/verify-email                        
+/profile                             profile, addresses, applications, bookings
+/become-wholesaler                   wholesale application
+/become-distributor                  distributor application
+/academy                             programmes and the live class schedule
+/academy/classes/[slug]              class detail and seat booking
+/academy/registrations/[reference]   booking receipt
+/services/[slug]                     
 ```
 
-### Code Quality
+Interactive pages split into `page.tsx` (Server Component, metadata) and a
+`*Client.tsx`. Most routes carry sibling `loading.tsx` and `error.tsx` — keep
+them if you move a route.
 
-- **ESLint**: Next.js recommended config
-- **TypeScript**: Strict mode enabled
-- **Component Documentation**: JSDoc comments
+## Design tokens
 
-## 🎨 Customization
+Tailwind v4 via `@import "tailwindcss"`; there is no `tailwind.config`. Tokens
+are CSS variables in `app/globals.css`, exposed through `@theme inline`.
 
-### Updating Content
+| Token | Value |
+|---|---|
+| primary | `#2d5f3f` |
+| secondary | `#4a7c59` |
+| accent | `#6b9d7a` |
+| earth | `#8b6f47` |
+| cream | `#faf8f5` |
 
-Edit constants in `frontend/lib/constants.ts`:
-- Navigation links
-- Stats data
-- Services information
-- Footer links
+Headings use Playfair Display, body uses Inter. Combine classes with `cn()`
+(clsx + tailwind-merge).
 
-### Changing Colors
+## Tests
 
-Update CSS variables in `frontend/app/globals.css`:
-```css
-:root {
-  --primary-green: #2d5f3f;
-  --secondary-green: #4a7c59;
-  /* ... */
-}
-```
+`npm test` runs Vitest + React Testing Library over the parts where a
+regression would be expensive and invisible:
 
-### Adding New Sections
+- the HTTP client — trailing slashes, envelope unwrapping, error mapping, and
+  single-flight refresh under concurrent 401s;
+- guest-ownership storage, including that it refuses to hand back an email for
+  a *different* order reference;
+- money formatting;
+- the class booking form — a full class renders no form at all.
 
-1. Create component in `components/sections/`
-2. Import in `app/page.tsx`
-3. Add to component tree
+There is no browser end-to-end suite yet, so a broken checkout would still
+reach production. That gap is tracked in the PRD.
 
-## 📱 Responsive Breakpoints
+## Known gaps
 
-- **Mobile**: < 640px (1 column)
-- **Tablet**: 640px - 1024px (2 columns)
-- **Desktop**: > 1024px (3-4 columns)
-
-## ⚡ Performance Features
-
-- Image optimization with Next.js Image
-- Font optimization with next/font
-- Automatic code splitting
-- Turbopack for fast development
-
-## 🔒 Best Practices
-
-✅ Component modularity
-✅ TypeScript type safety
-✅ Semantic HTML
-✅ Accessibility considerations
-✅ Consistent naming conventions
-✅ Clean code organization
-✅ Reusable utilities
-
-## 📄 License
-
-MIT License - feel free to use for your projects
-
-## 🤝 Contributing
-
-Contributions welcome! Please follow the existing code style and structure.
-
-## 📧 Contact
-
-For questions or feedback, reach out to your development team.
-
----
-
-**Built with ❤️ for sustainable farming**
+- No Playwright suite and no CI workflow; the gates above are local commands.
+- 103 product images are Unsplash hotlinks awaiting owned photography.
+- `NEXT_PUBLIC_API_URL` still falls back to `http://localhost:8000/api/v1`.
+  Removing the fallback would make a misconfigured build fail loudly, which is
+  the intent.
+- There is no staff UI. Back-office work runs through Django Admin — see PRD
+  §13 Q4, which is still an open decision.

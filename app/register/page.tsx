@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/context/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
@@ -9,7 +8,6 @@ import { Footer } from "@/components/layout/Footer";
 import { UserPlus, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
@@ -20,6 +18,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +43,7 @@ export default function RegisterPage() {
         full_name: formData.name,
         phone: formData.phone || undefined,
       });
-      router.push("/");
+      setSubmitted(true);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
     } finally {
@@ -58,6 +57,46 @@ export default function RegisterPage() {
       [e.target.name]: e.target.value,
     }));
   };
+
+  // Deliberately identical whether or not the address was already registered.
+  // Saying "welcome!" for a new account and "that email is taken" for an
+  // existing one would make this form an account-enumeration oracle, which is
+  // exactly what the API now refuses to be.
+  if (submitted) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50 pt-24 pb-16">
+          <div className="mx-auto max-w-md px-4 sm:px-6 lg:px-8">
+            <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-lg">
+              <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+                <Mail className="h-8 w-8 text-green-600" />
+              </div>
+              <h1 className="mb-2 font-serif text-3xl font-bold text-gray-900">
+                Check your email
+              </h1>
+              <p className="mb-6 text-gray-600">
+                We&apos;ve sent a message to{" "}
+                <span className="font-semibold">{formData.email}</span>. Open the link inside to
+                confirm your address, then sign in.
+              </p>
+              <p className="mb-8 text-sm text-gray-500">
+                Nothing arrived? Check your spam folder. If you already had an account with us,
+                the email explains how to get back in.
+              </p>
+              <Link
+                href="/login"
+                className="inline-block rounded-full bg-green-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-green-700"
+              >
+                Go to sign in
+              </Link>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
