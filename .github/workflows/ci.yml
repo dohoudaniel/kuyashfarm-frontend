@@ -52,6 +52,116 @@ jobs:
       - name: No secrets in the client bundle
         run: node scripts/check-bundle-secrets.mjs
 
+  # ── End-to-end ────────────────────────────────────────────────────────────
+  # Drives a real browser against a real Django API. Nothing is mocked, because
+  # every expensive bug in this project has been the two sides disagreeing about
+  # a contract, and a mock agrees with whatever you tell it to.
+  #
+  # PREREQUISITE: this checks out the backend repository. If it is private, add
+  # a `BACKEND_REPO_TOKEN` secret with read access to it — without one this job
+  # fails at checkout rather than silently skipping, which is the intent.
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: kuyash
+          POSTGRES_PASSWORD: kuyash
+          POSTGRES_DB: kuyash
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U kuyash"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+
+    steps:
+      - name: Check out the frontend
+        uses: actions/checkout@v5
+        with:
+          path: frontend
+
+      - name: Check out the backend
+        uses: actions/checkout@v5
+        with:
+          repository: dohoudaniel/kuyashfarm-backend
+          path: backend
+          token: ${{ secrets.BACKEND_REPO_TOKEN || github.token }}
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Start the API
+        working-directory: backend
+        env:
+          DJANGO_SECRET_KEY: ci-only-secret-not-used-anywhere-real
+          DJANGO_DEBUG: "True"
+          DATABASE_URL: postgresql://kuyash:kuyash@localhost:5432/kuyash
+          DB_SCHEMA: kuyash
+          REDIS_URL: redis://localhost:6379/0
+          # 3100 is where Playwright serves the frontend. Without it the browser
+          # preflight blocks every request and the failures look like bugs.
+          CORS_ALLOWED_ORIGINS: http://localhost:3100,http://127.0.0.1:3100
+          CELERY_TASK_ALWAYS_EAGER: "True"
+          # The suite makes more auth calls in a minute than any real person
+          # would. A 429 here would look like a product bug; the limiter itself
+          # is covered by the backend's tests/test_throttling.py.
+          THROTTLE_LOGIN: 200/min
+          THROTTLE_ANON: 600/min
+        run: |
+          uv sync --locked
+          uv run python manage.py ensure_schema
+          uv run python manage.py migrate --noinput
+          uv run python manage.py seed_catalogue
+          uv run python manage.py seed_academy
+          uv run python manage.py runserver 8000 --noreload &
+          for _ in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8000/api/v1/health/ >/dev/null && break
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:8000/api/v1/health/
+
+      - name: Build the frontend
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000/api/v1
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install chromium --with-deps
+
+      - name: Run end-to-end tests
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000/api/v1
+          E2E_API_URL: http://127.0.0.1:8000/api/v1
+        run: npm run test:e2e
+
+      - name: Upload the report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest

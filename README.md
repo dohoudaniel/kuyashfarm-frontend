@@ -35,6 +35,8 @@ backend, then build.
 | `npm test` | Vitest, 35 specs |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run check:bundle` | After a build: fails if anything secret-shaped reached the client JS |
+| `npm run test:e2e` | Playwright, 11 specs — needs the API running |
+| `npm run test:e2e:ui` | Playwright in watch/inspector mode |
 | `npx tsc --noEmit` | Typecheck |
 
 All of these run on every push — see `.github/workflows/ci.yml`.
@@ -147,13 +149,30 @@ regression would be expensive and invisible:
 - money formatting;
 - the class booking form — a full class renders no form at all.
 
-There is no browser end-to-end suite yet, so a broken checkout would still
-reach production. That gap is tracked in the PRD.
+`npm run test:e2e` drives a real browser against a real API — nothing mocked.
+It needs the backend running, and the API must allow `http://127.0.0.1:3100`
+in `CORS_ALLOWED_ORIGINS` (that is the port Playwright serves the build on).
+
+Eleven specs across three files:
+
+- **checkout** — browse, add to basket, place a cash-on-delivery order, and
+  confirm the item on the order is the item that went into the basket. Plus:
+  an empty basket offers no way to pay.
+- **disclosure** — signing up says exactly the same thing for a new and an
+  existing address, and does not sign you in; a failed sign-in and a password
+  reset are equally uninformative; the admin path is in no script an anonymous
+  visitor downloads.
+- **academy** — booking a seat decrements the class, issues a server-side
+  reference, and a stranger with the reference still cannot open the booking.
+
+Writing these found two production bugs that every other gate had missed —
+see the note in `e2e/checkout.spec.ts`.
 
 ## Known gaps
 
-- No Playwright suite. A broken checkout would still pass CI, because nothing
-  drives a real browser through it.
+- The end-to-end suite covers guest journeys. There is no signed-in checkout
+  path, no Paystack card flow (that leaves our origin entirely), and no
+  staff journey.
 - 103 product images are Unsplash hotlinks awaiting owned photography.
 - There is no staff UI. Back-office work runs through Django Admin — see PRD
   §13 Q4, which is still an open decision.

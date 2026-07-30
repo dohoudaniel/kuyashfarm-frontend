@@ -57,6 +57,7 @@ kuyashfarm-frontend/                  # the app lives at the repo root
 │   └── utils.ts                      # cn(), formatPrice()
 │
 ├── tests/                            # Vitest specs
+├── e2e/                              # Playwright specs (real browser, real API)
 ├── scripts/                          # check-bundle-secrets.mjs
 ├── docs/                             # back office, cart, wholesale guides
 ├── .github/workflows/ci.yml          # lint, types, tests, build, bundle scan
@@ -134,6 +135,10 @@ summed as floats.
 
 ## Tests
 
-`tests/` holds Vitest specs, run with `npm test`. They cover the HTTP client,
-guest-ownership storage, money formatting and the class-booking form. There is
-no browser end-to-end suite.
+`tests/` holds Vitest specs (`npm test`): the HTTP client, guest-ownership
+storage, money formatting and the class-booking form.
+
+`e2e/` holds Playwright specs (`npm run test:e2e`), which drive a real browser
+against a real API with nothing mocked. That is deliberate — every expensive
+bug here has been the two sides disagreeing about a contract, and a mock agrees
+with whatever you tell it to.
