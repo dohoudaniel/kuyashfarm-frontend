@@ -35,7 +35,7 @@ backend, then build.
 | `npm test` | Vitest, 35 specs |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run check:bundle` | After a build: fails if anything secret-shaped reached the client JS |
-| `npm run test:e2e` | Playwright, 11 specs — needs the API running |
+| `npm run test:e2e` | Playwright, 14 specs — needs the API running |
 | `npm run test:e2e:ui` | Playwright in watch/inspector mode |
 | `npx tsc --noEmit` | Typecheck |
 
@@ -153,7 +153,7 @@ regression would be expensive and invisible:
 It needs the backend running, and the API must allow `http://127.0.0.1:3100`
 in `CORS_ALLOWED_ORIGINS` (that is the port Playwright serves the build on).
 
-Eleven specs across three files:
+Fourteen specs across four files:
 
 - **checkout** — browse, add to basket, place a cash-on-delivery order, and
   confirm the item on the order is the item that went into the basket. Plus:
@@ -164,15 +164,24 @@ Eleven specs across three files:
   visitor downloads.
 - **academy** — booking a seat decrements the class, issues a server-side
   reference, and a stranger with the reference still cannot open the booking.
+- **signed-in** — a basket filled as a guest survives signing in (the merge is
+  best-effort in the client, so a merge that stopped working would look like
+  nothing at all); a signed-in customer is not asked to retype their email and
+  their order reaches their history; signing out genuinely ends the session,
+  which the prototype's did not.
+
+If a spec fails right after you have edited source, `rm -rf .next` and rebuild
+before believing it. An incremental Next build can leave stale chunks that
+Playwright then serves, which produces timeouts that look like product bugs.
 
 Writing these found two production bugs that every other gate had missed —
 see the note in `e2e/checkout.spec.ts`.
 
 ## Known gaps
 
-- The end-to-end suite covers guest journeys. There is no signed-in checkout
-  path, no Paystack card flow (that leaves our origin entirely), and no
-  staff journey.
+- The end-to-end suite covers guest and signed-in journeys. It does not cover
+  the Paystack card flow (that leaves our origin entirely) or any staff
+  journey.
 - 103 product images are Unsplash hotlinks awaiting owned photography.
 - There is no staff UI. Back-office work runs through Django Admin — see PRD
   §13 Q4, which is still an open decision.
