@@ -1,3 +1,7 @@
+/**
+ * Service page content. Pure marketing copy with no business records in it.
+ */
+
 import {
   Leaf,
   TrendingUp,

@@ -1,3 +1,11 @@
+/**
+ * Labelled text input.
+ *
+ * The label is wired to the input with `htmlFor`, which is what lets both
+ * assistive technology and the end-to-end suite find a field by its name
+ * rather than by a brittle CSS path.
+ */
+
 import { LucideIcon } from "lucide-react";
 
 interface FormFieldProps {

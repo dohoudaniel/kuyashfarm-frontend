@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Error boundary for anything that throws outside a more specific boundary.
+ *
+ * Keep this alongside the route when moving it — losing it turns a failed
+ * request into a crash rather than a recoverable message.
+ */
 import Link from "next/link";
 
 import { useEffect } from "react";

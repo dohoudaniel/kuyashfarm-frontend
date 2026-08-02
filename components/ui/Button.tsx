@@ -1,3 +1,11 @@
+/**
+ * Button.
+ *
+ * Variants and sizes compose through `cn()`, so a caller passing extra
+ * classes overrides cleanly rather than producing two conflicting Tailwind
+ * utilities.
+ */
+
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 

@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Frequently asked questions, as an accordion.
+ */
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";

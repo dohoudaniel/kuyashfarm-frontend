@@ -1,3 +1,10 @@
+/**
+ * Streamed while the route's data is being fetched.
+ *
+ * Keep this alongside the route when moving it — losing it turns a slow
+ * request into a blank screen.
+ */
+
 export default function OrdersLoading() {
   return (
     <div className="min-h-screen bg-[#faf8f5] pt-20">

@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Catches render errors below it and shows a recoverable message.
+ *
+ * Wraps the whole app in `ClientProviders`: without it, one throwing
+ * component blanks the entire page rather than its own corner of it.
+ */
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
 

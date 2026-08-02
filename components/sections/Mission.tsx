@@ -1,3 +1,7 @@
+/**
+ * Mission statement with supporting imagery.
+ */
+
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import Image from "next/image";

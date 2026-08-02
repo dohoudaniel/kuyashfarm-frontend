@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * The case for training at Kuyash.
+ */
 import { motion } from "framer-motion";
 import {
   Sprout, Users, Award, Handshake, Lightbulb, TrendingUp,

@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Error boundary for the product listing.
+ *
+ * Keep this alongside the route when moving it — losing it turns a failed
+ * request into a crash rather than a recoverable message.
+ */
 import { useEffect } from "react";
 import { ShoppingBasket, RotateCcw } from "lucide-react";
 

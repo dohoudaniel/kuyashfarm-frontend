@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * What a day of training actually looks like.
+ */
 import { motion } from "framer-motion";
 import { Cpu, Users, Sprout, FlaskConical } from "lucide-react";
 

@@ -1,3 +1,7 @@
+/**
+ * Small shared helpers: class merging and money formatting.
+ */
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 

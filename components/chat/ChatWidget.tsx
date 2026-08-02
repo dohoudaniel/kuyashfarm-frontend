@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * Keyword-matching support widget.
+ *
+ * It is not AI and does not pretend to be. Store facts — the free-delivery
+ * threshold, accepted payment methods — come from `/config/`, because this
+ * once quoted a ₦200,000 threshold against a configured ₦80,000 and offered
+ * PayPal, which was never a payment method here.
+ */
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Bot, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";

@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Instructor profiles.
+ */
 import { motion } from "framer-motion";
 import { ACADEMY_INSTRUCTORS } from "@/lib/data/academy";
 import { BadgeCheck } from "lucide-react";

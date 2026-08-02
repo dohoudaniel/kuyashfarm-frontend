@@ -1,3 +1,10 @@
+/**
+ * Academy landing page.
+ *
+ * The class schedule is fetched here and passed down, so the sections stay
+ * presentational and the page keeps a single source for it.
+ */
+
 import type { Metadata } from "next";
 
 import { fetchClassesPublic } from "@/lib/api/academy";

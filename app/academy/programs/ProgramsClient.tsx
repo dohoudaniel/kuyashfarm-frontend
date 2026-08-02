@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Interactive programme browser: filters and comparison.
+ */
 import { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";

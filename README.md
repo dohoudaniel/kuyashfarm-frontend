@@ -170,9 +170,15 @@ Fourteen specs across four files:
   their order reaches their history; signing out genuinely ends the session,
   which the prototype's did not.
 
-If a spec fails right after you have edited source, `rm -rf .next` and rebuild
-before believing it. An incremental Next build can leave stale chunks that
-Playwright then serves, which produces timeouts that look like product bugs.
+Two things to know before believing a failure:
+
+- If a spec fails right after you have edited source, `rm -rf .next` and rebuild.
+  An incremental Next build can leave stale chunks that Playwright then serves,
+  producing timeouts that look like product bugs.
+- Scope locators to a form or a card rather than matching a bare id. During a
+  client-side navigation React can briefly hold both the outgoing and incoming
+  trees in the DOM, so an unscoped `#email` occasionally matches twice and trips
+  strict mode. That is a flake, not a duplicate id — the served HTML has one.
 
 Writing these found two production bugs that every other gate had missed —
 see the note in `e2e/checkout.spec.ts`.

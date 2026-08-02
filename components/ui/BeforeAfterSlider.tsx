@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Draggable before/after image comparison, used on the services pages.
+ */
 import { useState } from "react";
 import Image from "next/image";
 

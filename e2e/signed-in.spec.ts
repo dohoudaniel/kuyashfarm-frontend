@@ -32,9 +32,17 @@ async function createVerifiedAccount(
 
 async function signIn(page: import("@playwright/test").Page, email: string) {
   await page.goto("/login");
-  await page.locator("#email").fill(email);
-  await page.locator("#password").fill(PASSWORD);
-  await page.getByRole("button", { name: /sign in/i }).click();
+
+  // Scoped to the form, and awaited before filling. During a client-side
+  // navigation React can briefly hold both the outgoing and incoming trees in
+  // the DOM, so a bare `#email` occasionally matched twice and failed strict
+  // mode — a flake, not a duplicate id: the served HTML has exactly one.
+  const form = page.locator("form").filter({ has: page.locator("#password") });
+  await expect(form).toBeVisible();
+
+  await form.locator("#email").fill(email);
+  await form.locator("#password").fill(PASSWORD);
+  await form.getByRole("button", { name: /sign in/i }).click();
   await expect(page).toHaveURL(/\/$|\/categories/, { timeout: 20_000 });
 }
 

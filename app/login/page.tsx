@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Sign in.
+ *
+ * The failure message is deliberately identical for a wrong password and an
+ * unknown account — the API is vague on purpose and the page must not undo
+ * that by being more helpful.
+ */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

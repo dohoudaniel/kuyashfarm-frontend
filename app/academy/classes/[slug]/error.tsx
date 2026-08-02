@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Error boundary for a class page.
+ *
+ * Keep this alongside the route when moving it — losing it turns a failed
+ * request into a crash rather than a recoverable message.
+ */
 import { useEffect } from "react";
 import { BookOpen, RotateCcw } from "lucide-react";
 

@@ -1,3 +1,7 @@
+/**
+ * Set a new password from an emailed link.
+ */
+
 import type { Metadata } from "next";
 import { Suspense } from "react";
 

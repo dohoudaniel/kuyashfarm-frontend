@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Teaching approach.
+ */
 import { motion } from "framer-motion";
 import { ClipboardList, Search, MessageSquare, CheckCircle, Users, Sprout, BarChart2, Award } from "lucide-react";
 import { ADMISSION_STEPS } from "@/lib/data/academy";

@@ -1,3 +1,7 @@
+/**
+ * 404 page.
+ */
+
 import Link from "next/link";
 import { Leaf } from "lucide-react";
 

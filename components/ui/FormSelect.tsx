@@ -1,3 +1,7 @@
+/**
+ * Labelled select, matching `FormField` so forms stay visually consistent.
+ */
+
 import { LucideIcon } from "lucide-react";
 
 interface FormSelectProps {

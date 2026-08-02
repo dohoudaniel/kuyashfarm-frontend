@@ -1,3 +1,10 @@
+/**
+ * Apply for wholesale pricing.
+ *
+ * Requires an account: approval writes `account_type` to a user row, and an
+ * anonymous application has nobody to approve.
+ */
+
 import type { Metadata } from "next";
 
 import { Navbar } from "@/components/layout/Navbar";

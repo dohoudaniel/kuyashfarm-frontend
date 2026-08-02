@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Landing hero.
+ */
 import { useState, useEffect } from "react";
 
 /**

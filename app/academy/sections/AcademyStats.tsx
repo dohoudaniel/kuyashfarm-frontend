@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Headline academy figures. Marketing copy, not live enrolment data.
+ */
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { ACADEMY_STATS } from "@/lib/data/academy";

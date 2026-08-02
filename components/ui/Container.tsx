@@ -1,3 +1,8 @@
+/**
+ * Max-width page gutter. Every full-width section wraps its content in one
+ * of these so margins stay consistent across routes.
+ */
+
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 

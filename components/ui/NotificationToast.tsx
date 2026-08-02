@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Transient in-app notifications. Mounted once in `ClientProviders`, so a
+ * message raised anywhere in the tree surfaces without prop-drilling.
+ */
 import { useEffect, useState } from "react";
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from "lucide-react";
 import { Notification } from "@/lib/types";

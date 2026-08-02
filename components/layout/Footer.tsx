@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Site footer: navigation, contact details and social links.
+ *
+ * The wholesale and distributor links live here rather than in the main nav,
+ * because they are for a minority of visitors who go looking.
+ */
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube, MessageCircle } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
 

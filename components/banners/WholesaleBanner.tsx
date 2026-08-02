@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Invites a retail shopper to apply for wholesale pricing.
+ */
 import { TrendingUp } from "lucide-react";
 
 interface WholesaleBannerProps {

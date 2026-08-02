@@ -1,3 +1,7 @@
+/**
+ * Request a password reset link.
+ */
+
 import type { Metadata } from "next";
 
 import ForgotPasswordClient from "./ForgotPasswordClient";

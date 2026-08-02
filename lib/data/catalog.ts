@@ -1,3 +1,8 @@
+/**
+ * Category presentation copy — blurbs and imagery for the shop sections.
+ * Products, prices and stock come from the API.
+ */
+
 export interface CatalogProgram {
   id: string;
   classId?: number;

@@ -1,3 +1,11 @@
+/**
+ * One order.
+ *
+ * Guests reach this too, after checking out. They are identified by the
+ * email held for the tab, because order numbers are guessable and the API
+ * refuses to show an order without proof of ownership.
+ */
+
 import type { Metadata } from "next";
 import OrderDetailClient from "./OrderDetailClient";
 

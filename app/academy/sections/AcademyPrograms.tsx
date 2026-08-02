@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Programme overview cards, linking to the full listing.
+ */
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {

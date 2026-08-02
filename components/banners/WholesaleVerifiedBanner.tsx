@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Confirms that bulk pricing is active on this account.
+ *
+ * Driven by `getsBulkPricing` from the server, never inferred from
+ * `account_type` here — pending accounts still pay retail.
+ */
 import { CheckCircle } from "lucide-react";
 
 export function WholesaleVerifiedBanner() {

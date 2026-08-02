@@ -1,3 +1,7 @@
+/**
+ * Labelled textarea with an optional character counter.
+ */
+
 import { LucideIcon } from "lucide-react";
 
 interface FormTextareaProps {

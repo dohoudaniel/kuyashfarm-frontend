@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Short-form wholesale enquiry.
+ *
+ * The full application lives at `/become-wholesaler`; this is the shortcut
+ * offered in context while somebody is shopping.
+ */
 import { useState } from "react";
 import { X } from "lucide-react";
 

@@ -1,3 +1,11 @@
+/**
+ * Static academy marketing copy — FAQ, testimonials, methodology.
+ *
+ * Classes, seats and prices are **not** here: those come from the API. This
+ * file once held the whole schedule as hardcoded arrays, which is why a
+ * class added in the admin never appeared and "8 seats left" never moved.
+ */
+
 export interface AcademyClass {
   id: number;
   title: string;

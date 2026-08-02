@@ -1,3 +1,7 @@
+/**
+ * Landing page. Assembles the marketing sections; no business data.
+ */
+
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/sections/Hero";

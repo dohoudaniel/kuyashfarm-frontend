@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Featured produce on the landing page. Reads the catalogue API, so it
+ * cannot advertise something that no longer exists.
+ */
 import Image from "next/image";
 import Link from "next/link";
 

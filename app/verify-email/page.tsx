@@ -1,3 +1,7 @@
+/**
+ * Confirm an email address from an emailed link.
+ */
+
 import type { Metadata } from "next";
 import { Suspense } from "react";
 

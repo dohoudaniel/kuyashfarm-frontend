@@ -1,3 +1,11 @@
+/**
+ * Root layout.
+ *
+ * Mounts the font variables and `ClientProviders` exactly once. Every other
+ * route renders inside this, so a provider added anywhere else would be a
+ * second, competing instance.
+ */
+
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";

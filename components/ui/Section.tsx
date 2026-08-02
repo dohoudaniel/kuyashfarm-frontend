@@ -1,3 +1,7 @@
+/**
+ * Vertical rhythm for a page section — spacing only, no opinion on content.
+ */
+
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 

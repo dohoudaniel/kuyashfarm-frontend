@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Academy hero.
+ */
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Play, Cpu, Leaf, TrendingUp } from "lucide-react";

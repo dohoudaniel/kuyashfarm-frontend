@@ -1,3 +1,7 @@
+/**
+ * Account: profile, addresses, applications and academy bookings.
+ */
+
 import type { Metadata } from "next";
 import ProfileClient from "./ProfileClient";
 

@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Short-form distributor enquiry, pointing at `/become-distributor` for the
+ * full application and its document uploads.
+ */
 import { useState } from "react";
 import { X, Truck } from "lucide-react";
 

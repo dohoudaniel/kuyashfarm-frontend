@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * Partner and accreditation logos.
+ */
 import { motion } from "framer-motion";
 import { ACADEMY_PARTNERS } from "@/lib/data/academy";
 

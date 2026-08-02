@@ -1,3 +1,7 @@
+/**
+ * Blog teasers. Static copy; there is no CMS behind this yet.
+ */
+
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import Image from "next/image";

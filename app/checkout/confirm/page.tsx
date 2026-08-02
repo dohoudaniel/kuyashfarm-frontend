@@ -1,3 +1,10 @@
+/**
+ * Where Paystack returns a customer after payment.
+ *
+ * This URL has been Paystack's `callback_url` since payments were wired up.
+ * It is wrapped in `Suspense` because it reads search params.
+ */
+
 import type { Metadata } from "next";
 import { Suspense } from "react";
 

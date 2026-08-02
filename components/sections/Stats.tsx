@@ -1,3 +1,8 @@
+/**
+ * Headline farm statistics. Marketing copy from `lib/data`, not live figures —
+ * business metrics belong to the staff analytics endpoints.
+ */
+
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { STATS } from "@/lib/constants";

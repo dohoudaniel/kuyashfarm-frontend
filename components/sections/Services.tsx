@@ -1,3 +1,7 @@
+/**
+ * Service offerings, linking through to the detail pages.
+ */
+
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SERVICES } from "@/lib/constants";

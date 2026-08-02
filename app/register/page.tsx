@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * Create an account.
+ *
+ * Submitting shows "check your email" whether or not the address was already
+ * registered, and does **not** sign you in. Both are deliberate: saying
+ * "that email is taken" would turn this form into an account-enumeration
+ * oracle, which is exactly what the API refuses to be.
+ */
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/context/AuthContext";

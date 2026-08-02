@@ -1,3 +1,7 @@
+/**
+ * Card surface with optional hover lift. Presentation only.
+ */
+
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 

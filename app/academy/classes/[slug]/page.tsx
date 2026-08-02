@@ -1,3 +1,10 @@
+/**
+ * One class, by slug.
+ *
+ * Slug-keyed rather than id-keyed: the route used to take a numeric id that
+ * matched nothing in the API, so a class added in the admin was unreachable.
+ */
+
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 

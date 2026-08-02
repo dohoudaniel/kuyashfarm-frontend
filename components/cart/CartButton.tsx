@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Basket button with a live item count.
+ *
+ * The count comes from the zustand store, which caches the *server* cart —
+ * so the badge is a fast paint of authoritative data, never a local tally.
+ */
 import { ShoppingCart } from "lucide-react";
 
 import { useCartStore } from "@/lib/store/useCartStore";

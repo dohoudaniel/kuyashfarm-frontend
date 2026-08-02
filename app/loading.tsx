@@ -1,3 +1,10 @@
+/**
+ * Streamed while the route's data is being fetched.
+ *
+ * Keep this alongside the route when moving it — losing it turns a slow
+ * request into a blank screen.
+ */
+
 export default function Loading() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#faf8f5]">

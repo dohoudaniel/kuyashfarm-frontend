@@ -1,5 +1,8 @@
 "use client";
 
+/**
+ * One service, from static marketing copy.
+ */
 import { use, useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
