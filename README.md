@@ -175,10 +175,13 @@ Two things to know before believing a failure:
 - If a spec fails right after you have edited source, `rm -rf .next` and rebuild.
   An incremental Next build can leave stale chunks that Playwright then serves,
   producing timeouts that look like product bugs.
-- Scope locators to a form or a card rather than matching a bare id. During a
-  client-side navigation React can briefly hold both the outgoing and incoming
-  trees in the DOM, so an unscoped `#email` occasionally matches twice and trips
-  strict mode. That is a flake, not a duplicate id — the served HTML has one.
+- Filter locators on `:visible` when a page can be mid-navigation. React
+  briefly holds both the outgoing and incoming trees in the DOM, so plain
+  selectors intermittently match twice and trip strict mode. Scoping to a
+  parent does *not* fix it — the duplicate simply moves up a level. Visibility
+  is what distinguishes them, because the outgoing tree is hidden while it
+  unmounts. This is a transition artefact, not a duplicate id: the served HTML
+  has exactly one.
 
 Writing these found two production bugs that every other gate had missed —
 see the note in `e2e/checkout.spec.ts`.

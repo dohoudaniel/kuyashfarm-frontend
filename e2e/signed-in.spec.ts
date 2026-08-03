@@ -33,11 +33,15 @@ async function createVerifiedAccount(
 async function signIn(page: import("@playwright/test").Page, email: string) {
   await page.goto("/login");
 
-  // Scoped to the form, and awaited before filling. During a client-side
-  // navigation React can briefly hold both the outgoing and incoming trees in
-  // the DOM, so a bare `#email` occasionally matched twice and failed strict
-  // mode — a flake, not a duplicate id: the served HTML has exactly one.
-  const form = page.locator("form").filter({ has: page.locator("#password") });
+  // During a client-side navigation React can briefly hold both the outgoing
+  // and incoming trees in the DOM, so plain selectors intermittently match
+  // twice and trip strict mode. The served HTML has exactly one of each — this
+  // is a transition artefact, not a duplicate id.
+  //
+  // Scoping to the form was not enough: the duplicate simply moved up a level.
+  // Filtering on `:visible` is what actually distinguishes them, because the
+  // outgoing tree is hidden while it unmounts.
+  const form = page.locator("form:visible").filter({ has: page.locator("#password") });
   await expect(form).toBeVisible();
 
   await form.locator("#email").fill(email);
