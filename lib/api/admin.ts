@@ -790,3 +790,33 @@ export function createInstructor(
 export function deleteInstructor(id: string): Promise<null> {
   return apiClient.delete<null>(`/staff/academy/instructors/${id}/`);
 }
+
+export interface TaxRule {
+  id: string;
+  name: string;
+  /** A fraction — 0.075 for 7.5%, not 7.5. */
+  rate: string;
+  effective_from: string;
+  effective_to: string | null;
+  is_active: boolean;
+}
+
+export function listTaxRules(): Promise<TaxRule[]> {
+  return apiClient.get<TaxRule[]>("/staff/tax-rules/");
+}
+
+/**
+ * Add a tax rate.
+ *
+ * Dated rather than a single number: an order placed last year was taxed at
+ * last year's rate and its total has to keep reconciling. Setting
+ * `effective_to` on the old rule is how you retire one — deleting it leaves
+ * historic orders with a figure nothing explains.
+ */
+export function createTaxRule(input: Partial<TaxRule>): Promise<TaxRule> {
+  return apiClient.post<TaxRule>("/staff/tax-rules/", input);
+}
+
+export function updateTaxRule(id: string, input: Partial<TaxRule>): Promise<TaxRule> {
+  return apiClient.patch<TaxRule>(`/staff/tax-rules/${id}/`, input);
+}

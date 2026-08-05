@@ -26,14 +26,18 @@ import { ApiError } from "@/lib/api/client";
 import {
   createCategory,
   createShippingRule,
+  createTaxRule,
   deleteCategory,
   deleteShippingRule,
   getSettings,
   listShippingRules,
   listStaffCategories,
+  listTaxRules,
   updateSettings,
+  updateTaxRule,
   type ShippingRule,
   type SiteSettings,
+  type TaxRule,
   type StaffCategory,
 } from "@/lib/api/admin";
 import { listStates, type State } from "@/lib/api/applications";
@@ -46,6 +50,7 @@ export default function SettingsClient() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [rules, setRules] = useState<ShippingRule[]>([]);
   const [categories, setCategories] = useState<StaffCategory[]>([]);
+  const [taxRules, setTaxRules] = useState<TaxRule[]>([]);
   const [states, setStates] = useState<State[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -55,18 +60,21 @@ export default function SettingsClient() {
 
   const [newRule, setNewRule] = useState({ name: "", state: "", flat_rate: "" });
   const [newCategory, setNewCategory] = useState("");
+  const [newTax, setNewTax] = useState({ name: "", rate: "", effective_from: "" });
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [fetched, fetchedRules, fetchedCategories] = await Promise.all([
+      const [fetched, fetchedRules, fetchedCategories, fetchedTax] = await Promise.all([
         getSettings(),
         listShippingRules(),
         listStaffCategories(),
+        listTaxRules(),
       ]);
       setSettings(fetched);
       setRules(fetchedRules);
       setCategories(fetchedCategories);
+      setTaxRules(fetchedTax);
       setError("");
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "Could not load the settings.");
@@ -332,6 +340,98 @@ export default function SettingsClient() {
               className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-secondary disabled:opacity-50"
             >
               <Plus className="h-4 w-4" /> Add
+            </button>
+          </div>
+        </section>
+
+        <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="mb-1 font-semibold text-gray-900">Tax</h2>
+          <p className="mb-4 text-sm text-gray-600">
+            Rates are dated, because an order placed last year was taxed at last year&apos;s rate
+            and its total has to keep reconciling. To retire a rate, give it an end date — deleting
+            it leaves historic orders with a figure nothing explains.
+          </p>
+
+          <ul className="mb-4 divide-y divide-gray-100">
+            {taxRules.map((rule) => (
+              <li key={rule.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                <span>
+                  <strong>{rule.name}</strong>{" "}
+                  <span className="text-gray-500">
+                    {/* Stored as a fraction; shown as the percentage people
+                        talk in, so nobody enters 7.5 meaning 750%. */}
+                    {(Number(rule.rate) * 100).toFixed(2)}% · from{" "}
+                    {new Date(rule.effective_from).toLocaleDateString("en-NG")}
+                    {rule.effective_to
+                      ? ` to ${new Date(rule.effective_to).toLocaleDateString("en-NG")}`
+                      : " · current"}
+                  </span>
+                </span>
+                {!rule.effective_to && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const ends = prompt("End this rate on which date? (yyyy-mm-dd)");
+                      if (!ends) return;
+                      void run(
+                        () => updateTaxRule(rule.id, { effective_to: ends }),
+                        "Rate end-dated. Historic orders keep the figure they were taxed at.",
+                      );
+                    }}
+                    className="rounded-lg border border-gray-300 px-3 py-1 text-xs hover:bg-gray-50"
+                  >
+                    End it
+                  </button>
+                )}
+              </li>
+            ))}
+            {taxRules.length === 0 && (
+              <li className="py-2 text-sm text-gray-500">No tax rate configured.</li>
+            )}
+          </ul>
+
+          <div className="flex flex-wrap items-end gap-3">
+            <FormField
+              label="Name"
+              name="tax_name"
+              value={newTax.name}
+              onChange={(e) => setNewTax({ ...newTax, name: e.target.value })}
+              placeholder="VAT"
+            />
+            <FormField
+              label="Rate (%)"
+              name="tax_rate"
+              value={newTax.rate}
+              onChange={(e) => setNewTax({ ...newTax, rate: e.target.value })}
+              placeholder="7.5"
+            />
+            <FormField
+              label="Applies from"
+              name="tax_from"
+              type="text"
+              value={newTax.effective_from}
+              onChange={(e) => setNewTax({ ...newTax, effective_from: e.target.value })}
+              placeholder="2026-01-01"
+            />
+            <button
+              type="button"
+              disabled={busy || !newTax.name || !newTax.rate || !newTax.effective_from}
+              onClick={() =>
+                void run(async () => {
+                  await createTaxRule({
+                    name: newTax.name,
+                    // Typed as a percentage, stored as a fraction. The server
+                    // refuses anything above 1, so 7.5 would be rejected — but
+                    // converting here means nobody has to know that.
+                    rate: String(Number(newTax.rate) / 100),
+                    effective_from: newTax.effective_from,
+                  });
+                  setNewTax({ name: "", rate: "", effective_from: "" });
+                }, "Tax rate added.")
+              }
+              className="flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-secondary disabled:opacity-50"
+            >
+              <Plus className="h-4 w-4" /> Add rate
             </button>
           </div>
         </section>
