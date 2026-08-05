@@ -29,6 +29,17 @@ import { AlertCircle, CheckCircle2, FileUp, Loader2, Lock, X } from "lucide-reac
 
 import { ApiError } from "@/lib/api/client";
 import {
+  fromApiFieldErrors,
+  isValid,
+  validateEmail,
+  validateFields,
+  validateInteger,
+  validateMeaningfulText,
+  validatePersonName,
+  validatePhone,
+  validateStreetAddress,
+} from "@/lib/validation";
+import {
   listStates,
   listTiers,
   submitApplication,
@@ -161,9 +172,64 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
     set(list.includes(value) ? list.filter((item) => item !== value) : [...list, value]);
   }
 
+  /**
+   * The rules, mirroring `SubmitApplicationSerializer`.
+   *
+   * Only what the server actually requires is required here. `cac_number` and
+   * `tax_id` are `allow_blank` — plenty of legitimate small traders have
+   * neither — so they are checked for shape only when filled in. Demanding
+   * them would turn an optional field into a wall.
+   *
+   * `years_in_business` carries the server's own 0–200 bounds. The API rejects
+   * 5000 with a 400 that would otherwise arrive after the whole form was
+   * filled in.
+   */
+  const rules: Record<string, (value: string) => string | undefined> = {
+    business_name: (value) => validateMeaningfulText(value, { field: "Business name" }),
+    business_address: validateStreetAddress,
+    cac_number: (value) =>
+      value.trim() ? validateMeaningfulText(value, { minimum: 2, field: "CAC number" }) : undefined,
+    tax_id: (value) =>
+      value.trim() ? validateMeaningfulText(value, { minimum: 2, field: "Tax ID" }) : undefined,
+    years_in_business: (value) =>
+      validateInteger(value, { min: 0, max: 200, field: "Years in business" }),
+    retail_network_size: (value) =>
+      validateInteger(value, { min: 0, field: "Retail network size" }),
+    contact_person: validatePersonName,
+    contact_email: validateEmail,
+    contact_phone: validatePhone,
+    // Required for distributors only — the serializer says so, and asking a
+    // wholesaler for it would block a form the server would have accepted.
+    monthly_volume_capacity: (value) =>
+      isDistributor && !value.trim() ? "Tell us roughly how much you move per month." : undefined,
+  };
+
+  /** Check one field when it is left, in the shape `FieldErrors` renders. */
+  function blur(name: string) {
+    const message = rules[name]?.(form[name as keyof typeof form] ?? "");
+    setErrors((current) => ({ ...current, [name]: message ? [message] : [] }));
+  }
+
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setFormError("");
+
+    const problems = validateFields(rules, form);
+    // The states picker is not a text field, so it cannot go through
+    // `validateFields`, but the server rejects an empty list for distributors.
+    if (isDistributor && selectedStates.length === 0) {
+      problems.state_ids = "Select the states you can distribute in.";
+    }
+
+    if (!isValid(problems)) {
+      setErrors(
+        Object.fromEntries(Object.entries(problems).map(([field, message]) => [field, [message]])),
+      );
+      setFormError("Please correct the highlighted fields.");
+      document.getElementById(Object.keys(problems)[0]!)?.focus();
+      return;
+    }
+
     setErrors({});
     setSubmitting(true);
 
@@ -191,7 +257,14 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
     } catch (caught) {
       if (caught instanceof ApiError) {
         setFormError(caught.message);
-        setErrors(caught.fieldErrors);
+        setErrors(
+          Object.fromEntries(
+            Object.entries(fromApiFieldErrors(caught.fieldErrors)).map(([field, message]) => [
+              field,
+              [message],
+            ]),
+          ),
+        );
       } else {
         setFormError("We couldn't submit your application. Please try again.");
       }
@@ -285,6 +358,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                 name="business_name"
                 value={form.business_name}
                 onChange={change}
+                onBlur={() => blur("business_name")}
+                aria-invalid={!!errors.business_name?.length}
                 required
                 className={fieldClass("business_name")}
               />
@@ -300,6 +375,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                 name="business_address"
                 value={form.business_address}
                 onChange={change}
+                onBlur={() => blur("business_address")}
+                aria-invalid={!!errors.business_address?.length}
                 required
                 rows={2}
                 className={`${fieldClass("business_address")} resize-none`}
@@ -317,6 +394,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                   name="cac_number"
                   value={form.cac_number}
                   onChange={change}
+                  onBlur={() => blur("cac_number")}
+                  aria-invalid={!!errors.cac_number?.length}
                   placeholder="RC1234567"
                   className={fieldClass("cac_number")}
                 />
@@ -331,6 +410,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                   name="tax_id"
                   value={form.tax_id}
                   onChange={change}
+                  onBlur={() => blur("tax_id")}
+                  aria-invalid={!!errors.tax_id?.length}
                   className={fieldClass("tax_id")}
                 />
                 <FieldErrors name="tax_id" />
@@ -350,6 +431,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                   max={200}
                   value={form.years_in_business}
                   onChange={change}
+                  onBlur={() => blur("years_in_business")}
+                  aria-invalid={!!errors.years_in_business?.length}
                   className={fieldClass("years_in_business")}
                 />
                 <FieldErrors name="years_in_business" />
@@ -395,6 +478,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                 name="monthly_volume_capacity"
                 value={form.monthly_volume_capacity}
                 onChange={change}
+                onBlur={() => blur("monthly_volume_capacity")}
+                aria-invalid={!!errors.monthly_volume_capacity?.length}
                 required={isDistributor}
                 className={`${fieldClass("monthly_volume_capacity")} bg-white`}
               >
@@ -422,6 +507,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                 min={0}
                 value={form.retail_network_size}
                 onChange={change}
+                onBlur={() => blur("retail_network_size")}
+                aria-invalid={!!errors.retail_network_size?.length}
                 className={fieldClass("retail_network_size")}
               />
               <FieldErrors name="retail_network_size" />
@@ -517,6 +604,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                 name="contact_person"
                 value={form.contact_person}
                 onChange={change}
+                onBlur={() => blur("contact_person")}
+                aria-invalid={!!errors.contact_person?.length}
                 required
                 className={fieldClass("contact_person")}
               />
@@ -532,6 +621,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                 type="email"
                 value={form.contact_email}
                 onChange={change}
+                onBlur={() => blur("contact_email")}
+                aria-invalid={!!errors.contact_email?.length}
                 required
                 className={fieldClass("contact_email")}
               />
@@ -546,6 +637,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                 name="contact_phone"
                 value={form.contact_phone}
                 onChange={change}
+                onBlur={() => blur("contact_phone")}
+                aria-invalid={!!errors.contact_phone?.length}
                 required
                 className={fieldClass("contact_phone")}
               />

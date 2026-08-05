@@ -9,6 +9,8 @@ interface FormTextareaProps {
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  /** Validate when the field is left, not on every keystroke. */
+  onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
   error?: string;
   placeholder?: string;
   icon?: LucideIcon;
@@ -27,6 +29,7 @@ export function FormTextarea({
   name,
   value,
   onChange,
+  onBlur,
   error,
   placeholder,
   icon: Icon,
@@ -50,6 +53,7 @@ export function FormTextarea({
           name={name}
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
           disabled={disabled}
           placeholder={placeholder}
           rows={rows}

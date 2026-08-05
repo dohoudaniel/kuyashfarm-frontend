@@ -16,17 +16,31 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ApiError } from "@/lib/api/client";
 import { requestPasswordReset } from "@/lib/api/auth";
+import { validateEmail } from "@/lib/validation";
 
 export default function ForgotPasswordClient() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
+
+    // A typo'd address otherwise consumes one of the throttled reset attempts
+    // and then shows the same "check your email" as a success, so the customer
+    // waits for a message that was never going to arrive.
+    const problem = validateEmail(email);
+    if (problem) {
+      setEmailError(problem);
+      document.getElementById("email")?.focus();
+      return;
+    }
+
     setBusy(true);
     setError("");
+    setEmailError("");
     try {
       await requestPasswordReset(email);
       setSent(true);
@@ -84,11 +98,26 @@ export default function ForgotPasswordClient() {
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(event) => setEmail(event.target.value)}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      setEmailError("");
+                    }}
+                    onBlur={() => setEmailError(validateEmail(email) ?? "")}
                     required
                     autoComplete="email"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary"
+                    aria-invalid={!!emailError}
+                    aria-describedby={emailError ? "email-error" : undefined}
+                    className={`w-full rounded-lg border px-4 py-3 focus:ring-1 ${
+                      emailError
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:border-primary focus:ring-primary"
+                    }`}
                   />
+                  {emailError && (
+                    <p id="email-error" role="alert" className="mt-1 text-sm text-red-600">
+                      {emailError}
+                    </p>
+                  )}
                 </div>
                 <button
                   type="submit"

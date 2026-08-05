@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/context/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { LogIn, Mail, Lock, AlertCircle } from "lucide-react";
+import { isValid, validateEmail, validateFields, type FieldErrors } from "@/lib/validation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,10 +25,39 @@ export default function LoginPage() {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  /**
+   * Only the shape of what was typed, never anything about the account.
+   *
+   * The password rule is deliberately just "not empty". Applying the
+   * create-a-password rules here would reject an older account's valid
+   * password at the door, and "use at least 8 characters" is nonsense advice
+   * when you are typing a password you already have. It would also hint at
+   * what this account's password looks like, which this page exists not to do.
+   */
+  const rules = {
+    email: validateEmail,
+    password: (value: string) => (value ? undefined : "Enter your password."),
+  };
+
+  const handleBlur = (field: keyof typeof rules) => {
+    const message = rules[field](formData[field]);
+    setFieldErrors((current) => ({ ...current, [field]: message ?? "" }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const problems = validateFields(rules, formData);
+    if (!isValid(problems)) {
+      setFieldErrors(problems);
+      document.getElementById(Object.keys(problems)[0]!)?.focus();
+      return;
+    }
+
+    setFieldErrors({});
     setIsLoading(true);
 
     try {
@@ -45,6 +75,7 @@ export default function LoginPage() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+    setFieldErrors((current) => ({ ...current, [e.target.name]: "" }));
   };
 
   return (
@@ -92,10 +123,22 @@ export default function LoginPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    onBlur={() => handleBlur("email")}
+                    aria-invalid={!!fieldErrors.email}
+                    aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
+                      fieldErrors.email
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-green-500"
+                    }`}
                     placeholder="you@example.com"
                   />
                 </div>
+                  {fieldErrors.email && (
+                    <p id="email-error" role="alert" className="mt-1 text-sm text-red-600">
+                      {fieldErrors.email}
+                    </p>
+                  )}
               </div>
 
               {/* Password Field */}
@@ -125,10 +168,22 @@ export default function LoginPage() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    onBlur={() => handleBlur("password")}
+                    aria-invalid={!!fieldErrors.password}
+                    aria-describedby={fieldErrors.password ? "password-error" : undefined}
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
+                      fieldErrors.password
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-green-500"
+                    }`}
                     placeholder="••••••••"
                   />
                 </div>
+                  {fieldErrors.password && (
+                    <p id="password-error" role="alert" className="mt-1 text-sm text-red-600">
+                      {fieldErrors.password}
+                    </p>
+                  )}
               </div>
 
               {/* Submit Button */}

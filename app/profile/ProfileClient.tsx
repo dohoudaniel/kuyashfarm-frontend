@@ -25,6 +25,15 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FormField } from "@/components/ui/FormField";
 import { ApiError } from "@/lib/api/client";
+import {
+  isValid,
+  validateFields,
+  validatePassword,
+  validatePasswordConfirmation,
+  validatePersonName,
+  validatePhone,
+  type FieldErrors,
+} from "@/lib/validation";
 import * as authApi from "@/lib/api/auth";
 import { useAuth } from "@/lib/context/AuthContext";
 import type { Address } from "@/lib/api/types";
@@ -62,6 +71,7 @@ export default function ProfileClient() {
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [passwords, setPasswords] = useState({ current: "", next: "", confirm: "" });
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   // An applicant used to have no way to see whether their application had been
   // looked at — approvals were written into the reviewer's own browser and
@@ -92,11 +102,31 @@ export default function ProfileClient() {
     void myRegistrations().then(setRegistrations, () => setRegistrations([]));
   }, [isAuthenticated, loadAddresses]);
 
+  /**
+   * Only `full_name` and `phone` are editable here — `accounts.services`
+   * restricts it to exactly those two — so those are the only rules needed.
+   * Phone is optional, but a half-typed one is worse than a blank: it looks
+   * like a way to reach the customer about an order, and it is not.
+   */
+  const profileRules = {
+    full_name: validatePersonName,
+    phone: (value: string) => (value.trim() ? validatePhone(value) : undefined),
+  };
+
   async function handleSaveProfile(event: React.FormEvent) {
     event.preventDefault();
-    setSaving(true);
     setMessage(null);
     setError(null);
+
+    const problems = validateFields(profileRules, { full_name: fullName, phone });
+    if (!isValid(problems)) {
+      setFieldErrors(problems);
+      document.getElementById(Object.keys(problems)[0]!)?.focus();
+      return;
+    }
+
+    setFieldErrors({});
+    setSaving(true);
     try {
       await updateProfile({ full_name: fullName, phone });
       setMessage("Profile updated.");
@@ -109,9 +139,25 @@ export default function ProfileClient() {
 
   async function handleChangePassword(event: React.FormEvent) {
     event.preventDefault();
-    setSaving(true);
     setMessage(null);
     setError(null);
+
+    const problems = validateFields(
+      {
+        current: (value: string) => (value ? undefined : "Enter your current password."),
+        next: validatePassword,
+        confirm: (value: string) => validatePasswordConfirmation(passwords.next, value),
+      },
+      passwords,
+    );
+    if (!isValid(problems)) {
+      setFieldErrors(problems);
+      document.getElementById(Object.keys(problems)[0]!)?.focus();
+      return;
+    }
+
+    setFieldErrors({});
+    setSaving(true);
     try {
       await authApi.changePassword({
         current_password: passwords.current,
@@ -204,8 +250,14 @@ export default function ProfileClient() {
             <div className="lg:col-span-3">
               {tab === "profile" && (
                 <form onSubmit={handleSaveProfile} className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
-                  <FormField label="Full name" name="full_name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                  <FormField label="Phone" name="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  <FormField label="Full name" name="full_name" value={fullName}
+                    onChange={(e) => { setFullName(e.target.value); setFieldErrors((c) => ({ ...c, full_name: "" })); }}
+                    onBlur={() => setFieldErrors((c) => ({ ...c, full_name: validatePersonName(fullName) ?? "" }))}
+                    error={fieldErrors.full_name} required autoComplete="name" />
+                  <FormField label="Phone" name="phone" type="tel" value={phone}
+                    onChange={(e) => { setPhone(e.target.value); setFieldErrors((c) => ({ ...c, phone: "" })); }}
+                    onBlur={() => setFieldErrors((c) => ({ ...c, phone: (phone.trim() ? validatePhone(phone) : undefined) ?? "" }))}
+                    error={fieldErrors.phone} autoComplete="tel" placeholder="08039876543" />
                   <p className="text-xs text-gray-500">
                     Your email address and account type are set by Kuyash Farm and cannot be
                     changed here.
@@ -385,9 +437,15 @@ export default function ProfileClient() {
               {tab === "settings" && (
                 <form onSubmit={handleChangePassword} className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
                   <h2 className="text-lg font-bold text-gray-900">Change password</h2>
-                  <FormField label="Current password" name="current" type="password" value={passwords.current} onChange={(e) => setPasswords({ ...passwords, current: e.target.value })} required />
-                  <FormField label="New password" name="next" type="password" value={passwords.next} onChange={(e) => setPasswords({ ...passwords, next: e.target.value })} required />
-                  <FormField label="Confirm new password" name="confirm" type="password" value={passwords.confirm} onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })} required />
+                  <FormField label="Current password" name="current" type="password" value={passwords.current}
+                    onChange={(e) => { setPasswords({ ...passwords, current: e.target.value }); setFieldErrors((c) => ({ ...c, current: "" })); }}
+                    error={fieldErrors.current} required autoComplete="current-password" />
+                  <FormField label="New password" name="next" type="password" value={passwords.next}
+                    onChange={(e) => { setPasswords({ ...passwords, next: e.target.value }); setFieldErrors((c) => ({ ...c, next: "" })); }}
+                    error={fieldErrors.next} required autoComplete="new-password" />
+                  <FormField label="Confirm new password" name="confirm" type="password" value={passwords.confirm}
+                    onChange={(e) => { setPasswords({ ...passwords, confirm: e.target.value }); setFieldErrors((c) => ({ ...c, confirm: "" })); }}
+                    error={fieldErrors.confirm} required autoComplete="new-password" />
                   <button type="submit" disabled={saving} className="rounded-lg bg-primary px-6 py-2.5 font-semibold text-white hover:bg-secondary disabled:opacity-60">
                     {saving ? "Saving…" : "Change password"}
                   </button>

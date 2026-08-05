@@ -17,6 +17,14 @@ import { CheckCircle2, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ApiError } from "@/lib/api/client";
+import {
+  fromApiFieldErrors,
+  isValid,
+  validateFields,
+  validatePassword,
+  validatePasswordConfirmation,
+  type FieldErrors,
+} from "@/lib/validation";
 import { confirmPasswordReset } from "@/lib/api/auth";
 
 export default function ResetPasswordClient() {
@@ -32,20 +40,30 @@ export default function ResetPasswordClient() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const linkComplete = Boolean(uid && token);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
-    setFieldErrors({});
 
-    if (password !== confirm) {
-      setError("The two passwords don't match.");
+    const problems = validateFields(
+      {
+        new_password: validatePassword,
+        new_password_confirm: (value: string) => validatePasswordConfirmation(password, value),
+      },
+      { new_password: password, new_password_confirm: confirm },
+    );
+    if (!isValid(problems)) {
+      setFieldErrors(problems);
+      // A reset link is single-use and expires. Burning one on a typo means
+      // going back to the email and requesting another.
+      document.getElementById(problems.new_password ? "password" : "confirm")?.focus();
       return;
     }
 
+    setFieldErrors({});
     setBusy(true);
     try {
       await confirmPasswordReset({
@@ -60,7 +78,7 @@ export default function ResetPasswordClient() {
     } catch (caught) {
       if (caught instanceof ApiError) {
         setError(caught.message);
-        setFieldErrors(caught.fieldErrors);
+        setFieldErrors(fromApiFieldErrors(caught.fieldErrors));
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -118,11 +136,29 @@ export default function ResetPasswordClient() {
                       id="password"
                       type={visible ? "text" : "password"}
                       value={password}
-                      onChange={(event) => setPassword(event.target.value)}
+                      onChange={(event) => {
+                        setPassword(event.target.value);
+                        setFieldErrors((current) => ({ ...current, new_password: "" }));
+                      }}
+                      onBlur={() =>
+                        setFieldErrors((current) => ({
+                          ...current,
+                          new_password: validatePassword(password) ?? "",
+                        }))
+                      }
                       required
-                      minLength={10}
+                      // Eight, not ten. The server's MinimumLengthValidator is
+                      // set to 8, so `minLength={10}` had the browser silently
+                      // blocking passwords the API would have accepted.
+                      minLength={8}
                       autoComplete="new-password"
-                      className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-11 focus:border-primary focus:ring-1 focus:ring-primary"
+                      aria-invalid={!!fieldErrors.new_password}
+                      aria-describedby={fieldErrors.new_password ? "password-error" : undefined}
+                      className={`w-full rounded-lg border px-4 py-3 pr-11 focus:ring-1 ${
+                        fieldErrors.new_password
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:border-primary focus:ring-primary"
+                      }`}
                     />
                     <button
                       type="button"
@@ -133,11 +169,13 @@ export default function ResetPasswordClient() {
                       {visible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
                   </div>
-                  {fieldErrors.new_password?.map((problem) => (
-                    <p key={problem} className="mt-1 text-xs text-red-600">{problem}</p>
-                  ))}
+                  {fieldErrors.new_password && (
+                    <p id="password-error" role="alert" className="mt-1 text-xs text-red-600">
+                      {fieldErrors.new_password}
+                    </p>
+                  )}
                   <p className="mt-1 text-xs text-gray-500">
-                    At least 10 characters, and not a password everyone uses.
+                    At least 8 characters, not all numbers, and not a password everyone uses.
                   </p>
                 </div>
 
@@ -149,11 +187,33 @@ export default function ResetPasswordClient() {
                     id="confirm"
                     type={visible ? "text" : "password"}
                     value={confirm}
-                    onChange={(event) => setConfirm(event.target.value)}
+                    onChange={(event) => {
+                      setConfirm(event.target.value);
+                      setFieldErrors((current) => ({ ...current, new_password_confirm: "" }));
+                    }}
+                    onBlur={() =>
+                      setFieldErrors((current) => ({
+                        ...current,
+                        new_password_confirm: validatePasswordConfirmation(password, confirm) ?? "",
+                      }))
+                    }
                     required
                     autoComplete="new-password"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary"
+                    aria-invalid={!!fieldErrors.new_password_confirm}
+                    aria-describedby={
+                      fieldErrors.new_password_confirm ? "confirm-error" : undefined
+                    }
+                    className={`w-full rounded-lg border px-4 py-3 focus:ring-1 ${
+                      fieldErrors.new_password_confirm
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:border-primary focus:ring-primary"
+                    }`}
                   />
+                  {fieldErrors.new_password_confirm && (
+                    <p id="confirm-error" role="alert" className="mt-1 text-xs text-red-600">
+                      {fieldErrors.new_password_confirm}
+                    </p>
+                  )}
                 </div>
 
                 <button

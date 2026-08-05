@@ -4,6 +4,8 @@
  * Newsletter sign-up for announcements about new dates.
  */
 import { useState } from "react";
+
+import { validateEmail } from "@/lib/validation";
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle } from "lucide-react";
 
@@ -11,11 +13,25 @@ export function AcademyNewsletter() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+
+    const problem = validateEmail(email);
+    if (problem) {
+      setError(problem);
+      return;
+    }
+    setError("");
+
     setLoading(true);
+    // NOTE: there is no newsletter endpoint on the API — no serializer, no
+    // route, no table. This delay and the success panel below it are the
+    // prototype's, and nobody is subscribed by pressing this button. The
+    // address is validated so that whoever wires up the real endpoint is not
+    // handed a backlog of malformed input, but the confirmation message is
+    // still untrue until that endpoint exists.
     await new Promise((r) => setTimeout(r, 800));
     setSubmitted(true);
     setLoading(false);
@@ -88,14 +104,23 @@ export function AcademyNewsletter() {
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="email"
                     placeholder="Enter your email address"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError("");
+                    }}
+                    onBlur={() => setError(validateEmail(email) ?? "")}
                     required
-                    className="flex-1 bg-white/[0.06] border border-white/15 text-white placeholder:text-white/30 rounded-xl px-5 py-4 text-sm font-sans outline-none focus:border-[#2d5f3f] focus:bg-white/[0.09] transition-all duration-200"
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "newsletter-error" : undefined}
+                    className={`flex-1 bg-white/[0.06] border text-white placeholder:text-white/30 rounded-xl px-5 py-4 text-sm font-sans outline-none focus:bg-white/[0.09] transition-all duration-200 ${
+                      error ? "border-red-400/70" : "border-white/15 focus:border-[#2d5f3f]"
+                    }`}
                   />
                   <button
                     type="submit"
@@ -108,6 +133,12 @@ export function AcademyNewsletter() {
                       <>Subscribe <ArrowRight className="w-4 h-4" /></>
                     )}
                   </button>
+                  </div>
+                  {error && (
+                    <p id="newsletter-error" role="alert" className="text-xs text-red-300">
+                      {error}
+                    </p>
+                  )}
                 </form>
               )}
               <p className="mt-3 text-white/25 text-xs font-sans">

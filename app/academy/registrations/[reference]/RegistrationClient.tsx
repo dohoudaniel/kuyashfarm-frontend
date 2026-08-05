@@ -32,6 +32,7 @@ import { cancelRegistration, getRegistration, type Registration } from "@/lib/ap
 import { registrationEmailFor } from "@/lib/api/guest-registration";
 import { useAuth } from "@/lib/context/AuthContext";
 import { formatPrice } from "@/lib/utils";
+import { validateEmail } from "@/lib/validation";
 
 const STATUS_COPY: Record<
   Registration["status"],
@@ -71,6 +72,7 @@ export default function RegistrationClient({ reference }: { reference: string })
   const [loading, setLoading] = useState(true);
   const [needsEmail, setNeedsEmail] = useState(false);
   const [emailInput, setEmailInput] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
 
@@ -162,18 +164,42 @@ export default function RegistrationClient({ reference }: { reference: string })
                 <form
                   onSubmit={(event) => {
                     event.preventDefault();
+                    // A malformed address just returns 403 — the API cannot
+                    // distinguish "wrong email" from "not your booking", by
+                    // design — so the customer sees "that isn't the right
+                    // email" for what is really a typo. Catch it here instead.
+                    const problem = validateEmail(emailInput);
+                    if (problem) {
+                      setEmailError(problem);
+                      return;
+                    }
+                    setEmailError("");
                     void load(emailInput.trim());
                   }}
                   className="space-y-4"
                 >
                   <input
+                    id="booking-email"
                     type="email"
                     required
                     value={emailInput}
-                    onChange={(event) => setEmailInput(event.target.value)}
+                    onChange={(event) => {
+                      setEmailInput(event.target.value);
+                      setEmailError("");
+                    }}
+                    onBlur={() => setEmailError(validateEmail(emailInput) ?? "")}
                     placeholder="you@example.com"
-                    className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#2d5f3f]/30"
+                    aria-invalid={!!emailError}
+                    aria-describedby={emailError ? "booking-email-error" : undefined}
+                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#2d5f3f]/30 ${
+                      emailError ? "border-red-400" : "border-gray-200"
+                    }`}
                   />
+                  {emailError && (
+                    <p id="booking-email-error" role="alert" className="text-sm text-red-600">
+                      {emailError}
+                    </p>
+                  )}
                   <button
                     type="submit"
                     className="w-full rounded-full bg-[#2d5f3f] py-3 font-semibold text-white transition-colors hover:bg-[#1a3d2b]"

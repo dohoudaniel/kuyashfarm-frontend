@@ -14,6 +14,14 @@ interface FormFieldProps {
   type?: "text" | "email" | "tel" | "number" | "password";
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /**
+   * Validate when the field is left, rather than on every keystroke.
+   *
+   * Checking as someone types tells them their email is invalid after the
+   * first character, which trains people to ignore the message. Blur is the
+   * first moment the value is meant to be complete.
+   */
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   error?: string;
   placeholder?: string;
   icon?: LucideIcon;
@@ -32,6 +40,7 @@ export function FormField({
   type = "text",
   value,
   onChange,
+  onBlur,
   error,
   placeholder,
   icon: Icon,
@@ -55,6 +64,7 @@ export function FormField({
           name={name}
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
           disabled={disabled}
           autoComplete={autoComplete}
           placeholder={placeholder}

@@ -37,6 +37,15 @@ import { registerForClass, type AcademyClassDetail } from "@/lib/api/academy";
 import { rememberRegistration } from "@/lib/api/guest-registration";
 import { useAuth } from "@/lib/context/AuthContext";
 import { formatPrice } from "@/lib/utils";
+import {
+  fromApiFieldErrors,
+  isValid,
+  validateEmail,
+  validateFields,
+  validateMeaningfulText,
+  validatePersonName,
+  validatePhone,
+} from "@/lib/validation";
 
 const LEVEL_STYLES: Record<string, string> = {
   BEGINNER: "bg-green-100 text-green-800",
@@ -105,9 +114,48 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
     }
   }
 
+  /**
+   * What a booking has to contain to be worth holding a seat for.
+   *
+   * This form is why this whole module exists: the API accepted
+   * `full_name: "..."` with `phone: "aaaaaaaaaa"` and held a real seat on a
+   * real class for it. Nobody could have been contacted, and the seat was
+   * gone. The server now refuses that too; this is the copy that says so
+   * before the seat is taken.
+   *
+   * `email` is optional only when signed in, where the API falls back to the
+   * account address rather than making someone retype it.
+   */
+  const rules = {
+    full_name: validatePersonName,
+    email: isAuthenticated
+      ? (value: string) => (value.trim() ? validateEmail(value) : undefined)
+      : validateEmail,
+    phone: validatePhone,
+    occupation: (value: string) =>
+      value.trim() ? validateMeaningfulText(value, { field: "Occupation" }) : undefined,
+  };
+
+  /** Check one field when it is left, in the shape the markup already renders. */
+  function blur(field: keyof typeof rules) {
+    const message = rules[field](form[field]);
+    setErrors((current) => ({ ...current, [field]: message ? [message] : [] }));
+  }
+
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setFormError("");
+
+    const problems = validateFields(rules, form);
+    if (!isValid(problems)) {
+      setErrors(
+        Object.fromEntries(Object.entries(problems).map(([field, message]) => [field, [message]])),
+      );
+      setFormError("Please correct the highlighted fields.");
+      document.getElementById(Object.keys(problems)[0]!)?.focus();
+      return;
+    }
+
     setErrors({});
     setSubmitting(true);
 
@@ -132,7 +180,14 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
     } catch (caught) {
       if (caught instanceof ApiError) {
         setFormError(caught.message);
-        setErrors(caught.fieldErrors);
+        setErrors(
+          Object.fromEntries(
+            Object.entries(fromApiFieldErrors(caught.fieldErrors)).map(([field, message]) => [
+              field,
+              [message],
+            ]),
+          ),
+        );
       } else {
         setFormError("We couldn't complete your registration. Please try again.");
       }
@@ -328,8 +383,10 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         name="full_name"
                         value={form.full_name}
                         onChange={change}
+                        onBlur={() => blur("full_name")}
                         required
                         placeholder="Adaeze Okonkwo"
+                        aria-invalid={!!errors.full_name?.length}
                         className={fieldClass("full_name")}
                       />
                       {errors.full_name?.map((problem) => (
@@ -352,7 +409,9 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         type="email"
                         value={form.email}
                         onChange={change}
+                        onBlur={() => blur("email")}
                         required={!isAuthenticated}
+                        aria-invalid={!!errors.email?.length}
                         placeholder={user?.email ?? "you@example.com"}
                         className={fieldClass("email")}
                       />
@@ -380,8 +439,10 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         name="phone"
                         value={form.phone}
                         onChange={change}
+                        onBlur={() => blur("phone")}
                         required
-                        placeholder="08012345678"
+                        placeholder="08039876543"
+                        aria-invalid={!!errors.phone?.length}
                         className={fieldClass("phone")}
                       />
                       {errors.phone?.map((problem) => (
@@ -403,9 +464,16 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         name="occupation"
                         value={form.occupation}
                         onChange={change}
+                        onBlur={() => blur("occupation")}
                         placeholder="e.g. Farmer, Student, Business owner"
+                        aria-invalid={!!errors.occupation?.length}
                         className={fieldClass("occupation")}
                       />
+                      {errors.occupation?.map((problem) => (
+                        <p key={problem} role="alert" className="mt-1 text-xs text-red-500">
+                          {problem}
+                        </p>
+                      ))}
                     </div>
 
                     <div>

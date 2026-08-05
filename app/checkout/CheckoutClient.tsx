@@ -26,6 +26,7 @@ import { ArrowLeft, Banknote, Loader2, Lock, Wallet } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FormField } from "@/components/ui/FormField";
+import { FormSelect } from "@/components/ui/FormSelect";
 import { FormTextarea } from "@/components/ui/FormTextarea";
 import { ApiError } from "@/lib/api/client";
 import { getQuote, getStoreConfig, placeOrder } from "@/lib/api/cart";
@@ -36,6 +37,19 @@ import { useCartStore } from "@/lib/store/useCartStore";
 import type { CheckoutQuote, PaymentMethod, StoreConfig } from "@/lib/api/types";
 import { formatPrice } from "@/lib/utils";
 import { randomUUID } from "@/lib/uuid";
+import { listStates, type State } from "@/lib/api/applications";
+import {
+  fromApiFieldErrors,
+  isValid,
+  validateCity,
+  validateEmail,
+  validateFields,
+  validatePersonName,
+  validatePhone,
+  validatePostalCode,
+  validateStreetAddress,
+  type FieldErrors,
+} from "@/lib/validation";
 
 const EMPTY_ADDRESS = {
   recipient_name: "",
@@ -62,7 +76,24 @@ export default function CheckoutClient() {
   const [quoting, setQuoting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  /**
+   * One place for both sources of error.
+   *
+   * Client rules and server rules write to the same state, so a server error
+   * cannot be outlived by a stale client error on the same field — which is
+   * what happens when the two are kept apart.
+   */
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  /**
+   * The real states, for the delivery select.
+   *
+   * This used to be a free-text box, and `_matching_shipping_rule` looks the
+   * value up with `state__iexact`. A typo therefore matched no rule and fell
+   * through to the stateless fallback, quoting the customer the wrong delivery
+   * fee with nothing to show anything had gone wrong.
+   */
+  const [states, setStates] = useState<State[]>([]);
 
   /**
    * One key per checkout attempt, reused across retries.
@@ -75,6 +106,9 @@ export default function CheckoutClient() {
   useEffect(() => {
     void loadCart();
     getStoreConfig().then(setConfig).catch(() => undefined);
+    // Best-effort: if this fails the select falls back to a plain text box
+    // below rather than blocking checkout on a secondary lookup.
+    listStates().then(setStates).catch(() => undefined);
   }, [loadCart]);
 
   useEffect(() => {
@@ -101,10 +135,66 @@ export default function CheckoutClient() {
     return () => clearTimeout(timer);
   }, [refreshQuote, cart?.updated_at]);
 
+  /**
+   * The delivery rules, assembled per attempt.
+   *
+   * `email` is conditional: a signed-in customer's address comes from their
+   * account and the input is disabled, so validating it would reject a form
+   * the customer cannot fix. `validateFields` skips an `undefined` rule, which
+   * keeps that decision here rather than in two branches.
+   */
+  function deliveryRules() {
+    return {
+      recipient_name: validatePersonName,
+      email: isAuthenticated ? undefined : validateEmail,
+      street: validateStreetAddress,
+      city: validateCity,
+      state: (value: string) => (value.trim() ? undefined : "Choose a delivery state."),
+      postal_code: validatePostalCode,
+      phone: validatePhone,
+    };
+  }
+
+  /** Clear one field's error as it is corrected, so it cannot linger. */
+  function clearFieldError(field: string) {
+    setFieldErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }
+
+  /**
+   * Check a single field once the customer has finished with it.
+   *
+   * Blur rather than change: validating every keystroke declares an email
+   * invalid after the first character, which teaches people to ignore the
+   * message entirely.
+   */
+  function validateOnBlur(field: string, value: string) {
+    const rule = deliveryRules()[field as keyof ReturnType<typeof deliveryRules>];
+    const message = rule?.(value);
+    if (message) setFieldErrors((current) => ({ ...current, [field]: message }));
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setSubmitting(true);
     setError(null);
+
+    // Check before spending a network round-trip, a reservation and — for
+    // Paystack — a redirect away from the site.
+    const problems = validateFields(deliveryRules(), { ...address, email });
+    if (!isValid(problems)) {
+      setFieldErrors(problems);
+      setError("Please correct the highlighted fields.");
+      // Without this the message can render below the fold on a phone, and the
+      // form looks like it silently did nothing.
+      document.getElementById(Object.keys(problems)[0]!)?.focus();
+      return;
+    }
+
+    setSubmitting(true);
     setFieldErrors({});
 
     try {
@@ -137,7 +227,7 @@ export default function CheckoutClient() {
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
-        setFieldErrors(err.fieldErrors);
+        setFieldErrors(fromApiFieldErrors(err.fieldErrors));
       } else {
         setError("Something went wrong placing your order. Please try again.");
       }
@@ -189,36 +279,58 @@ export default function CheckoutClient() {
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <FormField label="Recipient name" name="recipient_name" value={address.recipient_name}
-                    onChange={(e) => setAddress({ ...address, recipient_name: e.target.value })}
-                    error={fieldErrors.recipient_name?.[0]} required className="md:col-span-2" />
+                    onChange={(e) => { setAddress({ ...address, recipient_name: e.target.value }); clearFieldError("recipient_name"); }}
+                    onBlur={() => validateOnBlur("recipient_name", address.recipient_name)}
+                    error={fieldErrors.recipient_name} required className="md:col-span-2"
+                    autoComplete="name" />
 
                   <FormField label="Email" name="email" type="email" value={email}
-                    onChange={(e) => setEmail(e.target.value)} error={fieldErrors.email?.[0]}
+                    onChange={(e) => { setEmail(e.target.value); clearFieldError("email"); }}
+                    onBlur={() => validateOnBlur("email", email)}
+                    error={fieldErrors.email}
                     required disabled={isAuthenticated} className="md:col-span-2"
                     autoComplete="email" />
 
                   <FormField label="Street address" name="street" value={address.street}
-                    onChange={(e) => setAddress({ ...address, street: e.target.value })}
-                    error={fieldErrors.street?.[0]} required className="md:col-span-2"
+                    onChange={(e) => { setAddress({ ...address, street: e.target.value }); clearFieldError("street"); }}
+                    onBlur={() => validateOnBlur("street", address.street)}
+                    error={fieldErrors.street} required className="md:col-span-2"
                     autoComplete="street-address" />
 
                   <FormField label="City" name="city" value={address.city}
-                    onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                    error={fieldErrors.city?.[0]} required autoComplete="address-level2" />
+                    onChange={(e) => { setAddress({ ...address, city: e.target.value }); clearFieldError("city"); }}
+                    onBlur={() => validateOnBlur("city", address.city)}
+                    error={fieldErrors.city} required autoComplete="address-level2" />
 
-                  <FormField label="State" name="state" value={address.state}
-                    onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                    error={fieldErrors.state?.[0]} required autoComplete="address-level1"
-                    placeholder="Lagos" />
+                  {/* A select, not a text box: shipping is looked up by exact
+                      state name, so a typo silently quotes the wrong fee. The
+                      text fallback keeps checkout usable if /states/ fails. */}
+                  {states.length > 0 ? (
+                    <FormSelect label="State" name="state" value={address.state}
+                      onChange={(e) => { setAddress({ ...address, state: e.target.value }); clearFieldError("state"); }}
+                      options={[
+                        { value: "", label: "Choose a state" },
+                        ...states.map((entry) => ({ value: entry.name, label: entry.name })),
+                      ]}
+                      error={fieldErrors.state} required />
+                  ) : (
+                    <FormField label="State" name="state" value={address.state}
+                      onChange={(e) => { setAddress({ ...address, state: e.target.value }); clearFieldError("state"); }}
+                      error={fieldErrors.state} required autoComplete="address-level1"
+                      placeholder="Lagos" />
+                  )}
 
                   <FormField label="Postal code (optional)" name="postal_code" value={address.postal_code}
-                    onChange={(e) => setAddress({ ...address, postal_code: e.target.value })}
+                    onChange={(e) => { setAddress({ ...address, postal_code: e.target.value }); clearFieldError("postal_code"); }}
+                    onBlur={() => validateOnBlur("postal_code", address.postal_code)}
+                    error={fieldErrors.postal_code}
                     autoComplete="postal-code" />
 
                   <FormField label="Phone" name="phone" type="tel" value={address.phone}
-                    onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                    error={fieldErrors.phone?.[0]} required autoComplete="tel"
-                    placeholder="+234 800 000 0000" />
+                    onChange={(e) => { setAddress({ ...address, phone: e.target.value }); clearFieldError("phone"); }}
+                    onBlur={() => validateOnBlur("phone", address.phone)}
+                    error={fieldErrors.phone} required autoComplete="tel"
+                    placeholder="08039876543" />
                 </div>
               </section>
 

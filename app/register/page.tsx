@@ -14,6 +14,17 @@ import { useAuth } from "@/lib/context/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { UserPlus, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from "lucide-react";
+import { ApiError } from "@/lib/api/client";
+import {
+  fromApiFieldErrors,
+  isValid,
+  validateEmail,
+  validateFields,
+  validatePassword,
+  validatePersonName,
+  validatePhone,
+  type FieldErrors,
+} from "@/lib/validation";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -27,18 +38,48 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  /**
+   * The rules, keyed by input name.
+   *
+   * `phone` is optional here — the API takes it as `allow_blank` — so an empty
+   * box is fine, but a filled-in one has to be a number somebody could answer.
+   * A half-typed phone number is worse than none: it looks like a way to reach
+   * the customer and is not.
+   */
+  const rules = {
+    name: validatePersonName,
+    email: validateEmail,
+    phone: (value: string) => (value.trim() ? validatePhone(value) : undefined),
+    password: validatePassword,
+    confirmPassword: (value: string) =>
+      !value
+        ? "Re-enter the password."
+        : value !== formData.password
+          ? "The passwords do not match."
+          : undefined,
+  };
+
+  const handleBlur = (field: keyof typeof rules) => {
+    const message = rules[field](formData[field]);
+    setFieldErrors((current) => ({ ...current, [field]: message ?? "" }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+    const problems = validateFields(rules, formData);
+    if (!isValid(problems)) {
+      setFieldErrors(problems);
+      setError("Please correct the highlighted fields.");
+      document.getElementById(Object.keys(problems)[0]!)?.focus();
       return;
     }
 
     setIsLoading(true);
+    setFieldErrors({});
 
     try {
       // Field names match the API exactly. The previous version sent `name`
@@ -53,7 +94,26 @@ export default function RegisterPage() {
       });
       setSubmitted(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
+      // The server has the last word on passwords: it checks a 20,000-entry
+      // common-password list and similarity to the name and email, neither of
+      // which is reproducible here. Those verdicts land on the field.
+      if (err instanceof ApiError) {
+        setError(err.message);
+        // This form's inputs are not named the way the API names its fields,
+        // so a server error would otherwise attach to an input that does not
+        // exist and render nowhere at all.
+        const API_TO_INPUT: Record<string, string> = {
+          full_name: "name",
+          password_confirm: "confirmPassword",
+        };
+        const mapped: FieldErrors = {};
+        for (const [field, message] of Object.entries(fromApiFieldErrors(err.fieldErrors))) {
+          mapped[API_TO_INPUT[field] ?? field] = message;
+        }
+        setFieldErrors(mapped);
+      } else {
+        setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -64,6 +124,8 @@ export default function RegisterPage() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+    // Clear as it is corrected, so a message cannot outlive the problem.
+    setFieldErrors((current) => ({ ...current, [e.target.name]: "" }));
   };
 
   // Deliberately identical whether or not the address was already registered.
@@ -151,10 +213,22 @@ export default function RegisterPage() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    onBlur={() => handleBlur("name")}
+                    aria-invalid={!!fieldErrors.name}
+                    aria-describedby={fieldErrors.name ? "name-error" : undefined}
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
+                      fieldErrors.name
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-green-500"
+                    }`}
                     placeholder="John Doe"
                   />
                 </div>
+                  {fieldErrors.name && (
+                    <p id="name-error" role="alert" className="mt-1 text-sm text-red-600">
+                      {fieldErrors.name}
+                    </p>
+                  )}
               </div>
 
               {/* Email Field */}
@@ -176,10 +250,22 @@ export default function RegisterPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    onBlur={() => handleBlur("email")}
+                    aria-invalid={!!fieldErrors.email}
+                    aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
+                      fieldErrors.email
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-green-500"
+                    }`}
                     placeholder="you@example.com"
                   />
                 </div>
+                  {fieldErrors.email && (
+                    <p id="email-error" role="alert" className="mt-1 text-sm text-red-600">
+                      {fieldErrors.email}
+                    </p>
+                  )}
               </div>
 
               {/* Phone Field */}
@@ -200,10 +286,22 @@ export default function RegisterPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    onBlur={() => handleBlur("phone")}
+                    aria-invalid={!!fieldErrors.phone}
+                    aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
+                      fieldErrors.phone
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-green-500"
+                    }`}
                     placeholder="+234 800 000 0000"
                   />
                 </div>
+                  {fieldErrors.phone && (
+                    <p id="phone-error" role="alert" className="mt-1 text-sm text-red-600">
+                      {fieldErrors.phone}
+                    </p>
+                  )}
               </div>
 
               {/* Password Field */}
@@ -225,10 +323,22 @@ export default function RegisterPage() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    onBlur={() => handleBlur("password")}
+                    aria-invalid={!!fieldErrors.password}
+                    aria-describedby={fieldErrors.password ? "password-error" : undefined}
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
+                      fieldErrors.password
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-green-500"
+                    }`}
                     placeholder="••••••••"
                   />
                 </div>
+                  {fieldErrors.password && (
+                    <p id="password-error" role="alert" className="mt-1 text-sm text-red-600">
+                      {fieldErrors.password}
+                    </p>
+                  )}
               </div>
 
               {/* Confirm Password Field */}
@@ -250,10 +360,22 @@ export default function RegisterPage() {
                     required
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    onBlur={() => handleBlur("confirmPassword")}
+                    aria-invalid={!!fieldErrors.confirmPassword}
+                    aria-describedby={fieldErrors.confirmPassword ? "confirmPassword-error" : undefined}
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
+                      fieldErrors.confirmPassword
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-green-500"
+                    }`}
                     placeholder="••••••••"
                   />
                 </div>
+                  {fieldErrors.confirmPassword && (
+                    <p id="confirmPassword-error" role="alert" className="mt-1 text-sm text-red-600">
+                      {fieldErrors.confirmPassword}
+                    </p>
+                  )}
               </div>
 
               {/* Password Requirements */}
@@ -261,6 +383,12 @@ export default function RegisterPage() {
                 <p className="text-xs font-medium text-gray-700 mb-2">
                   Password must contain:
                 </p>
+                {/* These are the rules the server actually enforces, from
+                    AUTH_PASSWORD_VALIDATORS. The previous list promised
+                    uppercase, lowercase, a number and a special character —
+                    none of which is checked anywhere, so it demanded work of
+                    the customer for nothing and misdescribed the real
+                    rejections. */}
                 <ul className="space-y-1 text-xs text-gray-600">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-3 h-3 text-green-600" />
@@ -268,11 +396,15 @@ export default function RegisterPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-3 h-3 text-green-600" />
-                    One uppercase & lowercase letter
+                    Not entirely numbers
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-3 h-3 text-green-600" />
-                    One number & special character
+                    Not a commonly used password
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-3 h-3 text-green-600" />
+                    Not too similar to your name or email
                   </li>
                 </ul>
               </div>

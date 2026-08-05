@@ -9,6 +9,8 @@ interface FormSelectProps {
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  /** Validate when the field is left, not on every keystroke. */
+  onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
   options: { value: string; label: string }[];
   error?: string;
   icon?: LucideIcon;
@@ -25,6 +27,7 @@ export function FormSelect({
   name,
   value,
   onChange,
+  onBlur,
   options,
   error,
   icon: Icon,
@@ -46,6 +49,7 @@ export function FormSelect({
           name={name}
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
           disabled={disabled}
           className={`w-full ${
             Icon ? "pl-10" : "pl-4"
