@@ -150,3 +150,55 @@ export function getRegistration(reference: string, email?: string): Promise<Regi
 export function cancelRegistration(reference: string): Promise<Registration> {
   return apiClient.post<Registration>(`/academy/registrations/${reference}/cancel/`);
 }
+
+/**
+ * Pay for a held seat online (PRD §13 Q6).
+ *
+ * The booking already exists and already holds the seat — this only settles
+ * it. Guests must pass the email the booking was made with: references appear
+ * in a forwardable email, so one alone identifies a booking without proving it
+ * is yours.
+ *
+ * The booking is confirmed by Paystack's signed webhook, not by the customer
+ * coming back through a URL. Poll `verifyClassPayment` on the return page: the
+ * redirect usually beats the webhook, and telling somebody their payment
+ * failed when it succeeded is the worst outcome available.
+ */
+export function payForRegistration(
+  reference: string,
+  email?: string,
+): Promise<{ authorization_url: string; reference: string; amount: string }> {
+  const suffix = email ? `?email=${encodeURIComponent(email)}` : "";
+  return apiClient.post(`/academy/registrations/${reference}/pay/${suffix}`);
+}
+
+export function verifyClassPayment(paymentReference: string): Promise<unknown> {
+  return apiClient.get(`/academy/payments/${paymentReference}/verify/`);
+}
+
+export interface Instructor {
+  id: string;
+  name: string;
+  title: string;
+  bio: string;
+  photo: string | null;
+  specialties: string[];
+}
+
+/**
+ * The teaching staff, for the academy page.
+ *
+ * Unpaginated — a bare array, not `{results, count}`. It is a handful of
+ * people rendered as a row of cards; typing it as paginated would crash on
+ * `.map`, which is the specific mistake seven other endpoints in this API
+ * invite.
+ *
+ * The page used to render a hardcoded array, so an instructor added in the
+ * back office appeared nowhere and the two slowly diverged.
+ */
+export function fetchInstructorsPublic(): Promise<Instructor[]> {
+  // `offlineFallback` so an unreachable API at build time renders the section
+  // empty rather than failing the whole page — the same treatment the other
+  // academy reads get.
+  return fetchPublic<Instructor[]>("/academy/instructors/", { offlineFallback: [] });
+}

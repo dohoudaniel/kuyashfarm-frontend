@@ -128,6 +128,11 @@ jobs:
           uv run python manage.py migrate --noinput
           uv run python manage.py seed_catalogue
           uv run python manage.py seed_academy
+          # The staff and driver accounts the back-office specs sign in as.
+          # They cannot be created through the API: registration only ever
+          # produces a CUSTOMER, deliberately, so a browser test has no way to
+          # bootstrap one. The command refuses to run with DEBUG off.
+          uv run python manage.py seed_e2e
           uv run python manage.py runserver 8000 --noreload &
           for _ in $(seq 1 30); do
             curl -sf http://127.0.0.1:8000/api/v1/health/ >/dev/null && break
@@ -135,13 +140,15 @@ jobs:
           done
           curl -sf http://127.0.0.1:8000/api/v1/health/
 
-      - name: Build the frontend
+      # No build step here on purpose. `playwright.config.ts` builds the
+      # frontend itself, because `NEXT_PUBLIC_API_URL` is inlined at build time
+      # — a build done separately can be given a different value from the one
+      # the suite runs against, and the mismatch is silent: the two become
+      # cross-site, the SameSite=Lax refresh cookie is never sent, and every
+      # page load lands signed-out. Building in one place removes the chance.
+      - name: Install frontend dependencies
         working-directory: frontend
-        env:
-          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000/api/v1
-        run: |
-          npm ci
-          npm run build
+        run: npm ci
 
       - name: Install Playwright browsers
         working-directory: frontend

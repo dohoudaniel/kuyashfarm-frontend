@@ -38,6 +38,8 @@ import type { CheckoutQuote, PaymentMethod, StoreConfig } from "@/lib/api/types"
 import { formatPrice } from "@/lib/utils";
 import { randomUUID } from "@/lib/uuid";
 import { listStates, type State } from "@/lib/api/applications";
+import { listAddresses } from "@/lib/api/auth";
+import type { Address } from "@/lib/api/types";
 import {
   fromApiFieldErrors,
   isValid,
@@ -50,6 +52,25 @@ import {
   validateStreetAddress,
   type FieldErrors,
 } from "@/lib/validation";
+
+/**
+ * A saved address, in the shape the checkout form holds.
+ *
+ * Named `toFormAddress`, not `useAddress`: anything starting with `use` is a
+ * hook by React's rules, and the linter refuses to let one be called inside a
+ * callback — correctly, since it would then run conditionally.
+ */
+function toFormAddress(saved: Address) {
+  return {
+    recipient_name: saved.recipient_name,
+    street: saved.street,
+    city: saved.city,
+    state: saved.state,
+    postal_code: saved.postal_code ?? "",
+    country: saved.country || "NG",
+    phone: saved.phone,
+  };
+}
 
 const EMPTY_ADDRESS = {
   recipient_name: "",
@@ -96,6 +117,16 @@ export default function CheckoutClient() {
   const [states, setStates] = useState<State[]>([]);
 
   /**
+   * The customer's saved addresses.
+   *
+   * Checkout always started from a blank form, so a repeat customer retyped
+   * their address every single order — while the profile listed addresses it
+   * had no way to create. Both halves of that are fixed: this offers them, and
+   * the profile can now save them.
+   */
+  const [saved, setSaved] = useState<Address[]>([]);
+
+  /**
    * One key per checkout attempt, reused across retries.
    *
    * A double-clicked button or a dropped connection then returns the original
@@ -110,6 +141,23 @@ export default function CheckoutClient() {
     // below rather than blocking checkout on a secondary lookup.
     listStates().then(setStates).catch(() => undefined);
   }, [loadCart]);
+
+  // Only for signed-in customers: a guest has no saved addresses, and the
+  // request would 401 on every guest checkout.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    listAddresses()
+      .then((page) => {
+        setSaved(page.results);
+        // Prefill from the default, if they have one and have not started
+        // typing. Overwriting something already entered would be hostile.
+        const preferred = page.results.find((entry) => entry.is_default) ?? page.results[0];
+        if (preferred) {
+          setAddress((current) => (current.street ? current : toFormAddress(preferred)));
+        }
+      })
+      .catch(() => undefined);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (user) setEmail((current) => current || user.email);
@@ -276,6 +324,27 @@ export default function CheckoutClient() {
             <div className="space-y-6 lg:col-span-2">
               <section className="rounded-2xl bg-white p-6 shadow-sm">
                 <h2 className="mb-6 text-xl font-bold text-gray-900">Delivery</h2>
+
+                {saved.length > 0 && (
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    <span className="w-full text-sm font-medium text-gray-700">
+                      Use a saved address
+                    </span>
+                    {saved.map((entry) => (
+                      <button
+                        key={entry.id}
+                        type="button"
+                        onClick={() => {
+                          setAddress(toFormAddress(entry));
+                          setFieldErrors({});
+                        }}
+                        className="rounded-full border border-gray-300 px-3 py-1.5 text-sm hover:border-primary hover:text-primary"
+                      >
+                        {entry.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <FormField label="Recipient name" name="recipient_name" value={address.recipient_name}

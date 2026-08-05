@@ -28,7 +28,12 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { ApiError } from "@/lib/api/client";
-import { cancelRegistration, getRegistration, type Registration } from "@/lib/api/academy";
+import {
+  cancelRegistration,
+  getRegistration,
+  payForRegistration,
+  type Registration,
+} from "@/lib/api/academy";
 import { registrationEmailFor } from "@/lib/api/guest-registration";
 import { useAuth } from "@/lib/context/AuthContext";
 import { formatPrice } from "@/lib/utils";
@@ -75,6 +80,7 @@ export default function RegistrationClient({ reference }: { reference: string })
   const [emailError, setEmailError] = useState("");
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   const load = useCallback(
     async (email?: string) => {
@@ -107,6 +113,27 @@ export default function RegistrationClient({ reference }: { reference: string })
     void load(isAuthenticated ? undefined : registrationEmailFor(reference));
   }, [authLoading, isAuthenticated, reference, load]);
 
+  async function onPay() {
+    if (!registration) return;
+    setPaying(true);
+    setError("");
+    try {
+      // Guests identify themselves with the email the booking was made with —
+      // the same rule as viewing it, because a reference appears in an email
+      // that can be forwarded.
+      const result = await payForRegistration(
+        reference,
+        isAuthenticated ? undefined : registrationEmailFor(reference) || emailInput || undefined,
+      );
+      window.location.href = result.authorization_url;
+    } catch (caught) {
+      setError(
+        caught instanceof ApiError ? caught.message : "Could not start that payment.",
+      );
+      setPaying(false);
+    }
+  }
+
   async function onCancel() {
     if (!confirm("Cancel this booking and release the seat?")) return;
     setCancelling(true);
@@ -122,6 +149,19 @@ export default function RegistrationClient({ reference }: { reference: string })
   }
 
   const status = registration ? STATUS_COPY[registration.status] : null;
+  /**
+   * Paying online is offered, never required (PRD §13 Q6).
+   *
+   * The seat is already held. This is the transactional half of "both
+   * transactional and lead-generating" — somebody who wants it settled can
+   * settle it, and somebody who would rather pay at the farm still can. The
+   * copy below the buttons says so, because a lone "Pay now" reads as a demand.
+   */
+  const canPay =
+    registration &&
+    registration.status === "PENDING_PAYMENT" &&
+    Number(registration.price) > 0;
+
   const canCancel =
     registration &&
     isAuthenticated &&
@@ -283,6 +323,16 @@ export default function RegistrationClient({ reference }: { reference: string })
                   >
                     View the class
                   </Link>
+                  {canPay && (
+                    <button
+                      type="button"
+                      onClick={onPay}
+                      disabled={paying}
+                      className="flex-1 rounded-full bg-[#e8d5a3] px-6 py-3 font-semibold text-[#1a3d2b] transition-colors hover:bg-[#dfc98a] disabled:opacity-60"
+                    >
+                      {paying ? "Opening payment…" : `Pay ${formatPrice(registration.price)} now`}
+                    </button>
+                  )}
                   {canCancel && (
                     <button
                       type="button"
@@ -294,6 +344,13 @@ export default function RegistrationClient({ reference }: { reference: string })
                     </button>
                   )}
                 </div>
+
+                {canPay && (
+                  <p className="mt-3 text-center text-xs text-gray-500">
+                    Paying now is optional — your seat is already held. You can also pay when
+                    you arrive at the farm.
+                  </p>
+                )}
               </div>
             )}
           </div>

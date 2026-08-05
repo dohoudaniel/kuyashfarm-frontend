@@ -7,7 +7,7 @@
 
 import type { Metadata } from "next";
 
-import { fetchClassesPublic } from "@/lib/api/academy";
+import { fetchClassesPublic, fetchInstructorsPublic } from "@/lib/api/academy";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AcademyHero } from "./sections/AcademyHero";
@@ -40,10 +40,20 @@ export default async function AcademyPage() {
   // the schedule section shows an honest empty state rather than crashing the
   // whole academy landing page, which is what SSR against a hardcoded array
   // hid until now.
-  const classes = await fetchClassesPublic().then(
-    (list) => list,
-    () => [],
-  );
+  // Both in parallel: two sequential round-trips would double the time to
+  // first byte for a page that is mostly static marketing either side of them.
+  const [classes, instructors] = await Promise.all([
+    fetchClassesPublic().then(
+      (list) => list,
+      () => [],
+    ),
+    fetchInstructorsPublic().then(
+      (list) => list,
+      // The faculty section renders nothing when empty, so a failure here
+      // costs one section rather than the page.
+      () => [],
+    ),
+  ]);
 
   return (
     <>
@@ -56,7 +66,7 @@ export default async function AcademyPage() {
         <UpcomingClasses classes={classes} />
         <LearningExperience />
         <AcademyMethodology />
-        <AcademyInstructors />
+        <AcademyInstructors instructors={instructors} />
         <AcademyTestimonials />
         <AcademyPartners />
         <AcademyFAQ />

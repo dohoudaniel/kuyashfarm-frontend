@@ -1,218 +1,25 @@
-"use client";
-
 /**
  * Sign in.
  *
- * The failure message is deliberately identical for a wrong password and an
- * unknown account — the API is vague on purpose and the page must not undo
- * that by being more helpful.
+ * A thin server wrapper so the client component can use `useSearchParams` —
+ * for `?next=` and for the `?code=` Google sends back. Without the Suspense
+ * boundary Next refuses to build the route, because reading search params
+ * opts it out of static rendering.
  */
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useAuth } from "@/lib/context/AuthContext";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { LogIn, Mail, Lock, AlertCircle } from "lucide-react";
-import { isValid, validateEmail, validateFields, type FieldErrors } from "@/lib/validation";
+
+import type { Metadata } from "next";
+import { Suspense } from "react";
+
+import LoginClient from "./LoginClient";
+
+export const metadata: Metadata = {
+  title: "Sign in — Kuyash Integrated Farm",
+};
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { login } = useAuth();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-
-  /**
-   * Only the shape of what was typed, never anything about the account.
-   *
-   * The password rule is deliberately just "not empty". Applying the
-   * create-a-password rules here would reject an older account's valid
-   * password at the door, and "use at least 8 characters" is nonsense advice
-   * when you are typing a password you already have. It would also hint at
-   * what this account's password looks like, which this page exists not to do.
-   */
-  const rules = {
-    email: validateEmail,
-    password: (value: string) => (value ? undefined : "Enter your password."),
-  };
-
-  const handleBlur = (field: keyof typeof rules) => {
-    const message = rules[field](formData[field]);
-    setFieldErrors((current) => ({ ...current, [field]: message ?? "" }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    const problems = validateFields(rules, formData);
-    if (!isValid(problems)) {
-      setFieldErrors(problems);
-      document.getElementById(Object.keys(problems)[0]!)?.focus();
-      return;
-    }
-
-    setFieldErrors({});
-    setIsLoading(true);
-
-    try {
-      await login(formData.email, formData.password);
-      router.push("/");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed. Please check your credentials.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-    setFieldErrors((current) => ({ ...current, [e.target.name]: "" }));
-  };
-
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50 pt-24 pb-16">
-        <div className="mx-auto max-w-md px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-              <LogIn className="w-8 h-8 text-green-600" />
-            </div>
-            <h1 className="font-serif text-4xl font-bold text-gray-900 mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-gray-600">Sign in to your Kuyash Farm account</p>
-          </div>
-
-          {/* Login Form */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-800">{error}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email Field */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur("email")}
-                    aria-invalid={!!fieldErrors.email}
-                    aria-describedby={fieldErrors.email ? "email-error" : undefined}
-                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
-                      fieldErrors.email
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-green-500"
-                    }`}
-                    placeholder="you@example.com"
-                  />
-                </div>
-                  {fieldErrors.email && (
-                    <p id="email-error" role="alert" className="mt-1 text-sm text-red-600">
-                      {fieldErrors.email}
-                    </p>
-                  )}
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Password
-                  </label>
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm font-medium text-green-600 hover:text-green-700"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur("password")}
-                    aria-invalid={!!fieldErrors.password}
-                    aria-describedby={fieldErrors.password ? "password-error" : undefined}
-                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
-                      fieldErrors.password
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-green-500"
-                    }`}
-                    placeholder="••••••••"
-                  />
-                </div>
-                  {fieldErrors.password && (
-                    <p id="password-error" role="alert" className="mt-1 text-sm text-red-600">
-                      {fieldErrors.password}
-                    </p>
-                  )}
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-700 focus:ring-4 focus:ring-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              >
-                {isLoading ? "Signing in..." : "Sign In"}
-              </button>
-            </form>
-
-            {/* Divider */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Don&apos;t have an account?{" "}
-                <Link
-                  href="/register"
-                  className="font-semibold text-green-600 hover:text-green-700"
-                >
-                  Create one
-                </Link>
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </main>
-      <Footer />
-    </>
+    <Suspense>
+      <LoginClient />
+    </Suspense>
   );
 }

@@ -1,13 +1,35 @@
 "use client";
 
 /**
- * Instructor profiles.
+ * Instructor profiles, from the back office.
+ *
+ * This section rendered a hardcoded array until now, so an instructor added by
+ * staff appeared nowhere and the page slowly diverged from who actually
+ * teaches. Presentational: the page fetches and passes down, matching how the
+ * class schedule already works.
+ *
+ * Renders nothing when the list is empty rather than an empty grid with a
+ * heading over it — a "The Faculty" section with no faces reads as broken.
  */
 import { motion } from "framer-motion";
-import { ACADEMY_INSTRUCTORS } from "@/lib/data/academy";
+import Image from "next/image";
 import { BadgeCheck } from "lucide-react";
 
-export function AcademyInstructors() {
+import type { Instructor } from "@/lib/api/academy";
+
+/** Two letters for the avatar, since a photograph is optional. */
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter((part) => /\p{L}/u.test(part))
+    .slice(0, 2)
+    .map((part) => part[0]!.toUpperCase())
+    .join("");
+}
+
+export function AcademyInstructors({ instructors }: { instructors: Instructor[] }) {
+  if (instructors.length === 0) return null;
+
   return (
     <section className="bg-white py-28 md:py-36">
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
@@ -47,7 +69,7 @@ export function AcademyInstructors() {
 
         {/* Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {ACADEMY_INSTRUCTORS.map((inst, i) => (
+          {instructors.map((inst, i) => (
             <motion.div
               key={inst.id}
               initial={{ opacity: 0, y: 24 }}
@@ -61,8 +83,12 @@ export function AcademyInstructors() {
 
               {/* Avatar */}
               <div className="relative mb-6">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-serif text-xl font-bold shadow-lg bg-[#2d5f3f]">
-                  {inst.initials}
+                <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center text-white font-serif text-xl font-bold shadow-lg bg-[#2d5f3f] overflow-hidden">
+                  {inst.photo ? (
+                    <Image src={inst.photo} alt={inst.name} fill sizes="64px" className="object-cover" />
+                  ) : (
+                    initials(inst.name)
+                  )}
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border-2 border-white flex items-center justify-center shadow">
                   <BadgeCheck className="w-4 h-4 text-[#2d5f3f]" />
@@ -71,13 +97,14 @@ export function AcademyInstructors() {
 
               {/* Info */}
               <h3 className="font-serif text-lg font-bold text-[#080f0a] leading-tight mb-0.5">{inst.name}</h3>
-              <p className="text-sm font-semibold text-[#2d5f3f] mb-1">{inst.role}</p>
-              <p className="text-gray-400 text-xs font-sans mb-1">{inst.specialty}</p>
-              <p className="text-gray-400 text-xs font-sans mb-5">{inst.experience} of experience</p>
+              <p className="text-sm font-semibold text-[#2d5f3f] mb-1">{inst.title}</p>
+              {inst.bio && (
+                <p className="text-gray-400 text-xs font-sans mb-5 line-clamp-3">{inst.bio}</p>
+              )}
 
               {/* Credentials */}
               <ul className="space-y-2">
-                {inst.credentials.map((c) => (
+                {inst.specialties.map((c) => (
                   <li key={c} className="flex items-start gap-2 text-xs text-gray-500 font-sans leading-snug">
                     <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-[#2d5f3f]" />
                     {c}

@@ -1,4 +1,26 @@
 /**
+ * Academy marketing copy, and one thing that is not.
+ *
+ * **Wired to the API:** instructors and the class schedule. Both used to be
+ * hardcoded here, which meant somebody added in the back office appeared
+ * nowhere on the site. `ACADEMY_INSTRUCTORS` below is now unused; the page
+ * calls `fetchInstructorsPublic()`.
+ *
+ * **Still hardcoded, and this one is a real gap:** `ACADEMY_PROGRAMS`. There
+ * *is* a `Program` model and a public endpoint, but the section renders
+ * `category`, `certification`, `outcomes` and an `icon` — none of which the
+ * model has. Pointing the component at the API today would blank four fields
+ * out of five, so the model needs those columns before this can move. Until
+ * then a programme created in the back office does not appear on this page.
+ *
+ * **Genuinely static, deliberately:** FAQs, admission steps, partner logos,
+ * testimonials, headline statistics. Copy with no model behind it. Editing it
+ * is a code change, and a CMS for six testimonials costs more than it saves —
+ * none of it changes without somebody writing prose anyway. If any of it
+ * starts changing weekly, that is the signal to give it a model.
+ */
+
+/**
  * Static academy marketing copy — FAQ, testimonials, methodology.
  *
  * Classes, seats and prices are **not** here: those come from the API. This

@@ -43,11 +43,29 @@ export default defineConfig({
   // keeps a dev loop fast locally while always starting clean in CI.
   webServer: [
     {
-      command: `npx next start --port ${FRONTEND_PORT}`,
+      // **Builds here rather than assuming a build exists.**
+      //
+      // `NEXT_PUBLIC_API_URL` is inlined into the client bundle at build time,
+      // so passing it only to `next start` does nothing at all — the bundle
+      // keeps whatever URL the last `npm run build` baked in, which locally is
+      // whatever `.env.local` happens to say.
+      //
+      // That is not a cosmetic mismatch. Playwright serves from 127.0.0.1, and
+      // if the bundle points at a different host the two are cross-site: the
+      // `SameSite=Lax` refresh cookie is never sent, every full page load
+      // lands signed-out, and the failures read as "the admin pages render
+      // nothing" rather than as a cookie problem.
+      command: `npx next build && npx next start --port ${FRONTEND_PORT}`,
       url: `http://127.0.0.1:${FRONTEND_PORT}`,
       reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-      env: { NEXT_PUBLIC_API_URL: API_URL },
+      // Longer, because this now includes a production build.
+      timeout: 300_000,
+      env: {
+        NEXT_PUBLIC_API_URL: API_URL,
+        // Only fetches that supplied an `offlineFallback` render empty; the
+        // rest still fail loudly. Never set this in a real deploy.
+        NEXT_PRERENDER_OFFLINE: "1",
+      },
     },
   ],
 });

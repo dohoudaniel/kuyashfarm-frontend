@@ -22,6 +22,7 @@ import { LogOut, Package, Settings, ShieldCheck, User as UserIcon } from "lucide
 import CartButton from "@/components/cart/CartButton";
 import CartDrawer from "@/components/cart/CartDrawer";
 import { NAV_LINKS, SITE_CONFIG } from "@/lib/constants";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useAuth } from "@/lib/context/AuthContext";
 import { useCartStore } from "@/lib/store/useCartStore";
 import { cn } from "@/lib/utils";
@@ -98,6 +99,10 @@ export function Navbar() {
               ))}
 
               <CartButton onClick={() => setIsCartOpen(true)} />
+              {/* Renders nothing when signed out. Customers get order and
+                  academy notifications here; staff get the operational ones
+                  in the back office. */}
+              <NotificationBell />
 
               {isAuthenticated ? (
                 <div className="relative">

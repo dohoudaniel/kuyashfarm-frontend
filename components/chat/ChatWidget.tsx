@@ -9,6 +9,7 @@
  * PayPal, which was never a payment method here.
  */
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { MessageCircle, X, Send, Bot, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { getStoreConfig } from "@/lib/api/cart";
@@ -23,10 +24,27 @@ interface Message {
 }
 
 /**
- * AI Chat Widget for Customer Service
- * Floating chat button in bottom-right corner
+ * Where this must not appear.
+ *
+ * It is a `fixed bottom-4 right-4 z-50` button mounted once in
+ * `ClientProviders`, so it sits over every page in the application — including
+ * the ones it has no business being on.
+ *
+ * That is not only untidy. It overlays the rightmost column of every
+ * back-office table, which is where the row actions live, and on the driver's
+ * screen it covers the "Couldn't deliver" button — at a gate, on a phone, in
+ * the rain. The end-to-end suite found it by being unable to click a status
+ * dropdown for forty-five seconds.
+ *
+ * It is a customer sales bot besides. Staff and drivers have nobody to ask.
+ */
+const HIDDEN_ON = ["/admin", "/driver"];
+
+/**
+ * Floating support widget, on customer-facing pages only.
  */
 export function ChatWidget() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -95,6 +113,10 @@ export function ChatWidget() {
       handleSendMessage();
     }
   };
+
+  // After every hook, never before: a conditional return above them changes
+  // the hook order between renders, which React refuses at runtime.
+  if (HIDDEN_ON.some((prefix) => pathname.startsWith(prefix))) return null;
 
   return (
     <>

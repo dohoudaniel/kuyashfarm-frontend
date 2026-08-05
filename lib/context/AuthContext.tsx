@@ -25,8 +25,19 @@ import React, {
 
 import { apiClient } from "@/lib/api/client";
 import * as authApi from "@/lib/api/auth";
-import { mergeCart } from "@/lib/api/cart";
+import { clearCartSessionId, mergeCart } from "@/lib/api/cart";
 import type { User } from "@/lib/api/types";
+
+/**
+ * What a password sign-in produced.
+ *
+ * A discriminated union rather than an optional field, so a caller cannot read
+ * `user` without first establishing that there is one — which is exactly the
+ * mistake that would sign somebody in without their second factor.
+ */
+export type LoginOutcome =
+  | { twoFactorRequired: false; user: User }
+  | { twoFactorRequired: true; challengeToken: string };
 
 interface AuthContextValue {
   user: User | null;
@@ -35,7 +46,15 @@ interface AuthContextValue {
   /** Server-computed entitlement. Never inferred from account_type here. */
   getsBulkPricing: boolean;
   isBackOffice: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  /**
+   * Sign in with a password. Resolves to `twoFactorRequired: true` when the
+   * account has a second factor — nobody is signed in at that point.
+   */
+  login: (email: string, password: string) => Promise<LoginOutcome>;
+  /** Finish a sign-in that stopped for a second factor. */
+  completeTwoFactor: (challengeToken: string, code: string) => Promise<User>;
+  /** Sign in with a Google authorization code. Same two outcomes as `login`. */
+  signInWithGoogle: (code: string, redirectUri: string) => Promise<LoginOutcome>;
   /** Resolves when the request is accepted. Does not sign in — see below. */
   register: (input: authApi.RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
@@ -85,14 +104,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Carry the anonymous basket across. Failure here must not block sign-in.
     try {
       await mergeCart();
+      // The guest basket now belongs to the account, so the anonymous session
+      // id has done its job. Leaving it in localStorage means the next guest
+      // on this browser — after a sign-out — inherits the previous visitor's
+      // cart session, and picks up a basket that was never theirs.
+      clearCartSessionId();
     } catch {
       /* the basket merge is best-effort */
     }
   }, []);
 
+  /**
+   * Sign in with a password.
+   *
+   * Returns `{ twoFactorRequired: true, challengeToken }` when the account has
+   * a second factor, and nobody is signed in at that point — no tokens have
+   * been issued. The caller collects a code and calls `completeTwoFactor`.
+   *
+   * Modelled as a return value rather than a thrown error because needing a
+   * second factor is a successful outcome, not a failure, and callers that
+   * treat it as one show "sign-in failed" to somebody whose password was right.
+   */
   const login = useCallback(
-    async (email: string, password: string) => {
-      const { user: signedIn } = await authApi.login(email, password);
+    async (email: string, password: string): Promise<LoginOutcome> => {
+      const result = await authApi.login(email, password);
+
+      if (result.two_factor_required) {
+        return { twoFactorRequired: true, challengeToken: result.challenge_token };
+      }
+
+      await afterSignIn(result.user);
+      return { twoFactorRequired: false, user: result.user };
+    },
+    [afterSignIn],
+  );
+
+  /**
+   * Sign in with Google.
+   *
+   * Goes through `afterSignIn` exactly as a password sign-in does, so the
+   * basket merge and the profile load are not quietly skipped for social
+   * users — and the second factor is honoured identically.
+   */
+  const signInWithGoogle = useCallback(
+    async (code: string, redirectUri: string): Promise<LoginOutcome> => {
+      const result = await authApi.signInWithGoogle(code, redirectUri);
+
+      if (result.two_factor_required) {
+        return { twoFactorRequired: true, challengeToken: result.challenge_token };
+      }
+
+      await afterSignIn(result.user);
+      return { twoFactorRequired: false, user: result.user };
+    },
+    [afterSignIn],
+  );
+
+  /** Finish a sign-in that stopped for a second factor. */
+  const completeTwoFactor = useCallback(
+    async (challengeToken: string, code: string) => {
+      const { user: signedIn } = await authApi.completeTwoFactorLogin(challengeToken, code);
       await afterSignIn(signedIn);
       return signedIn;
     },
@@ -142,13 +213,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAuthenticated: user !== null,
       getsBulkPricing: user?.gets_bulk_pricing ?? false,
       isBackOffice: user?.is_back_office ?? false,
+      completeTwoFactor,
+      signInWithGoogle,
       login,
       register,
       logout,
       refresh,
       updateProfile,
     }),
-    [user, isLoading, login, register, logout, refresh, updateProfile],
+    [
+      user,
+      isLoading,
+      login,
+      completeTwoFactor,
+      signInWithGoogle,
+      register,
+      logout,
+      refresh,
+      updateProfile,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

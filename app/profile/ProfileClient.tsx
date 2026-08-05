@@ -24,6 +24,8 @@ import {
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FormField } from "@/components/ui/FormField";
+import { TwoFactorSection } from "@/components/account/TwoFactorSection";
+import { AddressForm } from "@/components/account/AddressForm";
 import { ApiError } from "@/lib/api/client";
 import {
   isValid,
@@ -269,9 +271,13 @@ export default function ProfileClient() {
               )}
 
               {tab === "addresses" && (
-                <div className="rounded-2xl bg-white p-6 shadow-sm">
+                <div className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
+                  <AddressForm onSaved={(saved) => setAddresses((current) => [...current, saved])} />
                   {addresses.length === 0 ? (
-                    <p className="text-gray-600">No saved addresses yet. You can add one at checkout.</p>
+                    <p className="text-gray-600">
+                      No saved addresses yet. Saving one here fills in your delivery details at
+                      checkout.
+                    </p>
                   ) : (
                     <ul className="divide-y">
                       {addresses.map((address) => (
@@ -435,6 +441,8 @@ export default function ProfileClient() {
               )}
 
               {tab === "settings" && (
+                <div className="space-y-6">
+                <TwoFactorSection />
                 <form onSubmit={handleChangePassword} className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
                   <h2 className="text-lg font-bold text-gray-900">Change password</h2>
                   <FormField label="Current password" name="current" type="password" value={passwords.current}
@@ -450,6 +458,7 @@ export default function ProfileClient() {
                     {saving ? "Saving…" : "Change password"}
                   </button>
                 </form>
+                </div>
               )}
             </div>
           </div>
