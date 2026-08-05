@@ -88,12 +88,32 @@ jobs:
         with:
           path: frontend
 
+      # The end-to-end suite runs the real API, which lives in a second,
+      # private repository.
+      #
+      # `github.token` is scoped to *this* repository only, so the fallback
+      # below cannot read a private one — the checkout fails with a bare
+      # "Not Found", which reads like a typo in the repository name rather
+      # than a permissions problem.
+      #
+      # Needs a fine-grained personal access token with **Contents: read** on
+      # dohoudaniel/kuyashfarm-backend, stored as the BACKEND_REPO_TOKEN
+      # secret. The step below says so out loud rather than failing obscurely.
+      - name: Check for the backend access token
+        run: |
+          if [ -z "${{ secrets.BACKEND_REPO_TOKEN }}" ]; then
+            echo "::error::BACKEND_REPO_TOKEN is not set. The end-to-end suite needs to check out"
+            echo "::error::dohoudaniel/kuyashfarm-backend, which is private. Create a fine-grained"
+            echo "::error::PAT with Contents: read on that repository and add it as a secret here."
+            exit 1
+          fi
+
       - name: Check out the backend
         uses: actions/checkout@v5
         with:
           repository: dohoudaniel/kuyashfarm-backend
           path: backend
-          token: ${{ secrets.BACKEND_REPO_TOKEN || github.token }}
+          token: ${{ secrets.BACKEND_REPO_TOKEN }}
 
       - uses: astral-sh/setup-uv@v7
         with:
