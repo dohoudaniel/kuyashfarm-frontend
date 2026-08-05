@@ -10,6 +10,7 @@
  * wholesale customer's basket visibly failed to add up (audit §3.7).
  */
 
+import { randomUUID } from "../uuid";
 import { apiClient } from "./client";
 import type {
   Cart,
@@ -34,7 +35,7 @@ export function getCartSessionId(): string {
 
   let id = window.localStorage.getItem(SESSION_STORAGE_KEY);
   if (!id) {
-    id = crypto.randomUUID();
+    id = randomUUID();
     window.localStorage.setItem(SESSION_STORAGE_KEY, id);
   }
   return id;

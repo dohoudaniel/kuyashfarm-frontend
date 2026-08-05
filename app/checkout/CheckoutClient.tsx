@@ -35,6 +35,7 @@ import { useAuth } from "@/lib/context/AuthContext";
 import { useCartStore } from "@/lib/store/useCartStore";
 import type { CheckoutQuote, PaymentMethod, StoreConfig } from "@/lib/api/types";
 import { formatPrice } from "@/lib/utils";
+import { randomUUID } from "@/lib/uuid";
 
 const EMPTY_ADDRESS = {
   recipient_name: "",
@@ -69,7 +70,7 @@ export default function CheckoutClient() {
    * A double-clicked button or a dropped connection then returns the original
    * order rather than creating a second one and reserving stock twice.
    */
-  const idempotencyKey = useMemo(() => crypto.randomUUID(), []);
+  const idempotencyKey = useMemo(() => randomUUID(), []);
 
   useEffect(() => {
     void loadCart();
