@@ -12,3 +12,4 @@ export * as authApi from "./auth";
 export * as catalogueApi from "./catalogue";
 export * as cartApi from "./cart";
 export * as ordersApi from "./orders";
+export * as newsletterApi from "./newsletter";

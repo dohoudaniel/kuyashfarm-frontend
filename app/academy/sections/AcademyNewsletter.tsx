@@ -2,9 +2,16 @@
 
 /**
  * Newsletter sign-up for announcements about new dates.
+ *
+ * Subscribing here does **not** put the address on the list — it sends a
+ * confirmation link, and the address joins only when that link is opened. The
+ * success copy says so. It previously said "You're subscribed!" after an 800ms
+ * `setTimeout` against no endpoint at all, which was untrue twice over.
  */
 import { useState } from "react";
 
+import { ApiError } from "@/lib/api/client";
+import { subscribe } from "@/lib/api/newsletter";
 import { validateEmail } from "@/lib/validation";
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle } from "lucide-react";
@@ -26,15 +33,21 @@ export function AcademyNewsletter() {
     setError("");
 
     setLoading(true);
-    // NOTE: there is no newsletter endpoint on the API — no serializer, no
-    // route, no table. This delay and the success panel below it are the
-    // prototype's, and nobody is subscribed by pressing this button. The
-    // address is validated so that whoever wires up the real endpoint is not
-    // handed a backlog of malformed input, but the confirmation message is
-    // still untrue until that endpoint exists.
-    await new Promise((r) => setTimeout(r, 800));
-    setSubmitted(true);
-    setLoading(false);
+    try {
+      await subscribe(email.trim(), "academy");
+      setSubmitted(true);
+    } catch (caught) {
+      // Rate limiting is the realistic failure — the endpoint is public and
+      // each request can send mail. Anything else is a genuine outage. Neither
+      // reveals whether the address is already on the list.
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : "We couldn't sign you up just now. Please try again shortly.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,8 +112,11 @@ export function AcademyNewsletter() {
                 <div className="flex items-center gap-3 bg-[#2d5f3f]/30 border border-[#2d5f3f]/50 rounded-2xl px-6 py-5">
                   <CheckCircle className="w-6 h-6 text-[#6b9d7a] shrink-0" />
                   <div>
-                    <p className="text-white font-semibold text-sm">You&apos;re subscribed!</p>
-                    <p className="text-white/50 text-xs mt-0.5 font-sans">Look out for your first email from us.</p>
+                    <p className="text-white font-semibold text-sm">Check your email</p>
+                    <p className="text-white/50 text-xs mt-0.5 font-sans">
+                      We&apos;ve sent a link to confirm your subscription. You&apos;re not on the
+                      list until you open it.
+                    </p>
                   </div>
                 </div>
               ) : (
