@@ -61,8 +61,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="sticky top-0 z-40 border-b border-gray-200 bg-[#1a3d2b]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-primary-dark">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 2xl:max-w-[1720px]">
           <Link href="/admin" className="font-serif text-lg font-bold text-white">
             Kuyash <span className="font-sans text-xs font-normal text-white/60">back office</span>
           </Link>
@@ -95,7 +95,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6 sm:px-6">
+      <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6 sm:px-6 2xl:max-w-[1720px] 2xl:gap-8">
         <nav className="hidden w-56 shrink-0 lg:block" aria-label="Back office">
           <ul className="space-y-1">
             {items.map((item) => {
@@ -112,7 +112,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                     className={cn(
                       "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
                       active
-                        ? "bg-white font-semibold text-[#1a3d2b] shadow-sm"
+                        ? "bg-white font-semibold text-primary-dark shadow-sm"
                         : "text-gray-600 hover:bg-white/60 hover:text-gray-900",
                     )}
                   >
@@ -146,7 +146,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex min-w-[5rem] flex-col items-center gap-1 px-3 py-2 text-[11px]",
-                active ? "font-semibold text-[#1a3d2b]" : "text-gray-500",
+                active ? "font-semibold text-primary-dark" : "text-gray-500",
               )}
             >
               <item.icon className="h-4 w-4" />

@@ -14,8 +14,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { ApiError } from "@/lib/api/client";
 import { verifyEmail } from "@/lib/api/auth";
 import { useAuth } from "@/lib/context/AuthContext";
@@ -63,7 +61,6 @@ export default function VerifyEmailClient() {
 
   return (
     <>
-      <Navbar />
       <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 pt-24 pb-16">
         <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
           {state === "working" && (
@@ -105,7 +102,6 @@ export default function VerifyEmailClient() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

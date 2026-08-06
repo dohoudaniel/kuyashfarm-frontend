@@ -23,8 +23,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Banknote, Loader2, Lock, Wallet } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { FormField } from "@/components/ui/FormField";
 import { FormSelect } from "@/components/ui/FormSelect";
 import { FormTextarea } from "@/components/ui/FormTextarea";
@@ -288,7 +286,6 @@ export default function CheckoutClient() {
   if (items.length === 0) {
     return (
       <>
-        <Navbar />
         <main className="min-h-screen bg-gray-50 pt-24 pb-16">
           <div className="mx-auto max-w-3xl px-4 text-center">
             <h1 className="mb-4 text-3xl font-bold text-gray-900">Your cart is empty</h1>
@@ -298,14 +295,12 @@ export default function CheckoutClient() {
             </Link>
           </div>
         </main>
-        <Footer />
       </>
     );
   }
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Link href="/categories" className="mb-8 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
@@ -515,7 +510,6 @@ export default function CheckoutClient() {
           </form>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

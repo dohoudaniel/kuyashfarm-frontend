@@ -124,7 +124,7 @@ export function ChatWidget() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bg-[#2d5f3f] text-white rounded-full p-3 sm:p-4 shadow-lg hover:bg-[#4a7c59] transition-all duration-300 hover:scale-110 group"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bg-primary text-white rounded-full p-3 sm:p-4 shadow-lg hover:bg-secondary transition-all duration-300 hover:scale-110 group"
           aria-label="Open chat"
         >
           <MessageCircle className="w-6 h-6" />
@@ -141,7 +141,7 @@ export function ChatWidget() {
       {isOpen && (
         <div className="fixed inset-x-4 bottom-4 sm:inset-x-auto sm:bottom-6 sm:right-6 z-50 w-auto sm:w-96 h-[calc(100vh-2rem)] sm:h-[600px] max-h-[700px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#2d5f3f] to-[#4a7c59] text-white p-4 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-primary to-secondary text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 <Bot className="w-6 h-6" />
@@ -170,14 +170,14 @@ export function ChatWidget() {
                 }`}
               >
                 {message.sender === "bot" && (
-                  <div className="w-8 h-8 bg-[#2d5f3f] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <Bot className="w-5 h-5 text-white" />
                   </div>
                 )}
                 <div
                   className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                     message.sender === "user"
-                      ? "bg-[#2d5f3f] text-white rounded-br-sm"
+                      ? "bg-primary text-white rounded-br-sm"
                       : "bg-white text-gray-800 rounded-bl-sm shadow-sm"
                   }`}
                 >
@@ -204,7 +204,7 @@ export function ChatWidget() {
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex gap-2 justify-start">
-                <div className="w-8 h-8 bg-[#2d5f3f] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                   <Bot className="w-5 h-5 text-white" />
                 </div>
                 <div className="bg-white text-gray-800 rounded-2xl rounded-bl-sm shadow-sm px-4 py-3">
@@ -244,12 +244,12 @@ export function ChatWidget() {
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#2d5f3f] focus:border-transparent text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim()}
-                className="bg-[#2d5f3f] text-white rounded-full p-2 hover:bg-[#4a7c59] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-primary text-white rounded-full p-2 hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Send message"
               >
                 <Send className="w-5 h-5" />

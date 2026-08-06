@@ -76,6 +76,16 @@ export interface Application {
   computed_tier: Tier | null;
   documents: ApplicationDocument[];
   applicant_email: string;
+  /**
+   * Why this was turned down. Empty unless the status is REJECTED.
+   *
+   * The server has always sent it — deliberately, and separately from the
+   * internal `review_notes` an applicant must never see. The frontend simply
+   * never declared it or rendered it, so a rejected applicant was shown a red
+   * chip reading "rejected" and nothing else: no reason, no next step, on the
+   * single worst retention moment in the product.
+   */
+  decision_reason: string;
   submitted_at: string;
   reviewed_at: string | null;
 }

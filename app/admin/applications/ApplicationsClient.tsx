@@ -166,6 +166,11 @@ export default function ApplicationsClient() {
                         `${row.business_name} approved.`,
                       );
                     }}
+                    /* Semantic green, not brand green, and deliberately so:
+                       this is one half of an approve/reject pair, and the pair
+                       has to read as go/stop. Brand green here would make
+                       "approve" look like every other button on the page at
+                       the one moment where it must not. */
                     className="flex items-center gap-1 rounded-lg bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700"
                   >
                     <Check className="h-3.5 w-3.5" /> Approve

@@ -27,6 +27,21 @@ export interface Program {
   duration: string;
   level: string;
   price: string;
+  /**
+   * Presentation, and deliberately server-owned.
+   *
+   * These four used to be a hardcoded array in `lib/data/academy.ts` that the
+   * public page read *instead of* this endpoint, so a programme created in the
+   * back office never appeared on the site. Keeping the look-and-feel on the
+   * client was the tempting half-measure and is worse: a new programme the
+   * client did not recognise would render with a default icon, no outcomes and
+   * no certification line — which reads as a broken page, not a new one.
+   */
+  certification: string;
+  outcomes: string[];
+  category: string;
+  /** A lucide-react icon name. Unknown values fall back to a leaf. */
+  icon: string;
 }
 
 export interface AcademyClass {

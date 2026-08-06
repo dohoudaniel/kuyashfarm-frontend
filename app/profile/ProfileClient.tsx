@@ -21,8 +21,6 @@ import {
   User as UserIcon,
 } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { FormField } from "@/components/ui/FormField";
 import { TwoFactorSection } from "@/components/account/TwoFactorSection";
 import { AddressForm } from "@/components/account/AddressForm";
@@ -70,6 +68,34 @@ export default function ProfileClient() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Resending the verification email is a three-state affair, not a fire.
+   *
+   * "sent" is sticky on purpose. The API throttles this endpoint at three a
+   * minute because the cost of getting it wrong lands on the sending domain's
+   * reputation — every other customer's mail is delivered on that reputation —
+   * so the button must not invite a fourth click.
+   */
+  const [resendState, setResendState] = useState<"idle" | "sending" | "sent">("idle");
+
+  async function resendVerification() {
+    setResendState("sending");
+    setError(null);
+    try {
+      await authApi.resendVerification();
+      setResendState("sent");
+    } catch (caught) {
+      // The server's own message is shown: a 429 says how long to wait, and
+      // "that did not work" would hide the one useful thing in the response.
+      setError(
+        caught instanceof ApiError
+          ? caught.message
+          : "Could not send that email. Please try again shortly.",
+      );
+      setResendState("idle");
+    }
+  }
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [passwords, setPasswords] = useState({ current: "", next: "", confirm: "" });
@@ -183,11 +209,9 @@ export default function ProfileClient() {
   if (isLoading) {
     return (
       <>
-        <Navbar />
         <main className="flex min-h-screen items-center justify-center bg-gray-50">
           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </main>
-        <Footer />
       </>
     );
   }
@@ -195,14 +219,12 @@ export default function ProfileClient() {
   if (!isAuthenticated || !user) {
     return (
       <>
-        <Navbar />
         <main className="min-h-screen bg-gray-50 pt-24 pb-16">
           <div className="mx-auto max-w-md px-4 text-center">
             <p className="mb-6 text-gray-600">Sign in to manage your account.</p>
             <Link href="/login" className="rounded-full bg-primary px-6 py-3 font-semibold text-white">Sign in</Link>
           </div>
         </main>
-        <Footer />
       </>
     );
   }
@@ -217,7 +239,6 @@ export default function ProfileClient() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <h1 className="mb-2 text-3xl font-bold text-gray-900 sm:text-4xl">My account</h1>
@@ -228,9 +249,27 @@ export default function ProfileClient() {
 
           {!user.is_email_verified && (
             <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
-              <span>Your email address is not verified yet.</span>
-              <button type="button" onClick={() => authApi.resendVerification()} className="font-semibold underline">
-                Resend the link
+              <span>
+                {resendState === "sent"
+                  ? "Sent. Check your inbox — and your spam folder."
+                  : "Your email address is not verified yet."}
+              </span>
+              {/* Was `onClick={() => authApi.resendVerification()}`: no await,
+                  no state, no catch. Clicking did nothing visible, so people
+                  clicked again — and the API throttles this at 3/min, so the
+                  rejection became an unhandled promise nobody ever saw. A
+                  button that silently fails is worse than no button. */}
+              <button
+                type="button"
+                disabled={resendState === "sending" || resendState === "sent"}
+                onClick={resendVerification}
+                className="font-semibold underline disabled:no-underline disabled:opacity-60"
+              >
+                {resendState === "sending"
+                  ? "Sending…"
+                  : resendState === "sent"
+                    ? "Sent"
+                    : "Resend the link"}
               </button>
             </div>
           )}
@@ -358,6 +397,38 @@ export default function ProfileClient() {
                                 }`
                               : ""}
                           </p>
+                          {/* The reason, when there is one. Without this a
+                              rejected applicant sees a red chip and nothing
+                              else — no explanation, no way forward — which is
+                              the worst moment in the product to go silent.
+                              `decision_reason` is populated only on rejection
+                              and is written for the applicant; the internal
+                              `review_notes` are never sent here. */}
+                          {application.status === "REJECTED" && application.decision_reason && (
+                            <div className="mt-3 rounded-lg border border-red-100 bg-red-50 p-3">
+                              <p className="text-sm font-semibold text-red-900">
+                                Why this was not approved
+                              </p>
+                              <p className="mt-1 text-sm text-red-800">
+                                {application.decision_reason}
+                              </p>
+                              <p className="mt-2 text-xs text-red-700">
+                                You are welcome to apply again once this is resolved.{" "}
+                                <Link
+                                  href={
+                                    application.application_type === "DISTRIBUTOR"
+                                      ? "/become-distributor"
+                                      : "/become-wholesaler"
+                                  }
+                                  className="font-semibold underline"
+                                >
+                                  Start a new application
+                                </Link>
+                                .
+                              </p>
+                            </div>
+                          )}
+
                           <p className="mt-1 text-xs text-gray-400">
                             Submitted{" "}
                             {new Date(application.submitted_at).toLocaleDateString("en-NG", {
@@ -464,7 +535,6 @@ export default function ProfileClient() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

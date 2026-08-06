@@ -36,7 +36,7 @@ export default function ServiceLoading() {
       </div>
 
       {/* Stats skeleton */}
-      <div className="bg-[#2d5f3f]/5 py-16">
+      <div className="bg-primary/5 py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (

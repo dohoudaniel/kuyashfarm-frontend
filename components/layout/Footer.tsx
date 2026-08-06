@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 /**
  * Site footer: navigation, contact details and social links.
  *
@@ -7,13 +9,13 @@
  * because they are for a minority of visitors who go looking.
  */
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube, MessageCircle } from "lucide-react";
-import { SITE_CONFIG } from "@/lib/constants";
+import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#1a2e20] text-white">
+    <footer className="bg-primary-dark text-white">
       {/* Main Footer */}
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-10 lg:px-8 lg:pt-20">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8 xl:gap-12">
@@ -21,7 +23,7 @@ export function Footer() {
           {/* Col 1 — Brand */}
           <div className="lg:col-span-1">
             <div className="mb-4 flex items-center gap-2">
-              <div className="h-7 w-1 rounded-full bg-[#6b9d7a]" />
+              <div className="h-7 w-1 rounded-full bg-accent" />
               <span className="font-serif text-lg font-bold tracking-tight text-white">
                 {SITE_CONFIG.name}
               </span>
@@ -31,17 +33,28 @@ export function Footer() {
             </p>
             {/* Social Icons */}
             <div className="flex items-center gap-3">
-              {[
-                { icon: Instagram, label: "Instagram" },
-                { icon: Facebook, label: "Facebook" },
-                { icon: Youtube, label: "YouTube" },
-                { icon: MessageCircle, label: "WhatsApp" },
-              ].map(({ icon: Icon, label }) => (
+              {/* Only accounts that exist. Every one of these was `href="#"`
+                  — four icons promising a presence the business does not have,
+                  and a visitor who clicks one learns something about how
+                  carefully the rest of the site was built. Fill in
+                  SOCIAL_LINKS and the icon appears. */}
+              {(
+                [
+                  { icon: Instagram, label: "Instagram", href: SOCIAL_LINKS.instagram },
+                  { icon: Facebook, label: "Facebook", href: SOCIAL_LINKS.facebook },
+                  { icon: Youtube, label: "YouTube", href: SOCIAL_LINKS.youtube },
+                  { icon: MessageCircle, label: "WhatsApp", href: SOCIAL_LINKS.whatsapp },
+                ] as const
+              )
+                .filter((link): link is typeof link & { href: string } => Boolean(link.href))
+                .map(({ icon: Icon, label, href }) => (
                 <a
                   key={label}
-                  href="#"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all duration-200 hover:border-[#6b9d7a] hover:text-[#6b9d7a]"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all duration-200 hover:border-accent hover:text-accent"
                 >
                   <Icon className="h-3.5 w-3.5" />
                 </a>
@@ -69,7 +82,7 @@ export function Footer() {
                     href={link.href}
                     className="group inline-flex items-center gap-1.5 font-sans text-sm text-white/50 transition-colors duration-200 hover:text-white"
                   >
-                    <span className="h-px w-0 bg-[#6b9d7a] transition-all duration-200 group-hover:w-3" />
+                    <span className="h-px w-0 bg-accent transition-all duration-200 group-hover:w-3" />
                     {link.label}
                   </a>
                 </li>
@@ -96,7 +109,7 @@ export function Footer() {
                     href={link.href}
                     className="group inline-flex items-center gap-1.5 font-sans text-sm text-white/50 transition-colors duration-200 hover:text-white"
                   >
-                    <span className="h-px w-0 bg-[#6b9d7a] transition-all duration-200 group-hover:w-3" />
+                    <span className="h-px w-0 bg-accent transition-all duration-200 group-hover:w-3" />
                     {link.label}
                   </a>
                 </li>
@@ -129,7 +142,7 @@ export function Footer() {
                 },
               ].map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3">
-                  <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#6b9d7a]" />
+                  <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
                   <span className="font-sans text-sm leading-snug text-white/50">{text}</span>
                 </li>
               ))}
@@ -150,14 +163,22 @@ export function Footer() {
             © {currentYear} {SITE_CONFIG.name}. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            {["Privacy Policy", "Terms & Conditions", "Cookie Policy"].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="font-sans text-xs text-white/30 transition-colors duration-200 hover:text-[#6b9d7a]"
+            {/* These were `href="#"`. A shop that takes card payments and
+                collects addresses cannot have a Privacy Policy link that goes
+                nowhere — under the NDPR that is not a cosmetic gap. The pages
+                exist now and describe what this system actually does. */}
+            {[
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Terms & Conditions", href: "/terms" },
+              { label: "Cookie Policy", href: "/cookies" },
+            ].map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="font-sans text-xs text-white/30 transition-colors duration-200 hover:text-accent"
               >
-                {item}
-              </a>
+                {label}
+              </Link>
             ))}
           </div>
         </div>

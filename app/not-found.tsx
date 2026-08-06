@@ -7,12 +7,12 @@ import { Leaf } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#faf8f5] px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cream px-4">
       <div className="max-w-lg text-center">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#2d5f3f]/10">
-          <Leaf className="h-7 w-7 text-[#2d5f3f]" />
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <Leaf className="h-7 w-7 text-primary" />
         </div>
-        <p className="mb-2 font-sans text-xs font-semibold uppercase tracking-widest text-[#6b9d7a]">
+        <p className="mb-2 font-sans text-xs font-semibold uppercase tracking-widest text-accent">
           404 — Page not found
         </p>
         <h1 className="mb-4 font-serif text-4xl font-bold text-gray-900 md:text-5xl">
@@ -25,13 +25,13 @@ export default function NotFound() {
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full bg-[#2d5f3f] px-7 py-3 font-sans text-sm font-semibold text-white transition-colors hover:bg-[#4a7c59]"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 font-sans text-sm font-semibold text-white transition-colors hover:bg-secondary"
           >
             Back to Home
           </Link>
           <Link
             href="/#services"
-            className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-7 py-3 font-sans text-sm font-semibold text-gray-700 transition-colors hover:border-[#2d5f3f] hover:text-[#2d5f3f]"
+            className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-7 py-3 font-sans text-sm font-semibold text-gray-700 transition-colors hover:border-primary hover:text-primary"
           >
             Our Services
           </Link>

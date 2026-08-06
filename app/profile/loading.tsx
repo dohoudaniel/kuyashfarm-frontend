@@ -7,7 +7,7 @@
 
 export default function ProfileLoading() {
   return (
-    <div className="min-h-screen bg-[#faf8f5] pt-20">
+    <div className="min-h-screen bg-cream pt-20">
       <div className="mx-auto max-w-3xl px-6 py-10 lg:px-8">
         {/* Avatar + name */}
         <div className="mb-8 flex items-center gap-5">

@@ -286,8 +286,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
   if (!isAuthenticated) {
     return (
       <div className="mx-auto max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
-        <Lock className="mx-auto mb-4 h-10 w-10 text-[#2d5f3f]" />
-        <h2 className="mb-2 font-serif text-2xl font-bold text-[#1a3d2b]">
+        <Lock className="mx-auto mb-4 h-10 w-10 text-primary" />
+        <h2 className="mb-2 font-serif text-2xl font-bold text-primary-dark">
           Sign in to apply
         </h2>
         <p className="mb-6 text-sm text-gray-500">
@@ -297,7 +297,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href={`/login?next=${encodeURIComponent(isDistributor ? "/become-distributor" : "/become-wholesaler")}`}
-            className="rounded-full bg-[#2d5f3f] px-6 py-3 font-semibold text-white hover:bg-[#1a3d2b]"
+            className="rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-primary-dark"
           >
             Sign in
           </Link>
@@ -317,7 +317,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
   }
 
   const fieldClass = (name: string) =>
-    `w-full rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#2d5f3f]/30 ${
+    `w-full rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 ${
       errors[name] ? "border-red-400" : "border-gray-200"
     }`;
 
@@ -334,7 +334,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-8">
-        <h1 className="mb-3 font-serif text-3xl font-bold text-[#1a3d2b] md:text-4xl">{title}</h1>
+        <h1 className="mb-3 font-serif text-3xl font-bold text-primary-dark md:text-4xl">{title}</h1>
         <p className="text-gray-500">{intro}</p>
       </div>
 
@@ -347,7 +347,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
 
       <form onSubmit={onSubmit} className="space-y-8">
         <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="mb-5 font-serif text-lg font-bold text-[#1a3d2b]">Your business</h2>
+          <h2 className="mb-5 font-serif text-lg font-bold text-primary-dark">Your business</h2>
           <div className="space-y-4">
             <div>
               <label htmlFor="business_name" className="mb-1 block text-sm font-medium text-gray-700">
@@ -442,7 +442,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
         </section>
 
         <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="mb-5 font-serif text-lg font-bold text-[#1a3d2b]">
+          <h2 className="mb-5 font-serif text-lg font-bold text-primary-dark">
             What you handle
           </h2>
 
@@ -456,7 +456,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                 aria-pressed={specialties.includes(item)}
                 className={`rounded-full border px-4 py-2 text-sm transition-colors ${
                   specialties.includes(item)
-                    ? "border-[#2d5f3f] bg-[#2d5f3f] text-white"
+                    ? "border-primary bg-primary text-white"
                     : "border-gray-200 text-gray-600 hover:border-gray-300"
                 }`}
               >
@@ -534,7 +534,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
 
         {isDistributor && (
           <section className="rounded-2xl bg-white p-6 shadow-sm">
-            <h2 className="mb-2 font-serif text-lg font-bold text-[#1a3d2b]">
+            <h2 className="mb-2 font-serif text-lg font-bold text-primary-dark">
               Coverage area *
             </h2>
             <p className="mb-5 text-sm text-gray-500">
@@ -560,7 +560,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                           aria-pressed={selectedStates.includes(state.id)}
                           className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                             selectedStates.includes(state.id)
-                              ? "border-[#2d5f3f] bg-[#2d5f3f] text-white"
+                              ? "border-primary bg-primary text-white"
                               : "border-gray-200 text-gray-600 hover:border-gray-300"
                           }`}
                         >
@@ -576,14 +576,14 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
             <FieldErrors name="state_ids" />
 
             {selectedStates.length > 0 && (
-              <div className="mt-5 rounded-lg bg-[#f0f7f3] px-4 py-3 text-sm">
+              <div className="mt-5 rounded-lg bg-mist px-4 py-3 text-sm">
                 <span className="text-gray-600">
                   {selectedStates.length} {selectedStates.length === 1 ? "state" : "states"}{" "}
                   selected
                 </span>
                 {projectedTier && (
                   <span className="ml-2 text-gray-500">
-                    — likely <span className="font-semibold text-[#1a3d2b]">{projectedTier.name}</span>{" "}
+                    — likely <span className="font-semibold text-primary-dark">{projectedTier.name}</span>{" "}
                     tier. We confirm this during review.
                   </span>
                 )}
@@ -593,7 +593,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
         )}
 
         <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="mb-5 font-serif text-lg font-bold text-[#1a3d2b]">Contact</h2>
+          <h2 className="mb-5 font-serif text-lg font-bold text-primary-dark">Contact</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label htmlFor="contact_person" className="mb-1 block text-sm font-medium text-gray-700">
@@ -663,8 +663,8 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
           </div>
         </section>
 
-        <div className="rounded-2xl border border-gray-200 bg-[#f7f5f0] p-5 text-sm text-gray-600">
-          <p className="mb-1 font-semibold text-[#1a3d2b]">We don&apos;t ask for bank details here.</p>
+        <div className="rounded-2xl border border-gray-200 bg-cream p-5 text-sm text-gray-600">
+          <p className="mb-1 font-semibold text-primary-dark">We don&apos;t ask for bank details here.</p>
           <p>
             You&apos;ll add payout details from your profile after approval, where they&apos;re
             stored encrypted. Nobody from Kuyash will ever ask for them by email or phone.
@@ -674,7 +674,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
         <button
           type="submit"
           disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#2d5f3f] px-6 py-4 font-semibold text-white transition-colors hover:bg-[#1a3d2b] disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-60"
         >
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
           {submitting ? "Submitting…" : "Submit application"}
@@ -720,7 +720,7 @@ function SubmittedPanel({
     <div className="mx-auto max-w-2xl">
       <div className="mb-6 rounded-2xl bg-white p-8 text-center shadow-sm">
         <CheckCircle2 className="mx-auto mb-4 h-14 w-14 text-green-600" />
-        <h1 className="mb-2 font-serif text-2xl font-bold text-[#1a3d2b]">Application received</h1>
+        <h1 className="mb-2 font-serif text-2xl font-bold text-primary-dark">Application received</h1>
         <p className="mb-1 text-gray-500">
           {application.business_name} — we usually review within two business days.
         </p>
@@ -730,7 +730,7 @@ function SubmittedPanel({
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <h2 className="mb-1 font-serif text-lg font-bold text-[#1a3d2b]">
+        <h2 className="mb-1 font-serif text-lg font-bold text-primary-dark">
           Supporting documents
         </h2>
         <p className="mb-5 text-sm text-gray-500">
@@ -759,7 +759,7 @@ function SubmittedPanel({
                     <span className="max-w-[12rem] truncate">{existing.original_filename}</span>
                   </span>
                 ) : (
-                  <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#2d5f3f] hover:underline">
+                  <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-primary hover:underline">
                     {uploading === type ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (

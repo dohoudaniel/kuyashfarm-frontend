@@ -7,7 +7,7 @@
 
 export default function OrdersLoading() {
   return (
-    <div className="min-h-screen bg-[#faf8f5] pt-20">
+    <div className="min-h-screen bg-cream pt-20">
       <div className="mx-auto max-w-4xl px-6 py-10 lg:px-8">
         <div className="mb-8 space-y-2">
           <div className="h-7 w-32 animate-pulse rounded-lg bg-gray-200" />

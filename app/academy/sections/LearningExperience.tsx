@@ -14,7 +14,7 @@ const EXPERIENCES = [
       "You don't learn farming by reading about it. Every program at Kuyash Academy is built around direct, supervised work on our 40-acre farm — from soil testing to harvest. Our instructors are beside you, not behind a podium.",
     highlight: "60% hands-on fieldwork in every program",
     icon: Sprout,
-    color: "#22c55e",
+    color: "var(--primary-green)",
     features: ["Live crop and livestock units", "Supervised practical assessments", "Daily field journaling"],
     flipped: false,
   },
@@ -25,7 +25,7 @@ const EXPERIENCES = [
       "Our training facility integrates modern learning tools — precision agriculture software, drone simulation suites, IoT dashboards, and agri-fintech platforms — giving students exposure to the tools shaping the future of farming.",
     highlight: "Nigeria's most technology-equipped farm training facility",
     icon: Cpu,
-    color: "#06b6d4",
+    color: "var(--accent-green)",
     features: ["Drone flight simulation & operation", "IoT sensor configuration labs", "AI crop monitoring systems"],
     flipped: true,
   },
@@ -36,7 +36,7 @@ const EXPERIENCES = [
       "Every student is paired with a practicing industry mentor — a farmer, agribusiness owner, or agricultural specialist — who provides real-world guidance beyond the curriculum. This is the connection that accelerates careers.",
     highlight: "1-on-1 mentorship with industry veterans",
     icon: Users,
-    color: "#8b5cf6",
+    color: "var(--earth-brown)",
     features: ["Bi-weekly mentorship sessions", "Industry site visits", "Professional reference letters"],
     flipped: false,
   },
@@ -47,7 +47,7 @@ const EXPERIENCES = [
       "Students engage in active agricultural research projects in partnership with IITA and the University of Ibadan. Apply what you learn to solve real problems facing Nigerian farmers today.",
     highlight: "Active research partnership with IITA",
     icon: FlaskConical,
-    color: "#f97316",
+    color: "var(--wheat)",
     features: ["Soil and crop research projects", "Aquaculture trial systems", "Data collection & analysis"],
     flipped: true,
   },
@@ -63,7 +63,7 @@ export function LearningExperience() {
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-xs font-mono uppercase tracking-[0.2em] text-[#6b9d7a] mb-4"
+            className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-4"
           >
             The Learning Experience
           </motion.p>
@@ -72,11 +72,11 @@ export function LearningExperience() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-[#080f0a] leading-[1.05]"
+            className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-ink leading-[1.05]"
           >
             Four pillars of
             <br />
-            <span className="text-[#2d5f3f]">world-class training.</span>
+            <span className="text-primary">world-class training.</span>
           </motion.h2>
         </div>
 
@@ -100,7 +100,7 @@ export function LearningExperience() {
                 >
                   <p className="text-xs font-mono uppercase tracking-[0.2em] text-gray-400 mb-5">{exp.tag}</p>
                   <h3
-                    className="font-serif text-3xl md:text-4xl font-bold text-[#080f0a] leading-tight mb-5"
+                    className="font-serif text-3xl md:text-4xl font-bold text-ink leading-tight mb-5"
                     style={{ whiteSpace: "pre-line" }}
                   >
                     {exp.title}
@@ -108,7 +108,7 @@ export function LearningExperience() {
                   <p className="text-gray-500 text-lg leading-relaxed font-sans mb-8">{exp.description}</p>
 
                   {/* Highlight badge */}
-                  <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl mb-8 text-sm font-medium bg-[#eef5f1] text-[#2d5f3f] border border-[#c6dece]">
+                  <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl mb-8 text-sm font-medium bg-mist text-primary border border-edge">
                     <Icon className="w-4 h-4" />
                     {exp.highlight}
                   </div>
@@ -117,8 +117,8 @@ export function LearningExperience() {
                   <ul className="space-y-3">
                     {exp.features.map((f) => (
                       <li key={f} className="flex items-center gap-3 text-gray-700 font-sans text-sm">
-                        <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-[#eef5f1]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#2d5f3f]" />
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-mist">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                         </span>
                         {f}
                       </li>
@@ -132,7 +132,7 @@ export function LearningExperience() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.7 }}
-                  className="relative h-[400px] rounded-3xl overflow-hidden bg-[#eef5f1] border border-[#c6dece]"
+                  className="relative h-[400px] rounded-3xl overflow-hidden bg-mist border border-edge"
                 >
                   {/* Grid pattern */}
                   <div
@@ -144,8 +144,8 @@ export function LearningExperience() {
                   />
                   {/* Central icon */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-28 h-28 rounded-3xl flex items-center justify-center shadow-lg bg-white border-2 border-[#c6dece]">
-                      <Icon className="w-14 h-14 text-[#2d5f3f]" />
+                    <div className="w-28 h-28 rounded-3xl flex items-center justify-center shadow-lg bg-white border-2 border-edge">
+                      <Icon className="w-14 h-14 text-primary" />
                     </div>
                   </div>
                   {/* Step label */}

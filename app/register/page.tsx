@@ -11,8 +11,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/context/AuthContext";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { UserPlus, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -135,7 +133,6 @@ export default function RegisterPage() {
   if (submitted) {
     return (
       <>
-        <Navbar />
         <main className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50 pt-24 pb-16">
           <div className="mx-auto max-w-md px-4 sm:px-6 lg:px-8">
             <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-lg">
@@ -156,21 +153,19 @@ export default function RegisterPage() {
               </p>
               <Link
                 href="/login"
-                className="inline-block rounded-full bg-green-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-green-700"
+                className="inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-secondary"
               >
                 Go to sign in
               </Link>
             </div>
           </div>
         </main>
-        <Footer />
       </>
     );
   }
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50 pt-24 pb-16">
         <div className="mx-auto max-w-md px-4 sm:px-6 lg:px-8">
           {/* Header */}
@@ -413,7 +408,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-700 focus:ring-4 focus:ring-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-secondary focus:ring-4 focus:ring-accent/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isLoading ? "Creating account..." : "Create Account"}
               </button>
@@ -434,7 +429,6 @@ export default function RegisterPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

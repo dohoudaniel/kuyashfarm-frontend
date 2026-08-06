@@ -22,8 +22,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2, Clock, Loader2 } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { ApiError } from "@/lib/api/client";
 import { verifyPayment } from "@/lib/api/orders";
 import { guestEmailFor } from "@/lib/api/guest-order";
@@ -112,7 +110,6 @@ export default function ConfirmClient() {
 
   return (
     <>
-      <Navbar />
       <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 pt-24 pb-16">
         <div className="w-full max-w-lg rounded-2xl bg-white p-8 text-center shadow-sm">
           {outcome === "checking" && (
@@ -212,7 +209,6 @@ export default function ConfirmClient() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

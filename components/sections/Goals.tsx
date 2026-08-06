@@ -15,7 +15,7 @@ export function Goals() {
       <Container>
         {/* Section Title */}
         <div className="mb-16 text-center">
-          <h2 className="mb-4 font-serif text-4xl font-bold text-[#2d5f3f] md:text-5xl">
+          <h2 className="mb-4 font-serif text-4xl font-bold text-primary md:text-5xl">
             Our Goals
           </h2>
           <p className="mx-auto max-w-2xl font-sans text-lg text-gray-600">
@@ -31,12 +31,12 @@ export function Goals() {
               className="group text-center transition-transform duration-300 hover:scale-105"
             >
               {/* Icon Circle */}
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#2d5f3f] text-white shadow-lg transition-all duration-300 group-hover:bg-[#4a7c59] group-hover:shadow-xl">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-all duration-300 group-hover:bg-secondary group-hover:shadow-xl">
                 <span className="font-serif text-2xl font-bold">{goal.id}</span>
               </div>
 
               {/* Metric Value */}
-              <div className="mb-4 font-serif text-5xl font-bold text-[#2d5f3f] md:text-6xl">
+              <div className="mb-4 font-serif text-5xl font-bold text-primary md:text-6xl">
                 {goal.value}
               </div>
 
@@ -49,7 +49,7 @@ export function Goals() {
         </div>
 
         {/* Additional Stats */}
-        <div className="mt-20 rounded-2xl bg-gradient-to-r from-[#2d5f3f] to-[#4a7c59] p-8 text-white shadow-2xl md:p-12">
+        <div className="mt-20 rounded-2xl bg-gradient-to-r from-primary to-secondary p-8 text-white shadow-2xl md:p-12">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             <div className="text-center">
               <div className="mb-2 font-serif text-3xl font-bold md:text-4xl">

@@ -57,6 +57,15 @@ function resolveApiBaseUrl(): string {
 const API_BASE_URL = resolveApiBaseUrl();
 
 /** A request that reached the server and came back with an error envelope. */
+/**
+ * Response header carrying the unread-notification count.
+ *
+ * Must be listed in the API's `CORS_EXPOSE_HEADERS` or the browser hides it
+ * from JavaScript on any cross-origin deployment — the server sends it, curl
+ * sees it, and only the real frontend does not.
+ */
+const UNREAD_HEADER = "X-Unread-Notifications";
+
 export class ApiError extends Error {
   readonly status: number;
   readonly fieldErrors: Record<string, string[]>;
@@ -113,6 +122,13 @@ export class ApiClient {
     return this.accessToken;
   }
 
+  /**
+   * Called with the unread-notification count whenever a response carries one.
+   * Set by the notification bell; a plain callback rather than a store import
+   * because `lib/api` must not depend on React.
+   */
+  onUnreadCount?: (count: number) => void;
+
   /** Lets AuthContext clear its state when a refresh finally fails. */
   setUnauthenticatedHandler(handler: (() => void) | null): void {
     this.onUnauthenticated = handler;
@@ -148,6 +164,8 @@ export class ApiClient {
       throw new NetworkError();
     }
 
+    this.readUnreadCount(response);
+
     if (response.status === 401 && !skipRefresh) {
       const refreshed = await this.refreshAccessToken();
       if (refreshed) {
@@ -158,6 +176,34 @@ export class ApiClient {
     }
 
     return this.unwrap<T>(response);
+  }
+
+  /**
+   * Pick the unread-notification count off any authenticated response.
+   *
+   * The bell used to poll for this every thirty seconds. At 5,000 concurrent
+   * users that is 167 requests a second against a backend that serves 8 at a
+   * time — about 40% of total capacity spent on a number that is almost always
+   * zero. It now rides along on requests the app already makes, so the badge
+   * costs nothing and updates as the user navigates, which is when they look
+   * at it anyway.
+   *
+   * Absent header means "no news", not "zero": an anonymous response never
+   * carries one, and neither does a response the middleware could not compute.
+   * Overwriting the count with 0 in those cases would blank a badge that is
+   * legitimately lit.
+   */
+  private readUnreadCount(response: Response): void {
+    // Guarded rather than assumed. This method's entire contract is that it is
+    // free and invisible — it must never be the reason a request fails. A
+    // response without readable headers simply carries no news.
+    const raw = response.headers?.get?.(UNREAD_HEADER);
+    if (raw === null || raw === undefined) return;
+
+    const value = Number.parseInt(raw, 10);
+    if (Number.isNaN(value) || value < 0) return;
+
+    this.onUnreadCount?.(value);
   }
 
   private async unwrap<T>(response: Response): Promise<T> {

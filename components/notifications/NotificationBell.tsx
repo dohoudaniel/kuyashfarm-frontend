@@ -11,13 +11,16 @@
  *
  * Three decisions:
  *
- * **The badge polls the count endpoint, not the list.** Pulling a page of
- * notifications every thirty seconds to render one number wastes a mobile data
- * allowance, and the warehouse runs this on a phone.
+ * **The badge is not polled at all.** It used to be, every thirty seconds. At
+ * 5,000 concurrent users that is 167 requests a second for a number that is
+ * almost always zero, against a backend that serves 8 requests at a time — the
+ * single largest consumer of capacity in the product, and it rendered a dot.
+ * The API now attaches `X-Unread-Notifications` to every authenticated
+ * response, so the count arrives on requests the app already makes.
  *
- * **Polling stops when the tab is hidden.** A back-office tab left open
- * overnight would otherwise make ~1,000 pointless requests before anyone came
- * back to it.
+ * **The list is still fetched on demand.** Only when the panel opens. Pulling a
+ * page of notifications to render one number wastes a mobile data allowance,
+ * and the warehouse runs this on a phone.
  *
  * **Opening one marks it read; nothing marks itself read on render.** A badge
  * that clears because a panel happened to mount tells you there was something
@@ -35,11 +38,9 @@ import {
   unreadCount,
   type Notification,
 } from "@/lib/api/notifications";
+import { apiClient } from "@/lib/api/client";
 import { useAuth } from "@/lib/context/AuthContext";
 import { cn } from "@/lib/utils";
-
-/** Thirty seconds: fast enough for a low-stock warning, cheap enough to leave on. */
-const POLL_MS = 30_000;
 
 export function NotificationBell() {
   const { isAuthenticated } = useAuth();
@@ -51,33 +52,41 @@ export function NotificationBell() {
 
   const panel = useRef<HTMLDivElement>(null);
 
-  const refreshCount = useCallback(async () => {
-    try {
-      const { unread: count } = await unreadCount();
-      setUnread(count);
-    } catch {
-      // A failed poll is not worth telling anyone about. The next one is
-      // thirty seconds away, and an error banner for a background request
-      // trains people to ignore error banners.
-    }
-  }, []);
-
+  /**
+   * The count arrives on responses the app is already making.
+   *
+   * This used to be a thirty-second `setInterval` calling
+   * `/notifications/unread-count/`. At the 5,000 concurrent users the product
+   * is sized for, that is 167 requests a second against a backend that serves
+   * 8 at a time — roughly 40% of the entire system's capacity, spent on a
+   * number that is almost always zero.
+   *
+   * The API now attaches `X-Unread-Notifications` to every authenticated
+   * response, so the badge updates as the user navigates and costs nothing.
+   * One deliberate read on mount covers the case where nothing else has
+   * fetched yet — a page opened directly on a route with no other requests.
+   */
   useEffect(() => {
     if (!isAuthenticated) {
       setUnread(0);
+      apiClient.onUnreadCount = undefined;
       return;
     }
 
-    void refreshCount();
+    apiClient.onUnreadCount = setUnread;
 
-    const timer = setInterval(() => {
-      // A tab left open overnight would otherwise make about a thousand
-      // pointless requests before anybody looked at it again.
-      if (document.visibilityState === "visible") void refreshCount();
-    }, POLL_MS);
+    // Seeds the badge on a cold open. Every subsequent update is free.
+    void unreadCount()
+      .then(({ unread: count }) => setUnread(count))
+      .catch(() => {
+        // A failed background read is not worth an error banner; the next
+        // response the user triggers will carry the count anyway.
+      });
 
-    return () => clearInterval(timer);
-  }, [isAuthenticated, refreshCount]);
+    return () => {
+      apiClient.onUnreadCount = undefined;
+    };
+  }, [isAuthenticated]);
 
   // Close on a click anywhere else, which is what people expect of a popover.
   useEffect(() => {
@@ -97,6 +106,15 @@ export function NotificationBell() {
       document.removeEventListener("keydown", onEscape);
     };
   }, [open]);
+
+  /** Re-read the count after an optimistic update turned out to be wrong. */
+  const resync = useCallback(
+    () =>
+      unreadCount()
+        .then(({ unread: count }) => setUnread(count))
+        .catch(() => undefined),
+    [],
+  );
 
   async function toggle() {
     const next = !open;
@@ -122,7 +140,10 @@ export function NotificationBell() {
         current.map((entry) => (entry.id === item.id ? { ...entry, is_read: true } : entry)),
       );
       setUnread((current) => Math.max(0, current - 1));
-      await markRead(item.id).catch(() => void refreshCount());
+      // The optimistic decrement above assumed success. Re-read on failure so
+      // the badge does not sit one lower than the truth until the next
+      // navigation happens to correct it.
+      await markRead(item.id).catch(() => void resync());
     }
     setOpen(false);
   }
@@ -130,7 +151,7 @@ export function NotificationBell() {
   async function clearAll() {
     setItems((current) => current.map((entry) => ({ ...entry, is_read: true })));
     setUnread(0);
-    await markAllRead().catch(() => void refreshCount());
+    await markAllRead().catch(() => void resync());
   }
 
   if (!isAuthenticated) return null;

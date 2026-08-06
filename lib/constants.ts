@@ -5,8 +5,27 @@
 export const SITE_CONFIG = {
   name: "Kuyash Integrated Farm",
   tagline: "Farming for a future",
-  description: "Cultivating a sustainable future through innovative agriculture and empowering rural communities.",
+  description:
+    "Cultivating a sustainable future through innovative agriculture and empowering rural communities.",
 } as const;
+
+/**
+ * Social accounts, and only the ones that exist.
+ *
+ * The footer rendered four icons — Instagram, Facebook, YouTube, WhatsApp —
+ * every one of them `href="#"`. A link that goes nowhere is worse than an
+ * absent one: it is a promise the site does not keep, and the visitor who
+ * clicks it has learnt something about how carefully the rest was built.
+ *
+ * Fill an entry in and its icon appears. Leave it empty and it does not.
+ */
+export const SOCIAL_LINKS: { instagram?: string; facebook?: string; youtube?: string; whatsapp?: string } =
+  {
+    // instagram: "https://instagram.com/kuyashfarm",
+    // facebook: "https://facebook.com/kuyashfarm",
+    // youtube: "https://youtube.com/@kuyashfarm",
+    // whatsapp: "https://wa.me/234XXXXXXXXXX",
+  };
 
 export const STATS = [
   { value: "5000+", label: "Farmers Connected" },

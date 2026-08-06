@@ -40,7 +40,7 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-xs font-mono uppercase tracking-[0.2em] text-[#6b9d7a] mb-4"
+              className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-4"
             >
               The Faculty
             </motion.p>
@@ -49,11 +49,11 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="font-serif text-4xl md:text-5xl font-bold text-[#080f0a] leading-tight"
+              className="font-serif text-4xl md:text-5xl font-bold text-ink leading-tight"
             >
               Taught by practitioners,
               <br />
-              <span className="text-[#2d5f3f]">not just professors.</span>
+              <span className="text-primary">not just professors.</span>
             </motion.h2>
           </div>
           <motion.p
@@ -68,7 +68,7 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-6">
           {instructors.map((inst, i) => (
             <motion.div
               key={inst.id}
@@ -79,11 +79,11 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
               className="group relative p-8 rounded-3xl border border-gray-100 hover:border-gray-200 hover:shadow-2xl transition-all duration-400 bg-white overflow-hidden"
             >
               {/* Subtle bg glow */}
-              <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[#2d5f3f]/10" />
+              <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/10" />
 
               {/* Avatar */}
               <div className="relative mb-6">
-                <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center text-white font-serif text-xl font-bold shadow-lg bg-[#2d5f3f] overflow-hidden">
+                <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center text-white font-serif text-xl font-bold shadow-lg bg-primary overflow-hidden">
                   {inst.photo ? (
                     <Image src={inst.photo} alt={inst.name} fill sizes="64px" className="object-cover" />
                   ) : (
@@ -91,13 +91,13 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
                   )}
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border-2 border-white flex items-center justify-center shadow">
-                  <BadgeCheck className="w-4 h-4 text-[#2d5f3f]" />
+                  <BadgeCheck className="w-4 h-4 text-primary" />
                 </div>
               </div>
 
               {/* Info */}
-              <h3 className="font-serif text-lg font-bold text-[#080f0a] leading-tight mb-0.5">{inst.name}</h3>
-              <p className="text-sm font-semibold text-[#2d5f3f] mb-1">{inst.title}</p>
+              <h3 className="font-serif text-lg font-bold text-ink leading-tight mb-0.5">{inst.name}</h3>
+              <p className="text-sm font-semibold text-primary mb-1">{inst.title}</p>
               {inst.bio && (
                 <p className="text-gray-400 text-xs font-sans mb-5 line-clamp-3">{inst.bio}</p>
               )}
@@ -106,7 +106,7 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
               <ul className="space-y-2">
                 {inst.specialties.map((c) => (
                   <li key={c} className="flex items-start gap-2 text-xs text-gray-500 font-sans leading-snug">
-                    <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-[#2d5f3f]" />
+                    <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-primary" />
                     {c}
                   </li>
                 ))}

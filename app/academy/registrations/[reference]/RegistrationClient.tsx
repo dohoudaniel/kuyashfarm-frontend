@@ -24,8 +24,6 @@ import {
   MapPin,
 } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -169,13 +167,12 @@ export default function RegistrationClient({ reference }: { reference: string })
 
   return (
     <>
-      <Navbar />
-      <main className="min-h-screen bg-[#f7f5f0] py-24">
+      <main className="min-h-screen bg-cream py-24">
         <Container>
           <div className="mx-auto max-w-xl">
             <Link
               href="/academy"
-              className="mb-6 inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-[#2d5f3f]"
+              className="mb-6 inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-primary"
             >
               <ArrowLeft className="h-4 w-4" /> Back to Academy
             </Link>
@@ -186,12 +183,12 @@ export default function RegistrationClient({ reference }: { reference: string })
               </div>
             ) : needsEmail ? (
               <div className="rounded-2xl bg-white p-8">
-                <h1 className="mb-2 font-serif text-2xl font-bold text-[#1a3d2b]">
+                <h1 className="mb-2 font-serif text-2xl font-bold text-primary-dark">
                   Confirm it&apos;s you
                 </h1>
                 <p className="mb-6 text-sm text-gray-500">
                   Enter the email address this booking was made with, or{" "}
-                  <Link href="/login" className="font-semibold text-[#2d5f3f] hover:underline">
+                  <Link href="/login" className="font-semibold text-primary hover:underline">
                     sign in
                   </Link>
                   .
@@ -231,7 +228,7 @@ export default function RegistrationClient({ reference }: { reference: string })
                     placeholder="you@example.com"
                     aria-invalid={!!emailError}
                     aria-describedby={emailError ? "booking-email-error" : undefined}
-                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#2d5f3f]/30 ${
+                    className={`w-full rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 ${
                       emailError ? "border-red-400" : "border-gray-200"
                     }`}
                   />
@@ -242,7 +239,7 @@ export default function RegistrationClient({ reference }: { reference: string })
                   )}
                   <button
                     type="submit"
-                    className="w-full rounded-full bg-[#2d5f3f] py-3 font-semibold text-white transition-colors hover:bg-[#1a3d2b]"
+                    className="w-full rounded-full bg-primary py-3 font-semibold text-white transition-colors hover:bg-primary-dark"
                   >
                     View booking
                   </button>
@@ -251,13 +248,13 @@ export default function RegistrationClient({ reference }: { reference: string })
             ) : error || !registration || !status ? (
               <div className="rounded-2xl bg-white p-8 text-center">
                 <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
-                <h1 className="mb-2 font-serif text-2xl font-bold text-[#1a3d2b]">
+                <h1 className="mb-2 font-serif text-2xl font-bold text-primary-dark">
                   Booking not found
                 </h1>
                 <p className="mb-6 text-gray-500">{error}</p>
                 <Link
                   href="/academy"
-                  className="inline-block rounded-full bg-[#2d5f3f] px-6 py-3 font-semibold text-white hover:bg-[#1a3d2b]"
+                  className="inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-primary-dark"
                 >
                   Browse classes
                 </Link>
@@ -266,9 +263,9 @@ export default function RegistrationClient({ reference }: { reference: string })
               <div className="rounded-2xl bg-white p-8">
                 <div className="mb-6 text-center">
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                    <CheckCircle2 className="h-8 w-8 text-[#2d5f3f]" />
+                    <CheckCircle2 className="h-8 w-8 text-primary" />
                   </div>
-                  <h1 className="mb-2 font-serif text-2xl font-bold text-[#1a3d2b]">
+                  <h1 className="mb-2 font-serif text-2xl font-bold text-primary-dark">
                     {registration.class_title}
                   </h1>
                   <span
@@ -309,7 +306,7 @@ export default function RegistrationClient({ reference }: { reference: string })
                   <span className="text-sm text-gray-500">
                     {Number(registration.price) === 0 ? "Cost" : "Amount to pay"}
                   </span>
-                  <span className="font-serif text-2xl font-bold text-[#1a3d2b]">
+                  <span className="font-serif text-2xl font-bold text-primary-dark">
                     {Number(registration.price) === 0
                       ? "Free"
                       : formatPrice(Number(registration.price))}
@@ -319,7 +316,7 @@ export default function RegistrationClient({ reference }: { reference: string })
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <Link
                     href={`/academy/classes/${registration.class_slug}`}
-                    className="flex-1 rounded-full bg-[#2d5f3f] px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-[#1a3d2b]"
+                    className="flex-1 rounded-full bg-primary px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-primary-dark"
                   >
                     View the class
                   </Link>
@@ -328,7 +325,7 @@ export default function RegistrationClient({ reference }: { reference: string })
                       type="button"
                       onClick={onPay}
                       disabled={paying}
-                      className="flex-1 rounded-full bg-[#e8d5a3] px-6 py-3 font-semibold text-[#1a3d2b] transition-colors hover:bg-[#dfc98a] disabled:opacity-60"
+                      className="flex-1 rounded-full bg-wheat px-6 py-3 font-semibold text-primary-dark transition-colors hover:bg-wheat disabled:opacity-60"
                     >
                       {paying ? "Opening payment…" : `Pay ${formatPrice(registration.price)} now`}
                     </button>
@@ -356,7 +353,6 @@ export default function RegistrationClient({ reference }: { reference: string })
           </div>
         </Container>
       </main>
-      <Footer />
     </>
   );
 }
@@ -375,11 +371,11 @@ function Row({
   return (
     <div className="flex items-center justify-between gap-4">
       <span className="flex items-center gap-2 text-gray-500">
-        {Icon && <Icon className="h-4 w-4 text-[#2d5f3f]" />}
+        {Icon && <Icon className="h-4 w-4 text-primary" />}
         {label}
       </span>
       <span
-        className={`text-right font-semibold text-[#1a3d2b] ${mono ? "font-mono text-xs" : ""}`}
+        className={`text-right font-semibold text-primary-dark ${mono ? "font-mono text-xs" : ""}`}
       >
         {value}
       </span>

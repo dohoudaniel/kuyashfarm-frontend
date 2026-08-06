@@ -12,8 +12,6 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Loader2, Truck } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { ApiError } from "@/lib/api/client";
 import { cancelOrder, getGuestOrder, getOrder, reorder } from "@/lib/api/orders";
 import { guestEmailFor } from "@/lib/api/guest-order";
@@ -78,11 +76,9 @@ export default function OrderDetailClient({ orderNumber }: { orderNumber: string
   if (loading) {
     return (
       <>
-        <Navbar />
         <main className="flex min-h-screen items-center justify-center bg-gray-50">
           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </main>
-        <Footer />
       </>
     );
   }
@@ -90,7 +86,6 @@ export default function OrderDetailClient({ orderNumber }: { orderNumber: string
   if (error || !order) {
     return (
       <>
-        <Navbar />
         <main className="min-h-screen bg-gray-50 pt-24 pb-16">
           <div className="mx-auto max-w-2xl px-4 text-center">
             <p role="alert" className="mb-6 text-gray-700">{error}</p>
@@ -99,14 +94,12 @@ export default function OrderDetailClient({ orderNumber }: { orderNumber: string
             </Link>
           </div>
         </main>
-        <Footer />
       </>
     );
   }
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
@@ -198,7 +191,6 @@ export default function OrderDetailClient({ orderNumber }: { orderNumber: string
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

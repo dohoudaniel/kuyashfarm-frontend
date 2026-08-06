@@ -29,8 +29,6 @@ import {
   Users,
 } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { ApiError } from "@/lib/api/client";
 import { registerForClass, type AcademyClassDetail } from "@/lib/api/academy";
@@ -196,22 +194,21 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
   }
 
   const fieldClass = (name: string) =>
-    `w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#2d5f3f]/30 ${
+    `w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30 ${
       errors[name] ? "border-red-400" : "border-gray-200"
     }`;
 
   return (
     <>
-      <Navbar />
-      <main className="min-h-screen bg-[#f7f5f0]">
+      <main className="min-h-screen bg-cream">
         {/* Hero */}
         <div className="relative h-72 w-full overflow-hidden md:h-96">
           {cls.image ? (
             <Image src={cls.image} alt={cls.title} fill priority className="object-cover" />
           ) : (
-            <div className="absolute inset-0 bg-[#1a3d2b]" />
+            <div className="absolute inset-0 bg-primary-dark" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1a3d2b]/80 via-[#1a3d2b]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/80 via-primary-dark/40 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-end pb-8">
             <Container>
               <Link
@@ -249,16 +246,16 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label}>
                     <div className="mb-1 flex items-center gap-2 text-xs text-gray-400">
-                      <Icon className="h-5 w-5 text-[#2d5f3f]" /> {label}
+                      <Icon className="h-5 w-5 text-primary" /> {label}
                     </div>
-                    <p className="text-sm font-semibold text-[#1a3d2b]">{value}</p>
+                    <p className="text-sm font-semibold text-primary-dark">{value}</p>
                   </div>
                 ))}
               </div>
 
               {cls.long_description && (
                 <div className="rounded-2xl bg-white p-6">
-                  <h2 className="mb-3 font-serif text-xl font-bold text-[#1a3d2b]">
+                  <h2 className="mb-3 font-serif text-xl font-bold text-primary-dark">
                     About this class
                   </h2>
                   <p className="leading-relaxed text-gray-500">{cls.long_description}</p>
@@ -267,14 +264,14 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
 
               {cls.topics.length > 0 && (
                 <div className="rounded-2xl bg-white p-6">
-                  <h2 className="mb-4 font-serif text-xl font-bold text-[#1a3d2b]">
+                  <h2 className="mb-4 font-serif text-xl font-bold text-primary-dark">
                     What you will cover
                   </h2>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {cls.topics.map((topic) => (
                       <div key={topic} className="flex items-center gap-3">
-                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#eef5f1]">
-                          <CheckCircle2 className="h-3 w-3 text-[#2d5f3f]" />
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mist">
+                          <CheckCircle2 className="h-3 w-3 text-primary" />
                         </div>
                         <span className="text-sm text-gray-700">{topic}</span>
                       </div>
@@ -285,13 +282,13 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
 
               {cls.includes.length > 0 && (
                 <div className="rounded-2xl bg-white p-6">
-                  <h2 className="mb-4 font-serif text-xl font-bold text-[#1a3d2b]">
+                  <h2 className="mb-4 font-serif text-xl font-bold text-primary-dark">
                     What&apos;s included
                   </h2>
                   <div className="space-y-2">
                     {cls.includes.map((item) => (
                       <div key={item} className="flex items-center gap-3">
-                        <Award className="h-4 w-4 shrink-0 text-[#e8d5a3]" />
+                        <Award className="h-4 w-4 shrink-0 text-wheat" />
                         <span className="text-sm text-gray-700">{item}</span>
                       </div>
                     ))}
@@ -301,7 +298,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
 
               {cls.instructor && (
                 <div className="flex items-center gap-5 rounded-2xl bg-white p-6">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#eef5f1]">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-mist">
                     {cls.instructor.photo ? (
                       <Image
                         src={cls.instructor.photo}
@@ -318,7 +315,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                     <p className="mb-1 text-xs uppercase tracking-wider text-gray-400">
                       Your instructor
                     </p>
-                    <p className="font-serif font-bold text-[#1a3d2b]">{cls.instructor.name}</p>
+                    <p className="font-serif font-bold text-primary-dark">{cls.instructor.name}</p>
                     <p className="text-sm text-gray-500">{cls.instructor.title}</p>
                   </div>
                 </div>
@@ -329,7 +326,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
             <div className="lg:col-span-1">
               <div className="sticky top-24 rounded-2xl bg-white p-6 shadow-sm">
                 <div className="mb-6 border-b border-gray-100 pb-6">
-                  <p className="font-serif text-4xl font-bold text-[#1a3d2b]">
+                  <p className="font-serif text-4xl font-bold text-primary-dark">
                     {isFree ? "Free" : formatPrice(Number(cls.price))}
                   </p>
                   <p className="mt-1 text-xs text-gray-400">
@@ -344,7 +341,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
 
                 {!cls.is_open_for_registration ? (
                   <div className="text-center">
-                    <p className="mb-2 font-semibold text-[#1a3d2b]">
+                    <p className="mb-2 font-semibold text-primary-dark">
                       {cls.is_full ? "This class is full" : "Registration is closed"}
                     </p>
                     <p className="mb-6 text-sm text-gray-500">
@@ -354,14 +351,14 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                     </p>
                     <Link
                       href="/academy"
-                      className="inline-block rounded-full bg-[#2d5f3f] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#1a3d2b]"
+                      className="inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-dark"
                     >
                       See other classes
                     </Link>
                   </div>
                 ) : (
                   <form onSubmit={onSubmit} className="space-y-4">
-                    <h3 className="font-serif text-lg font-bold text-[#1a3d2b]">
+                    <h3 className="font-serif text-lg font-bold text-primary-dark">
                       Register for this class
                     </h3>
 
@@ -502,7 +499,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="flex w-full items-center justify-center gap-2 rounded-full bg-[#2d5f3f] py-4 font-semibold text-white transition-colors duration-200 hover:bg-[#1a3d2b] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 font-semibold text-white transition-colors duration-200 hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                       {submitting ? "Reserving your seat…" : "Confirm registration"}
@@ -520,7 +517,6 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
           </div>
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

@@ -27,7 +27,7 @@ export function Services() {
           <p className="mb-4 font-sans text-xs uppercase tracking-wider text-gray-500">
             Our Services for a Greener Future
           </p>
-          <h2 className="font-serif text-2xl font-bold leading-tight text-[#2d5f3f] md:text-3xl lg:text-4xl">
+          <h2 className="font-serif text-2xl font-bold leading-tight text-primary md:text-3xl lg:text-4xl">
             Empowering communities through
             <br />
             sustainable agriculture and innovation.
@@ -35,7 +35,7 @@ export function Services() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {SERVICES.map((service, index) => (
             <Link
               key={service.id}
@@ -65,7 +65,7 @@ export function Services() {
               </div>
 
               {/* Accent Border on Hover */}
-              <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#6b9d7a] transition-all duration-500 group-hover:w-full" />
+              <div className="absolute bottom-0 left-0 h-1 w-0 bg-accent transition-all duration-500 group-hover:w-full" />
             </Link>
           ))}
         </div>

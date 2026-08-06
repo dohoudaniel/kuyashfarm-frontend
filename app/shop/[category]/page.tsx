@@ -15,8 +15,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { fetchCategoryPublic, fetchProductsPublic } from "@/lib/api/catalogue";
 import { ApiError } from "@/lib/api/client";
@@ -61,7 +59,6 @@ export default async function ShopPage({ params }: PageProps) {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-white pt-20 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="border-b border-gray-200 pb-6 pt-8">
@@ -85,7 +82,6 @@ export default async function ShopPage({ params }: PageProps) {
           />
         </div>
       </main>
-      <Footer />
     </>
   );
 }

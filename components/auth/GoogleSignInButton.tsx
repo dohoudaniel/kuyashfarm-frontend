@@ -127,6 +127,10 @@ export function GoogleSignInButton({ next = "/", onTwoFactorRequired }: Props) {
         {busy ? (
           <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
+          // Google's own brand colours, exact by requirement — their sign-in
+          // branding guidelines do not permit recolouring the mark. These are
+          // the only hex literals left in the codebase, and they are correct:
+          // everything that is *ours* is a token in app/globals.css.
           <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="#4285F4"

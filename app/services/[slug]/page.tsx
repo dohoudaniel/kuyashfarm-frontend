@@ -4,8 +4,6 @@
  * One service, from static marketing copy.
  */
 import { use, useState } from "react";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { BeforeAfterSlider } from "@/components/ui/BeforeAfterSlider";
 import { SERVICES } from "@/lib/constants";
 import { SERVICE_CONTENT } from "@/lib/data/services";
@@ -36,7 +34,6 @@ export default function ServicePage({ params }: ServicePageProps) {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-white pt-20">
 
         {/* Hero */}
@@ -59,8 +56,8 @@ export default function ServicePage({ params }: ServicePageProps) {
               Back to Services
             </Link>
 
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#6b9d7a]/20 px-4 py-2 backdrop-blur-sm">
-              <Leaf className="h-4 w-4 text-[#6b9d7a]" />
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-2 backdrop-blur-sm">
+              <Leaf className="h-4 w-4 text-accent" />
               <span className="font-sans text-sm font-medium text-white">100% Organic Certified</span>
             </div>
 
@@ -95,8 +92,8 @@ export default function ServicePage({ params }: ServicePageProps) {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
               <div>
-                <div className="mb-4 inline-block rounded-full bg-[#2d5f3f]/10 px-4 py-1">
-                  <span className="font-sans text-sm font-semibold uppercase tracking-wide text-[#2d5f3f]">
+                <div className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1">
+                  <span className="font-sans text-sm font-semibold uppercase tracking-wide text-primary">
                     Our Approach
                   </span>
                 </div>
@@ -106,14 +103,14 @@ export default function ServicePage({ params }: ServicePageProps) {
                 <p className="mb-8 font-sans text-lg leading-relaxed text-gray-600">{content.overview}</p>
                 <Link
                   href={content.shopHref}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#2d5f3f] px-8 py-4 font-sans text-base font-semibold text-white transition-all hover:bg-[#4a7c59] hover:gap-3"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 font-sans text-base font-semibold text-white transition-all hover:bg-secondary hover:gap-3"
                 >
                   Browse Products
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </div>
               <div className="relative">
-                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-[#2d5f3f]/20 to-[#6b9d7a]/20 blur-2xl" />
+                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-primary/20 to-accent/20 blur-2xl" />
                 <div className="relative aspect-square overflow-hidden rounded-3xl shadow-2xl">
                   <Image src={content.heroImage} alt="Farm overview" fill className="object-cover" />
                 </div>
@@ -123,13 +120,13 @@ export default function ServicePage({ params }: ServicePageProps) {
         </section>
 
         {/* Stats */}
-        <section className="bg-gradient-to-br from-[#2d5f3f] to-[#4a7c59] py-20">
+        <section className="bg-gradient-to-br from-primary to-secondary py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
               <h2 className="mb-4 font-serif text-3xl font-bold text-white md:text-4xl">Impact by the Numbers</h2>
               <p className="font-sans text-lg text-white/80">Measurable results from our innovative farming practices</p>
             </div>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 2xl:gap-10">
               {content.stats.map((stat, i) => (
                 <div key={i} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm transition-all hover:bg-white/10">
                   <div className="mb-3 font-serif text-5xl font-bold text-white md:text-6xl">{stat.value}</div>
@@ -146,8 +143,8 @@ export default function ServicePage({ params }: ServicePageProps) {
         <section className="py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
-              <div className="mb-4 inline-block rounded-full bg-[#6b9d7a]/10 px-4 py-1">
-                <span className="font-sans text-sm font-semibold uppercase tracking-wide text-[#2d5f3f]">
+              <div className="mb-4 inline-block rounded-full bg-accent/10 px-4 py-1">
+                <span className="font-sans text-sm font-semibold uppercase tracking-wide text-primary">
                   Seed to Harvest
                 </span>
               </div>
@@ -158,7 +155,7 @@ export default function ServicePage({ params }: ServicePageProps) {
             </div>
 
             <div className="relative">
-              <div className="absolute left-8 top-12 bottom-12 w-0.5 bg-linear-to-b from-[#2d5f3f] via-[#6b9d7a] to-[#2d5f3f] md:left-1/2" />
+              <div className="absolute left-8 top-12 bottom-12 w-0.5 bg-linear-to-b from-primary via-accent to-primary md:left-1/2" />
               <div className="space-y-12">
                 {content.farmingProcess.map((phase, i) => {
                   const Icon = phase.icon;
@@ -166,19 +163,19 @@ export default function ServicePage({ params }: ServicePageProps) {
                   return (
                     <div key={i} className={`relative flex flex-col items-center gap-8 md:flex-row ${isEven ? "" : "md:flex-row-reverse"}`}>
                       <div className={`w-full md:w-5/12 ${isEven ? "md:text-right" : "md:text-left"}`}>
-                        <div className="group rounded-2xl border border-gray-200 bg-white p-8 shadow-lg transition-all hover:border-[#6b9d7a] hover:shadow-xl">
+                        <div className="group rounded-2xl border border-gray-200 bg-white p-8 shadow-lg transition-all hover:border-accent hover:shadow-xl">
                           <div className={`mb-4 flex items-center gap-3 ${isEven ? "md:flex-row-reverse md:justify-start" : "md:justify-start"}`}>
-                            <span className="font-serif text-5xl font-bold text-[#2d5f3f]/20">{phase.phase}</span>
-                            <div className="h-px flex-1 bg-linear-to-r from-[#2d5f3f]/20 to-transparent" />
+                            <span className="font-serif text-5xl font-bold text-primary/20">{phase.phase}</span>
+                            <div className="h-px flex-1 bg-linear-to-r from-primary/20 to-transparent" />
                           </div>
                           <h3 className="mb-3 font-serif text-2xl font-bold text-gray-900">{phase.title}</h3>
                           <p className="mb-4 font-sans text-base leading-relaxed text-gray-600">{phase.description}</p>
-                          <div className="inline-flex items-center gap-2 rounded-full bg-[#f5f5f5] px-4 py-2">
+                          <div className="inline-flex items-center gap-2 rounded-full bg-[var(--light-gray)] px-4 py-2">
                             <span className="font-sans text-sm font-medium text-gray-700">Duration: {phase.duration}</span>
                           </div>
                         </div>
                       </div>
-                      <div className="absolute left-8 z-10 flex h-16 w-16 -translate-x-1/2 items-center justify-center rounded-full border-4 border-white bg-linear-to-br from-[#2d5f3f] to-[#6b9d7a] shadow-xl md:left-1/2">
+                      <div className="absolute left-8 z-10 flex h-16 w-16 -translate-x-1/2 items-center justify-center rounded-full border-4 border-white bg-linear-to-br from-primary to-accent shadow-xl md:left-1/2">
                         <Icon className="h-7 w-7 text-white" />
                       </div>
                       <div className="hidden w-5/12 md:block" />
@@ -191,11 +188,11 @@ export default function ServicePage({ params }: ServicePageProps) {
         </section>
 
         {/* Technology */}
-        <section className="bg-[#faf8f5] py-24">
+        <section className="bg-cream py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
-              <div className="mb-4 inline-block rounded-full bg-[#2d5f3f]/10 px-4 py-1">
-                <span className="font-sans text-sm font-semibold uppercase tracking-wide text-[#2d5f3f]">Innovation</span>
+              <div className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1">
+                <span className="font-sans text-sm font-semibold uppercase tracking-wide text-primary">Innovation</span>
               </div>
               <h2 className="mb-6 font-serif text-4xl font-bold text-gray-900 md:text-5xl">Technology Driving Excellence</h2>
               <p className="mx-auto max-w-2xl font-sans text-lg text-gray-600">
@@ -206,18 +203,18 @@ export default function ServicePage({ params }: ServicePageProps) {
               {content.technology.map((tech, i) => {
                 const Icon = tech.icon;
                 return (
-                  <div key={i} className="group relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-8 shadow-lg transition-all hover:border-[#6b9d7a] hover:shadow-2xl">
-                    <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-gradient-to-br from-[#2d5f3f]/10 to-[#6b9d7a]/10 blur-3xl transition-all group-hover:scale-150" />
+                  <div key={i} className="group relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-8 shadow-lg transition-all hover:border-accent hover:shadow-2xl">
+                    <div className="absolute right-0 top-0 h-32 w-32 translate-x-8 -translate-y-8 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 blur-3xl transition-all group-hover:scale-150" />
                     <div className="relative">
-                      <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-[#2d5f3f] to-[#6b9d7a] text-white shadow-lg">
+                      <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-accent text-white shadow-lg">
                         <Icon className="h-8 w-8" />
                       </div>
                       <h3 className="mb-4 font-serif text-2xl font-bold text-gray-900">{tech.title}</h3>
                       <p className="mb-6 font-sans text-base leading-relaxed text-gray-600">{tech.description}</p>
                       {tech.metrics && (
-                        <div className="inline-flex items-center gap-2 rounded-full bg-[#2d5f3f]/10 px-4 py-2">
-                          <TrendingUp className="h-4 w-4 text-[#2d5f3f]" />
-                          <span className="font-sans text-sm font-semibold text-[#2d5f3f]">{tech.metrics}</span>
+                        <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2">
+                          <TrendingUp className="h-4 w-4 text-primary" />
+                          <span className="font-sans text-sm font-semibold text-primary">{tech.metrics}</span>
                         </div>
                       )}
                     </div>
@@ -246,14 +243,14 @@ export default function ServicePage({ params }: ServicePageProps) {
                 Our commitment to excellence sets us apart in the agricultural industry
               </p>
             </div>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 2xl:gap-10">
               {content.features.map((feature, i) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={i} className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 transition-all hover:border-[#6b9d7a] hover:shadow-xl">
-                    <div className="absolute right-0 top-0 h-24 w-24 translate-x-8 -translate-y-8 rounded-full bg-gradient-to-br from-[#2d5f3f]/5 to-[#6b9d7a]/5 blur-2xl transition-all group-hover:scale-150" />
+                  <div key={i} className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-8 transition-all hover:border-accent hover:shadow-xl">
+                    <div className="absolute right-0 top-0 h-24 w-24 translate-x-8 -translate-y-8 rounded-full bg-gradient-to-br from-primary/5 to-accent/5 blur-2xl transition-all group-hover:scale-150" />
                     <div className="relative">
-                      <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-[#2d5f3f]/10 text-[#2d5f3f] transition-all group-hover:scale-110 group-hover:bg-gradient-to-br group-hover:from-[#2d5f3f] group-hover:to-[#6b9d7a] group-hover:text-white">
+                      <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all group-hover:scale-110 group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-accent group-hover:text-white">
                         <Icon className="h-7 w-7" />
                       </div>
                       <h3 className="mb-3 font-serif text-xl font-bold text-gray-900">{feature.title}</h3>
@@ -271,7 +268,7 @@ export default function ServicePage({ params }: ServicePageProps) {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="relative">
-                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-[#6b9d7a]/20 to-[#2d5f3f]/20 blur-2xl" />
+                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-accent/20 to-primary/20 blur-2xl" />
                 <div className="relative grid gap-4 sm:grid-cols-2">
                   {content.gallery.slice(0, 4).map((image, i) => (
                     <div key={i} className="aspect-square overflow-hidden rounded-2xl shadow-lg">
@@ -281,14 +278,14 @@ export default function ServicePage({ params }: ServicePageProps) {
                 </div>
               </div>
               <div>
-                <div className="mb-4 inline-block rounded-full bg-[#6b9d7a]/10 px-4 py-1">
-                  <span className="font-sans text-sm font-semibold uppercase tracking-wide text-[#2d5f3f]">Benefits</span>
+                <div className="mb-4 inline-block rounded-full bg-accent/10 px-4 py-1">
+                  <span className="font-sans text-sm font-semibold uppercase tracking-wide text-primary">Benefits</span>
                 </div>
                 <h2 className="mb-8 font-serif text-4xl font-bold text-gray-900 md:text-5xl">What You Get</h2>
                 <div className="space-y-4">
                   {content.benefits.map((benefit, i) => (
-                    <div key={i} className="flex items-start gap-4 rounded-xl border border-gray-100 bg-[#faf8f5] p-4 transition-all hover:border-[#6b9d7a] hover:shadow-md">
-                      <CheckCircle2 className="h-6 w-6 shrink-0 text-[#6b9d7a]" />
+                    <div key={i} className="flex items-start gap-4 rounded-xl border border-gray-100 bg-cream p-4 transition-all hover:border-accent hover:shadow-md">
+                      <CheckCircle2 className="h-6 w-6 shrink-0 text-accent" />
                       <p className="font-sans text-base leading-relaxed text-gray-700">{benefit}</p>
                     </div>
                   ))}
@@ -299,7 +296,7 @@ export default function ServicePage({ params }: ServicePageProps) {
         </section>
 
         {/* Gallery */}
-        <section className="bg-[#f5f5f5] py-24">
+        <section className="bg-[var(--light-gray)] py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
               <h2 className="mb-6 font-serif text-4xl font-bold text-gray-900 md:text-5xl">See Our Farm in Action</h2>
@@ -309,7 +306,7 @@ export default function ServicePage({ params }: ServicePageProps) {
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {content.gallery.map((image, i) => (
-                <div key={i} className="group relative aspect-square overflow-hidden rounded-xl shadow-md ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-[#6b9d7a]/40">
+                <div key={i} className="group relative aspect-square overflow-hidden rounded-xl shadow-md ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-accent/40">
                   <Image src={image} alt={`Gallery ${i + 1}`} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <div className="absolute bottom-2 left-2 flex items-center gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -323,7 +320,7 @@ export default function ServicePage({ params }: ServicePageProps) {
         </section>
 
         {/* CTA */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#2d5f3f] via-[#4a7c59] to-[#2d5f3f] py-24">
+        <section className="relative overflow-hidden bg-gradient-to-br from-primary via-secondary to-primary py-24">
           <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-5" />
           <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
@@ -339,7 +336,7 @@ export default function ServicePage({ params }: ServicePageProps) {
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href={content.shopHref}
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-sans text-base font-semibold text-[#2d5f3f] shadow-xl transition-all hover:scale-105 hover:gap-3 hover:shadow-2xl"
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-sans text-base font-semibold text-primary shadow-xl transition-all hover:scale-105 hover:gap-3 hover:shadow-2xl"
               >
                 Shop Now
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -355,7 +352,6 @@ export default function ServicePage({ params }: ServicePageProps) {
         </section>
 
       </main>
-      <Footer />
     </>
   );
 }

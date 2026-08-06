@@ -52,7 +52,7 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[#6b9d7a]"
+              className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-accent"
             >
               Upcoming Classes
             </motion.p>
@@ -61,11 +61,11 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="font-serif text-4xl font-bold leading-tight text-[#080f0a] md:text-5xl"
+              className="font-serif text-4xl font-bold leading-tight text-ink md:text-5xl"
             >
               Book your spot.
               <br />
-              <span className="text-[#2d5f3f]">Seats fill fast.</span>
+              <span className="text-primary">Seats fill fast.</span>
             </motion.h2>
           </div>
           <motion.p
@@ -80,8 +80,8 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
         </div>
 
         {classes.length === 0 ? (
-          <div className="rounded-3xl border border-gray-100 bg-[#f7f5f0] py-20 text-center">
-            <p className="mb-2 font-serif text-xl font-bold text-[#1a3d2b]">
+          <div className="rounded-3xl border border-gray-100 bg-cream py-20 text-center">
+            <p className="mb-2 font-serif text-xl font-bold text-primary-dark">
               No classes scheduled just yet
             </p>
             <p className="mx-auto max-w-md text-sm text-gray-500">
@@ -110,7 +110,7 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-[#1a3d2b]" />
+                    <div className="absolute inset-0 bg-primary-dark" />
                   )}
                   <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
 
@@ -135,7 +135,7 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
                 </div>
 
                 <div className="flex flex-1 flex-col p-7">
-                  <h3 className="mb-2 font-serif text-xl font-bold leading-tight text-[#080f0a]">
+                  <h3 className="mb-2 font-serif text-xl font-bold leading-tight text-ink">
                     {cls.title}
                   </h3>
                   <p className="mb-5 font-sans text-sm leading-relaxed text-gray-500">
@@ -144,18 +144,18 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
 
                   <div className="mb-6 space-y-2.5 border-t border-gray-50 pt-5 text-sm text-gray-400">
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 shrink-0 text-[#2d5f3f]" />
+                      <Calendar className="h-4 w-4 shrink-0 text-primary" />
                       <span>{when(cls.scheduled_date)}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 shrink-0 text-[#2d5f3f]" />
+                      <MapPin className="h-4 w-4 shrink-0 text-primary" />
                       <span>{cls.location || "Kuyash Integrated Farm, Lagos"}</span>
                     </div>
                   </div>
 
                   <div className="mt-auto flex items-center justify-between">
                     <div>
-                      <p className="font-serif text-2xl font-bold text-[#080f0a]">
+                      <p className="font-serif text-2xl font-bold text-ink">
                         {Number(cls.price) === 0 ? "Free" : formatPrice(Number(cls.price))}
                       </p>
                       <p className="font-sans text-xs text-gray-400">per person</p>
@@ -168,7 +168,7 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
                     ) : (
                       <Link
                         href={`/academy/classes/${cls.slug}`}
-                        className="group/btn inline-flex items-center gap-2 rounded-full bg-[#2d5f3f] px-6 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#1a3d2b]"
+                        className="group/btn inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-dark"
                       >
                         Register
                         <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-0.5" />

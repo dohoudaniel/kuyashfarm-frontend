@@ -30,7 +30,7 @@ function AnimatedCounter({ target, suffix, duration = 2000 }: { target: number; 
 
 export function AcademyStats() {
   return (
-    <section className="bg-[#080f0a] border-t border-b border-white/5 py-20">
+    <section className="bg-ink border-t border-b border-white/5 py-20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
           {ACADEMY_STATS.map((stat, i) => (

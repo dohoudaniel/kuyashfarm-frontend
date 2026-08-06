@@ -13,7 +13,7 @@ export function Collaboration() {
         }}
       >
         {/* Green Overlay */}
-        <div className="absolute inset-0 bg-[#2d5f3f]/70" />
+        <div className="absolute inset-0 bg-primary/70" />
       </div>
 
       {/* Content */}
@@ -37,7 +37,7 @@ export function Collaboration() {
                 key={index}
                 className="group flex items-center space-x-3 rounded-lg bg-white/10 p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/20"
               >
-                <div className="h-2 w-2 rounded-full bg-[#6b9d7a] group-hover:scale-150 transition-transform" />
+                <div className="h-2 w-2 rounded-full bg-accent group-hover:scale-150 transition-transform" />
                 <span className="font-sans text-sm text-white md:text-base">
                   {feature}
                 </span>

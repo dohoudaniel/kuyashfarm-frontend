@@ -7,7 +7,7 @@
 
 export default function CheckoutLoading() {
   return (
-    <div className="min-h-screen bg-[#faf8f5] pt-20">
+    <div className="min-h-screen bg-cream pt-20">
       <div className="mx-auto max-w-5xl px-6 py-10 lg:px-8">
         <div className="mb-8 h-7 w-32 animate-pulse rounded-lg bg-gray-200" />
         <div className="grid gap-8 lg:grid-cols-3">

@@ -38,11 +38,11 @@ export function Button({
 
   const variants = {
     primary:
-      "bg-[#2d5f3f] text-white hover:bg-[#4a7c59] hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+      "bg-primary text-white hover:bg-secondary hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
     secondary:
-      "bg-white text-[#2d5f3f] border-2 border-[#2d5f3f] hover:bg-[#2d5f3f] hover:text-white hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+      "bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
     outline:
-      "border-2 border-white text-white hover:bg-white hover:text-[#2d5f3f] hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+      "border-2 border-white text-white hover:bg-white hover:text-primary hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
   };
 
   const sizes = {

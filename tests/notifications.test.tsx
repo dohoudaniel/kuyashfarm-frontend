@@ -172,3 +172,58 @@ describe("the panel", () => {
     expect(link).toHaveAttribute("href", "/admin/inventory");
   });
 });
+
+describe("the badge costs nothing to keep current", () => {
+  /**
+   * The bell used to poll `/notifications/unread-count/` every thirty seconds.
+   * At 5,000 concurrent users that is 167 requests a second for a number that
+   * is almost always zero, against a backend that serves 8 requests at a time
+   * — the single largest consumer of capacity in the product.
+   *
+   * These pin the replacement. The first one is the important one: it fails if
+   * anybody reintroduces an interval, which is the easy thing to do when a
+   * badge looks stale during development.
+   */
+  it("does not poll", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    unreadCount.mockResolvedValue({ unread: 0 });
+
+    render(<NotificationBell />);
+    await waitFor(() => expect(unreadCount).toHaveBeenCalledTimes(1));
+
+    // Ten minutes. A thirty-second poll would be twenty more calls.
+    await vi.advanceTimersByTimeAsync(600_000);
+
+    expect(unreadCount).toHaveBeenCalledTimes(1);
+  });
+
+  it("updates from a response header without asking for it", async () => {
+    const { apiClient } = await import("@/lib/api/client");
+    unreadCount.mockResolvedValue({ unread: 0 });
+
+    render(<NotificationBell />);
+    await waitFor(() => expect(unreadCount).toHaveBeenCalled());
+
+    // What the API client does when any authenticated response carries the
+    // header. No request is made here — that is the whole point.
+    apiClient.onUnreadCount?.(4);
+
+    await waitFor(() =>
+      expect(screen.getByLabelText("Notifications, 4 unread")).toBeInTheDocument(),
+    );
+    expect(unreadCount).toHaveBeenCalledTimes(1);
+  });
+
+  it("stops listening when the user signs out", async () => {
+    const { apiClient } = await import("@/lib/api/client");
+
+    const view = render(<NotificationBell />);
+    await waitFor(() => expect(apiClient.onUnreadCount).toBeTypeOf("function"));
+
+    view.unmount();
+
+    // A dangling callback would call setState on an unmounted component, and
+    // would keep one signed-out user's badge wired to the next one's session.
+    expect(apiClient.onUnreadCount).toBeUndefined();
+  });
+});

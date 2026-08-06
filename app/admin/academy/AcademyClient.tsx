@@ -35,7 +35,7 @@ function Tabs({
           aria-pressed={tab === value}
           className={
             tab === value
-              ? "rounded-md bg-[#1a3d2b] px-3 py-1.5 font-semibold text-white"
+              ? "rounded-md bg-primary-dark px-3 py-1.5 font-semibold text-white"
               : "rounded-md px-3 py-1.5 text-gray-600 hover:text-gray-900"
           }
         >

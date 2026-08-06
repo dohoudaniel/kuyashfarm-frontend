@@ -18,8 +18,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, MailX } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { ApiError } from "@/lib/api/client";
 import { confirmSubscription } from "@/lib/api/newsletter";
 
@@ -57,7 +55,6 @@ export default function NewsletterConfirmClient() {
 
   return (
     <>
-      <Navbar />
       <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 pt-24 pb-16">
         <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
           {state === "working" ? (
@@ -101,7 +98,6 @@ export default function NewsletterConfirmClient() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

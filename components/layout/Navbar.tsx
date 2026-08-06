@@ -73,7 +73,7 @@ export function Navbar() {
       <nav
         className={cn(
           "fixed left-0 right-0 top-0 z-40 transition-all duration-300",
-          isScrolled ? "bg-[#2d5f3f]/95 shadow-md backdrop-blur-md" : "bg-[#2d5f3f]",
+          isScrolled ? "bg-primary/95 shadow-md backdrop-blur-md" : "bg-primary",
         )}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -90,7 +90,7 @@ export function Navbar() {
                   className={cn(
                     "font-sans text-sm font-medium transition-colors duration-300",
                     link.label === "Academy"
-                      ? "rounded-full bg-[#e8d5a3] px-4 py-2 font-semibold text-[#1a3d2b] hover:bg-[#dfc98a]"
+                      ? "rounded-full bg-wheat px-4 py-2 font-semibold text-primary-dark hover:bg-wheat"
                       : "text-white/90 hover:text-white",
                   )}
                 >
@@ -190,7 +190,7 @@ export function Navbar() {
           </div>
 
           {isMobileMenuOpen && (
-            <div className="border-t border-white/20 bg-[#2d5f3f] py-4 md:hidden">
+            <div className="border-t border-white/20 bg-primary py-4 md:hidden">
               <div className="flex flex-col space-y-4">
                 {NAV_LINKS.map((link) => (
                   <Link key={link.label} href={hrefFor(link)} onClick={() => setIsMobileMenuOpen(false)} className="font-sans text-sm font-medium text-white/90 hover:text-white">

@@ -152,6 +152,8 @@ export interface CartItem {
   id: string;
   product_slug: string;
   product_name: string;
+  /** Absolute URL of the product's primary photograph, or null if it has none. */
+  image: string | null;
   unit: string;
   quantity: number;
   unit_price: string;

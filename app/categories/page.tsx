@@ -12,8 +12,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { fetchCategoriesPublic } from "@/lib/api/catalogue";
 
 export const metadata: Metadata = {
@@ -27,7 +25,6 @@ export default async function CategoriesPage() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-linear-to-b from-white via-green-50/30 to-white pt-24 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
@@ -39,7 +36,7 @@ export default async function CategoriesPage() {
             </div>
 
             <h1 className="mb-6 font-serif text-5xl font-bold leading-tight md:text-6xl">
-              <span className="block bg-linear-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="block bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                 Visit our farm
               </span>
             </h1>
@@ -53,7 +50,7 @@ export default async function CategoriesPage() {
               Our catalogue is being updated. Please check back shortly.
             </p>
           ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
               {categories.map((category) => (
                 <Link
                   key={category.id}
@@ -95,7 +92,6 @@ export default async function CategoriesPage() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

@@ -126,7 +126,7 @@ export default function DriverClient() {
 
   return (
     <main className="min-h-screen bg-gray-50 pb-16">
-      <header className="sticky top-0 z-10 bg-[#1a3d2b] px-4 py-3 text-white">
+      <header className="sticky top-0 z-10 bg-primary-dark px-4 py-3 text-white">
         <h1 className="flex items-center gap-2 font-serif text-lg font-bold">
           <Truck className="h-5 w-5" /> My round
         </h1>
@@ -216,7 +216,7 @@ export default function DriverClient() {
                       {stop.phone && (
                         <a
                           href={`tel:${stop.phone}`}
-                          className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-[#2d5f3f]"
+                          className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-primary"
                         >
                           <Phone className="h-4 w-4" /> {stop.phone}
                         </a>

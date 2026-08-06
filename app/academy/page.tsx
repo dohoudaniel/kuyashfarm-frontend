@@ -7,9 +7,11 @@
 
 import type { Metadata } from "next";
 
-import { fetchClassesPublic, fetchInstructorsPublic } from "@/lib/api/academy";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import {
+  fetchClassesPublic,
+  fetchInstructorsPublic,
+  fetchProgramsPublic,
+} from "@/lib/api/academy";
 import { AcademyHero } from "./sections/AcademyHero";
 import { AcademyStats } from "./sections/AcademyStats";
 import { WhyAcademy } from "./sections/WhyAcademy";
@@ -42,7 +44,7 @@ export default async function AcademyPage() {
   // hid until now.
   // Both in parallel: two sequential round-trips would double the time to
   // first byte for a page that is mostly static marketing either side of them.
-  const [classes, instructors] = await Promise.all([
+  const [classes, instructors, programs] = await Promise.all([
     fetchClassesPublic().then(
       (list) => list,
       () => [],
@@ -53,16 +55,22 @@ export default async function AcademyPage() {
       // costs one section rather than the page.
       () => [],
     ),
+    // Programmes come from the API now. They used to be read from a hardcoded
+    // array in `lib/data/academy.ts`, so anything staff created in the back
+    // office was saved, listed in the admin, and never shown to a customer.
+    fetchProgramsPublic().then(
+      (list) => list,
+      () => [],
+    ),
   ]);
 
   return (
     <>
-      <Navbar />
       <main>
         <AcademyHero />
         <AcademyStats />
         <WhyAcademy />
-        <AcademyPrograms />
+        <AcademyPrograms programs={programs} />
         <UpcomingClasses classes={classes} />
         <LearningExperience />
         <AcademyMethodology />
@@ -72,7 +80,6 @@ export default async function AcademyPage() {
         <AcademyFAQ />
         <AcademyNewsletter />
       </main>
-      <Footer />
     </>
   );
 }

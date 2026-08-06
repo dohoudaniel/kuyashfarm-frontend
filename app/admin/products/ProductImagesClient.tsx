@@ -229,7 +229,7 @@ export default function ProductImagesClient() {
                     className={cn(
                       "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm",
                       selected?.id === product.id
-                        ? "bg-[#1a3d2b] text-white"
+                        ? "bg-primary-dark text-white"
                         : "hover:bg-gray-100",
                     )}
                   >

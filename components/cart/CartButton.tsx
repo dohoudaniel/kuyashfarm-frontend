@@ -22,7 +22,7 @@ export function CartButton({ onClick }: { onClick: () => void }) {
     >
       <ShoppingCart className="h-5 w-5" />
       {count > 0 && (
-        <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#e8d5a3] px-1 text-xs font-bold text-[#1a3d2b]">
+        <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-wheat px-1 text-xs font-bold text-primary-dark">
           {count > 99 ? "99+" : count}
         </span>
       )}

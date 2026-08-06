@@ -7,8 +7,6 @@
 
 import type { Metadata } from "next";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { ApplicationForm } from "@/components/applications/ApplicationForm";
 
@@ -21,8 +19,7 @@ export const metadata: Metadata = {
 export default function BecomeWholesalerPage() {
   return (
     <>
-      <Navbar />
-      <main className="min-h-screen bg-[#f7f5f0] px-4 pt-28 pb-20">
+      <main className="min-h-screen bg-cream px-4 pt-28 pb-20">
         <Container>
           <ApplicationForm
             applicationType="WHOLESALE"
@@ -31,7 +28,6 @@ export default function BecomeWholesalerPage() {
           />
         </Container>
       </main>
-      <Footer />
     </>
   );
 }

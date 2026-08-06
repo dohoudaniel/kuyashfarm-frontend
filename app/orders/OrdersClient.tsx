@@ -13,8 +13,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2, Package } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { listOrders } from "@/lib/api/orders";
 import { useAuth } from "@/lib/context/AuthContext";
 import type { OrderSummary, OrderStatus } from "@/lib/api/types";
@@ -50,7 +48,6 @@ export default function OrdersClient() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-gray-50 pt-24 pb-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <h1 className="mb-8 text-3xl font-bold text-gray-900 sm:text-4xl">My orders</h1>
@@ -108,7 +105,6 @@ export default function OrdersClient() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

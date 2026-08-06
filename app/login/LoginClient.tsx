@@ -11,8 +11,6 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/context/AuthContext";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { LogIn, Mail, Lock, AlertCircle } from "lucide-react";
 import { isValid, validateEmail, validateFields, type FieldErrors } from "@/lib/validation";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
@@ -120,7 +118,6 @@ export default function LoginClient() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50 pt-24 pb-16">
         <div className="mx-auto max-w-md px-4 sm:px-6 lg:px-8">
           {/* Header */}
@@ -174,7 +171,7 @@ export default function LoginClient() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-700 focus:ring-4 focus:ring-green-200 disabled:opacity-50 transition-all"
+                  className="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-secondary focus:ring-4 focus:ring-accent/40 disabled:opacity-50 transition-all"
                 >
                   {isLoading ? "Checking…" : "Verify"}
                 </button>
@@ -279,7 +276,7 @@ export default function LoginClient() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-700 focus:ring-4 focus:ring-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-secondary focus:ring-4 focus:ring-accent/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </button>
@@ -316,7 +313,6 @@ export default function LoginClient() {
 
         </div>
       </main>
-      <Footer />
     </>
   );
 }

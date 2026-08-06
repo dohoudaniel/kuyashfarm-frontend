@@ -26,8 +26,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, ShieldCheck, ShieldX } from "lucide-react";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { ApiError } from "@/lib/api/client";
 import { acceptInvitation } from "@/lib/api/auth";
 import {
@@ -96,7 +94,6 @@ export default function AcceptInvitationClient() {
 
   return (
     <>
-      <Navbar />
       <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 pt-24 pb-16">
         <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm">
           {done ? (
@@ -128,7 +125,7 @@ export default function AcceptInvitationClient() {
           ) : (
             <>
               <div className="mb-6 text-center">
-                <ShieldCheck className="mx-auto mb-3 h-10 w-10 text-[#2d5f3f]" />
+                <ShieldCheck className="mx-auto mb-3 h-10 w-10 text-primary" />
                 <h1 className="font-serif text-2xl font-bold text-gray-900">
                   Set up your back-office account
                 </h1>
@@ -273,7 +270,6 @@ export default function AcceptInvitationClient() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

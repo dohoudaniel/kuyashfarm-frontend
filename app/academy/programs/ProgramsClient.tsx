@@ -67,8 +67,8 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
   const isAvailable = program.enrollmentStatus === "Open" || program.enrollmentStatus === "Closing Soon";
 
   const statusStyle: Record<string, string> = {
-    "Open":          "bg-[#eef5f1] text-[#2d5f3f] border-[#c6dece]",
-    "Closing Soon":  "bg-[#eef5f1] text-[#2d5f3f] border-[#c6dece]",
+    "Open":          "bg-mist text-primary border-edge",
+    "Closing Soon":  "bg-mist text-primary border-edge",
     "Sold Out":      "bg-gray-50 text-gray-400 border-gray-200",
     "Coming Soon":   "bg-gray-50 text-gray-400 border-gray-200",
   };
@@ -80,7 +80,7 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.35, delay: index * 0.04 }}
-      className="group bg-white rounded-2xl border border-gray-100 hover:border-[#c6dece] hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+      className="group bg-white rounded-2xl border border-gray-100 hover:border-edge hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
     >
       {/* Image */}
       <div className="relative h-44 overflow-hidden shrink-0">
@@ -101,7 +101,7 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
         {/* Trending badge — top right, brand-toned */}
         {program.trending && (
           <div className="absolute top-3 right-3">
-            <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full border bg-[#080f0a]/60 text-[#e8d5a3] border-[#e8d5a3]/30 backdrop-blur-sm">
+            <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full border bg-ink/60 text-wheat border-wheat/30 backdrop-blur-sm">
               {program.trending}
             </span>
           </div>
@@ -128,12 +128,12 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
           <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 truncate">
             {program.department}
           </span>
-          <span className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full border bg-[#eef5f1] text-[#2d5f3f] border-[#c6dece]">
+          <span className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full border bg-mist text-primary border-edge">
             {program.level}
           </span>
         </div>
 
-        <h3 className="font-serif text-base font-bold text-[#080f0a] leading-tight mb-1.5">
+        <h3 className="font-serif text-base font-bold text-ink leading-tight mb-1.5">
           {program.title}
         </h3>
         <p className="text-gray-400 text-xs leading-relaxed font-sans mb-4 line-clamp-2">
@@ -143,12 +143,12 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
         {/* Duration + cert */}
         <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
           <span className="flex items-center gap-1.5">
-            <Clock className="w-3 h-3 text-[#6b9d7a]" />
+            <Clock className="w-3 h-3 text-accent" />
             {program.duration}
           </span>
           <span className="text-gray-200">·</span>
           <span className="flex items-center gap-1.5">
-            <Award className="w-3 h-3 text-[#6b9d7a]" />
+            <Award className="w-3 h-3 text-accent" />
             {program.certification}
           </span>
         </div>
@@ -157,7 +157,7 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
         <div className="mb-4">
           <div className="flex justify-between text-[10px] mb-1.5">
             <span className="text-gray-400">Practical training</span>
-            <span className="font-semibold text-[#2d5f3f]">{program.practicalPercent}%</span>
+            <span className="font-semibold text-primary">{program.practicalPercent}%</span>
           </div>
           <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
@@ -165,7 +165,7 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
               whileInView={{ width: `${program.practicalPercent}%` }}
               viewport={{ once: true }}
               transition={{ duration: 0.9, delay: 0.15 }}
-              className="h-full rounded-full bg-[#2d5f3f]"
+              className="h-full rounded-full bg-primary"
             />
           </div>
         </div>
@@ -173,8 +173,8 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
         {/* Rating + enrolled */}
         <div className="flex items-center gap-3 mb-4 text-xs">
           <div className="flex items-center gap-1">
-            <Star className="w-3.5 h-3.5 fill-[#e8d5a3] text-[#e8d5a3]" />
-            <span className="font-semibold text-[#080f0a]">{program.rating}</span>
+            <Star className="w-3.5 h-3.5 fill-wheat text-wheat" />
+            <span className="font-semibold text-ink">{program.rating}</span>
             <span className="text-gray-400">({program.reviewCount})</span>
           </div>
           <span className="text-gray-200">·</span>
@@ -186,7 +186,7 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
 
         {/* Instructor — brand-toned avatar */}
         <div className="flex items-center gap-2 mb-5">
-          <div className="w-6 h-6 rounded-full bg-[#2d5f3f] flex items-center justify-center text-white text-[9px] font-bold shrink-0">
+          <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[9px] font-bold shrink-0">
             {program.instructor.initials}
           </div>
           <span className="text-xs text-gray-500 font-sans">{program.instructor.name}</span>
@@ -195,20 +195,20 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
         {/* Price + CTAs */}
         <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-50">
           <div>
-            <p className="font-serif text-lg font-bold text-[#080f0a]">₦{program.price.toLocaleString()}</p>
+            <p className="font-serif text-lg font-bold text-ink">₦{program.price.toLocaleString()}</p>
             <p className="text-[10px] text-gray-400">per person</p>
           </div>
           <div className="flex gap-2">
             <Link
               href={href}
-              className="text-xs font-semibold text-[#2d5f3f] border border-[#2d5f3f]/25 px-3 py-2 rounded-lg hover:bg-[#eef5f1] transition-colors duration-200"
+              className="text-xs font-semibold text-primary border border-primary/25 px-3 py-2 rounded-lg hover:bg-mist transition-colors duration-200"
             >
               Learn More
             </Link>
             {isAvailable ? (
               <Link
                 href={href}
-                className="text-xs font-semibold text-white bg-[#2d5f3f] px-3 py-2 rounded-lg hover:bg-[#4a7c59] transition-colors duration-200"
+                className="text-xs font-semibold text-white bg-primary px-3 py-2 rounded-lg hover:bg-secondary transition-colors duration-200"
               >
                 Apply
               </Link>
@@ -235,8 +235,8 @@ function FilterPill({ label, active, onClick }: {
       onClick={onClick}
       className={`text-xs font-semibold px-3.5 py-2 rounded-full border whitespace-nowrap transition-all duration-200 ${
         active
-          ? "bg-[#2d5f3f] text-white border-[#2d5f3f]"
-          : "border-gray-200 text-gray-600 hover:border-[#2d5f3f] hover:text-[#2d5f3f] bg-white"
+          ? "bg-primary text-white border-primary"
+          : "border-gray-200 text-gray-600 hover:border-primary hover:text-primary bg-white"
       }`}
     >
       {label}
@@ -253,7 +253,7 @@ function SelectFilter({ options, value, onChange }: {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none text-xs font-medium border border-gray-200 text-gray-700 bg-white pl-3 pr-8 py-2 rounded-lg focus:outline-none focus:border-[#2d5f3f] hover:border-gray-300 transition-colors cursor-pointer"
+        className="appearance-none text-xs font-medium border border-gray-200 text-gray-700 bg-white pl-3 pr-8 py-2 rounded-lg focus:outline-none focus:border-primary hover:border-gray-300 transition-colors cursor-pointer"
       >
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -320,23 +320,23 @@ export function ProgramsClient() {
   };
 
   return (
-    <main className="bg-[#f9f8f6] min-h-screen">
+    <main className="bg-cream min-h-screen">
 
       {/* ── Page header ── */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs text-gray-400 mb-5 font-sans">
-            <Link href="/" className="hover:text-[#2d5f3f] transition-colors">Home</Link>
+            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
             <ChevronRight className="w-3 h-3" />
-            <Link href="/academy" className="hover:text-[#2d5f3f] transition-colors">Academy</Link>
+            <Link href="/academy" className="hover:text-primary transition-colors">Academy</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-[#2d5f3f] font-medium">Course Catalog</span>
+            <span className="text-primary font-medium">Course Catalog</span>
           </nav>
 
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-              <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#080f0a] leading-tight">
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-ink leading-tight">
                 Course Catalog
               </h1>
               <p className="mt-1.5 text-gray-500 text-sm font-sans">
@@ -345,7 +345,7 @@ export function ProgramsClient() {
             </div>
             <div className="flex items-center gap-3 text-xs text-gray-500 font-sans">
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                 <span>{CATALOG_PROGRAMS.filter((p) => p.enrollmentStatus === "Open" || p.enrollmentStatus === "Closing Soon").length} programs open for enrollment</span>
               </div>
             </div>
@@ -360,7 +360,7 @@ export function ProgramsClient() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by program name, skill, instructor, certification, career path..."
-              className="w-full bg-[#f9f8f6] border border-gray-200 rounded-xl pl-11 pr-12 py-3.5 text-sm font-sans text-[#080f0a] placeholder:text-gray-400 focus:outline-none focus:border-[#2d5f3f] focus:bg-white transition-all duration-200"
+              className="w-full bg-cream border border-gray-200 rounded-xl pl-11 pr-12 py-3.5 text-sm font-sans text-ink placeholder:text-gray-400 focus:outline-none focus:border-primary focus:bg-white transition-all duration-200"
             />
             {query && (
               <button onClick={() => setQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -380,7 +380,7 @@ export function ProgramsClient() {
           <div className="mt-4 flex items-center gap-3 flex-wrap">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`inline-flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-lg border transition-all duration-200 ${showFilters ? "bg-[#2d5f3f] text-white border-[#2d5f3f]" : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"}`}
+              className={`inline-flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-lg border transition-all duration-200 ${showFilters ? "bg-primary text-white border-primary" : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"}`}
             >
               <Filter className="w-3.5 h-3.5" />
               Filters
@@ -427,10 +427,10 @@ export function ProgramsClient() {
         {!hasActiveFilters && (
           <section>
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-6 h-6 rounded-lg bg-[#e8d5a3] flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-[#1a3d2b]" />
+              <div className="w-6 h-6 rounded-lg bg-wheat flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-primary-dark" />
               </div>
-              <h2 className="font-serif text-xl font-bold text-[#080f0a]">Featured Programs</h2>
+              <h2 className="font-serif text-xl font-bold text-ink">Featured Programs</h2>
               <span className="text-xs text-gray-400 font-sans ml-1">— Our flagship training pathways</span>
             </div>
 
@@ -444,31 +444,31 @@ export function ProgramsClient() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.08 }}
-                    className="group relative rounded-3xl overflow-hidden border border-[#c6dece]/40 hover:border-[#c6dece] hover:shadow-xl transition-all duration-300 bg-white"
+                    className="group relative rounded-3xl overflow-hidden border border-edge/40 hover:border-edge hover:shadow-xl transition-all duration-300 bg-white"
                   >
-                    <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl bg-[#2d5f3f]" />
+                    <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl bg-primary" />
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-5">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110 bg-[#eef5f1] border border-[#c6dece]">
-                          <Icon className="w-6 h-6 text-[#2d5f3f]" />
+                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110 bg-mist border border-edge">
+                          <Icon className="w-6 h-6 text-primary" />
                         </div>
                         <div className="text-right">
-                          <p className="font-serif text-xl font-bold text-[#080f0a]">₦{(program.price / 1000).toFixed(0)}k</p>
+                          <p className="font-serif text-xl font-bold text-ink">₦{(program.price / 1000).toFixed(0)}k</p>
                           <p className="text-[10px] text-gray-400">{program.duration}</p>
                         </div>
                       </div>
-                      <h3 className="font-serif text-lg font-bold text-[#080f0a] leading-tight mb-2">{program.title}</h3>
+                      <h3 className="font-serif text-lg font-bold text-ink leading-tight mb-2">{program.title}</h3>
                       <p className="text-gray-400 text-xs leading-relaxed mb-4 line-clamp-2">{program.summary}</p>
                       <div className="flex items-center gap-2 mb-5 text-xs text-gray-400">
-                        <Star className="w-3.5 h-3.5 fill-[#e8d5a3] text-[#e8d5a3]" />
-                        <span className="font-semibold text-[#080f0a]">{program.rating}</span>
+                        <Star className="w-3.5 h-3.5 fill-wheat text-wheat" />
+                        <span className="font-semibold text-ink">{program.rating}</span>
                         <span>· {program.enrolledCount.toLocaleString()} enrolled</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-[#eef5f1] text-[#2d5f3f] border border-[#c6dece]">
+                        <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-mist text-primary border border-edge">
                           {program.employmentRate}% employed
                         </span>
-                        <Link href={href} className="inline-flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-full transition-all duration-200 bg-[#2d5f3f] hover:bg-[#4a7c59]">
+                        <Link href={href} className="inline-flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-full transition-all duration-200 bg-primary hover:bg-secondary">
                           Apply <ArrowRight className="w-3 h-3" />
                         </Link>
                       </div>
@@ -484,10 +484,10 @@ export function ProgramsClient() {
         {!hasActiveFilters && (
           <section>
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-6 h-6 rounded-lg bg-[#eef5f1] flex items-center justify-center">
-                <BookOpen className="w-3.5 h-3.5 text-[#2d5f3f]" />
+              <div className="w-6 h-6 rounded-lg bg-mist flex items-center justify-center">
+                <BookOpen className="w-3.5 h-3.5 text-primary" />
               </div>
-              <h2 className="font-serif text-xl font-bold text-[#080f0a]">Learning Pathways</h2>
+              <h2 className="font-serif text-xl font-bold text-ink">Learning Pathways</h2>
               <span className="text-xs text-gray-400 font-sans ml-1">— Recommended course journeys</span>
             </div>
 
@@ -503,15 +503,15 @@ export function ProgramsClient() {
                     transition={{ delay: i * 0.07 }}
                     onClick={() => setActivePathway(isActive ? null : pw.id)}
                     className={`text-left p-5 rounded-2xl border transition-all duration-300 ${isActive
-                      ? "border-[#2d5f3f] bg-[#eef5f1] shadow-lg"
-                      : "border-gray-100 bg-white hover:border-[#c6dece] hover:shadow-md"}`}
+                      ? "border-primary bg-mist shadow-lg"
+                      : "border-gray-100 bg-white hover:border-edge hover:shadow-md"}`}
                   >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 border ${isActive ? "bg-[#2d5f3f] border-[#2d5f3f]" : "bg-[#eef5f1] border-[#c6dece]"}`}>
-                      <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-[#2d5f3f]"}`} />
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 border ${isActive ? "bg-primary border-primary" : "bg-mist border-edge"}`}>
+                      <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-primary"}`} />
                     </div>
-                    <h3 className="font-serif text-sm font-bold text-[#080f0a] leading-tight mb-1.5">{pw.title}</h3>
+                    <h3 className="font-serif text-sm font-bold text-ink leading-tight mb-1.5">{pw.title}</h3>
                     <p className="text-gray-400 text-xs leading-relaxed mb-3">{pw.description}</p>
-                    <span className="text-[10px] font-semibold text-[#2d5f3f]">
+                    <span className="text-[10px] font-semibold text-primary">
                       {pw.programs.length} programs →
                     </span>
                   </motion.button>
@@ -525,10 +525,10 @@ export function ProgramsClient() {
         {!hasActiveFilters && (
           <section>
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-6 h-6 rounded-lg bg-[#eef5f1] flex items-center justify-center">
-                <TrendingUp className="w-3.5 h-3.5 text-[#2d5f3f]" />
+              <div className="w-6 h-6 rounded-lg bg-mist flex items-center justify-center">
+                <TrendingUp className="w-3.5 h-3.5 text-primary" />
               </div>
-              <h2 className="font-serif text-xl font-bold text-[#080f0a]">Career Explorer</h2>
+              <h2 className="font-serif text-xl font-bold text-ink">Career Explorer</h2>
               <span className="text-xs text-gray-400 font-sans ml-1">— Browse by the career you want</span>
             </div>
 
@@ -544,8 +544,8 @@ export function ProgramsClient() {
                     onClick={() => setActiveCareer(isActive ? null : cp.id)}
                     className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? "bg-[#2d5f3f] text-white border-[#2d5f3f] shadow-lg"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-[#2d5f3f] hover:text-[#2d5f3f]"
+                        ? "bg-primary text-white border-primary shadow-lg"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-primary hover:text-primary"
                     }`}
                   >
                     {isActive && <CheckCircle className="w-3.5 h-3.5" />}
@@ -562,7 +562,7 @@ export function ProgramsClient() {
 
         {/* ── Stats strip ── */}
         {!hasActiveFilters && (
-          <section className="bg-[#080f0a] rounded-3xl py-10 px-8 md:px-12">
+          <section className="bg-ink rounded-3xl py-10 px-8 md:px-12">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 text-center">
               {CATALOG_STATS.map((s, i) => (
                 <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
@@ -581,10 +581,10 @@ export function ProgramsClient() {
         <section>
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <h2 className="font-serif text-xl font-bold text-[#080f0a]">
+              <h2 className="font-serif text-xl font-bold text-ink">
                 {hasActiveFilters ? "Matching Programs" : "All Programs"}
               </h2>
-              <span className="bg-[#eef5f1] text-[#2d5f3f] text-xs font-bold px-2.5 py-1 rounded-full">
+              <span className="bg-mist text-primary text-xs font-bold px-2.5 py-1 rounded-full">
                 {filtered.length}
               </span>
             </div>
@@ -597,10 +597,10 @@ export function ProgramsClient() {
               </div>
               <h3 className="font-serif text-lg font-bold text-gray-700 mb-2">No programs found</h3>
               <p className="text-gray-400 text-sm font-sans mb-6">Try adjusting your filters or search query.</p>
-              <button onClick={clearAll} className="text-sm font-semibold text-[#2d5f3f] hover:underline">Clear all filters</button>
+              <button onClick={clearAll} className="text-sm font-semibold text-primary hover:underline">Clear all filters</button>
             </div>
           ) : (
-            <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
               <AnimatePresence mode="popLayout">
                 {filtered.map((p, i) => <ProgramCard key={p.id} program={p} index={i} />)}
               </AnimatePresence>
@@ -610,7 +610,7 @@ export function ProgramsClient() {
 
         {/* ── CTA ── */}
         <section className="relative rounded-3xl overflow-hidden border border-white/10"
-          style={{ background: "linear-gradient(135deg, #0f2318 0%, #1a3d2b 60%, #0f2318 100%)" }}>
+          style={{ background: "linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-dark) 60%, var(--primary-dark) 100%)" }}>
           <div className="absolute inset-0 opacity-[0.04]"
             style={{
               backgroundImage: `linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)`,
@@ -618,11 +618,11 @@ export function ProgramsClient() {
             }} />
           <div className="relative z-10 px-8 md:px-14 py-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div>
-              <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#6b9d7a] mb-3">Ready to enrol?</p>
+              <p className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-3">Ready to enrol?</p>
               <h2 className="font-serif text-2xl md:text-3xl font-bold text-white leading-tight mb-3">
                 Begin your agricultural
                 <br />
-                <span className="text-[#e8d5a3]">career today.</span>
+                <span className="text-wheat">career today.</span>
               </h2>
               <p className="text-white/45 text-sm font-sans max-w-md leading-relaxed">
                 Applications are reviewed within 48 hours. Our admissions team is ready to help you find the right program for your goals.
@@ -631,7 +631,7 @@ export function ProgramsClient() {
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <Link
                 href="/academy#classes"
-                className="inline-flex items-center gap-2 bg-[#e8d5a3] text-[#1a3d2b] font-semibold px-7 py-3.5 rounded-full hover:bg-[#dfc98a] transition-colors text-sm"
+                className="inline-flex items-center gap-2 bg-wheat text-primary-dark font-semibold px-7 py-3.5 rounded-full hover:bg-wheat transition-colors text-sm"
               >
                 Apply Now <ArrowRight className="w-4 h-4" />
               </Link>

@@ -9,8 +9,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { ProductDetailClient } from "@/components/shop/ProductDetailClient";
 import { fetchProductPublic } from "@/lib/api/catalogue";
 import { ApiError } from "@/lib/api/client";
@@ -50,13 +48,11 @@ export default async function ProductPage({ params }: PageProps) {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-white pt-24 pb-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <ProductDetailClient initialProduct={product} categorySlug={category} />
         </div>
       </main>
-      <Footer />
     </>
   );
 }

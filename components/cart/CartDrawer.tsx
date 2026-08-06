@@ -11,7 +11,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Loader2, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import { Loader2, Minus, Plus, ShoppingBag, ShoppingBasket, Trash2, X } from "lucide-react";
 
 import { useCartStore } from "@/lib/store/useCartStore";
 import { formatPrice } from "@/lib/utils";
@@ -91,8 +91,25 @@ export function CartDrawer({ isOpen, onClose }: Props) {
             <ul className="space-y-4">
               {items.map((item) => (
                 <li key={item.id} className="flex gap-3 border-b pb-4">
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                    <Image src="/icons/file.svg" alt="" fill className="object-contain p-4 opacity-40" />
+                  {/* The real photograph. This was `/icons/file.svg` — the
+                      grey document icon that ships with create-next-app —
+                      rendered for every line in the basket, because the API
+                      never sent an image. A basket of unrecognisable grey
+                      squares is a basket people abandon. */}
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-mist">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt=""
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-primary/40">
+                        <ShoppingBasket className="h-6 w-6" />
+                      </span>
+                    )}
                   </div>
 
                   <div className="min-w-0 flex-1">

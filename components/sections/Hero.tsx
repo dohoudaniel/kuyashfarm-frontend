@@ -60,7 +60,7 @@ export function Hero() {
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
           <a
             href="/categories"
-            className="group relative overflow-hidden rounded-full bg-green-600 px-8 py-4 font-sans text-base font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-green-700 hover:shadow-2xl"
+            className="group relative overflow-hidden rounded-full bg-primary px-8 py-4 font-sans text-base font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-secondary hover:shadow-2xl"
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
               Shop Now
