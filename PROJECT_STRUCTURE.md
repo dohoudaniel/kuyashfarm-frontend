@@ -12,7 +12,11 @@ should go.
 ```
 kuyashfarm-frontend/                  # the app lives at the repo root
 ├── app/                              # App Router. One directory per route.
-│   ├── layout.tsx                    # Root layout: fonts, metadata, providers
+│   ├── layout.tsx                    # Root layout: fonts, metadata, providers,
+│   │                                 #   and SiteChrome (header + footer, once)
+│   ├── opengraph-image.tsx           # Share card, generated at build time
+│   ├── apple-icon.tsx                # Home-screen icon, generated
+│   ├── manifest.ts                   # Web app manifest
 │   ├── page.tsx                      # Landing page
 │   ├── globals.css                   # Design tokens via @theme inline
 │   ├── error.tsx  loading.tsx  not-found.tsx
@@ -31,6 +35,14 @@ kuyashfarm-frontend/                  # the app lives at the repo root
 │   ├── become-wholesaler/            # Wholesale application
 │   ├── become-distributor/           # Distributor application
 │   │
+│   ├── admin/                        # React back office — staff only.
+│   │                                 #   AdminGuard is NOT the security
+│   │                                 #   boundary; the API is.
+│   ├── driver/                       # Delivery run, built for a phone
+│   ├── accept-invitation/            # Staff invitation
+│   ├── newsletter/confirm|unsubscribe/
+│   ├── privacy/  terms/  cookies/    # Legal — awaiting review, says so
+│   │
 │   ├── academy/
 │   │   ├── classes/[slug]/           # Class detail and seat booking
 │   │   ├── registrations/[reference]/# Booking receipt
@@ -40,12 +52,17 @@ kuyashfarm-frontend/                  # the app lives at the repo root
 │
 ├── components/
 │   ├── ui/                           # Button, Card, Container, Section, FormField
-│   ├── layout/                       # Navbar, Footer
+│   ├── layout/                       # Navbar, Footer, SiteChrome
+│   ├── admin/                        # DataScreen and back-office pieces
+│   ├── legal/                        # Shell for the three legal pages
+│   ├── notifications/                # Bell — reads a header, never polls
+│   ├── account/                      # AddressForm, TwoFactorSection
+│   ├── auth/                         # GoogleSignInButton
 │   ├── sections/                     # Landing-page sections
 │   ├── shop/                         # ProductGrid and friends
 │   ├── cart/                         # Cart button, drawer
 │   ├── applications/                 # ApplicationForm (wholesale + distributor)
-│   ├── banners/  modals/  chat/
+│   ├── modals/  chat/
 │   └── providers/                    # ClientProviders — mounted once in layout
 │
 ├── lib/
@@ -53,6 +70,9 @@ kuyashfarm-frontend/                  # the app lives at the repo root
 │   ├── context/AuthContext.tsx       # useAuth()
 │   ├── store/useCartStore.ts         # zustand cache of the server cart
 │   ├── data/                         # Static marketing copy only
+│   ├── validation.ts                 # Shared field rules (phone, address, …)
+│   ├── uuid.ts                       # randomUUID with a secure fallback
+│   ├── constants.ts                  # SITE_CONFIG, SOCIAL_LINKS
 │   ├── types.ts                      # Shared types (was types/index.ts)
 │   └── utils.ts                      # cn(), formatPrice()
 │
@@ -60,9 +80,19 @@ kuyashfarm-frontend/                  # the app lives at the repo root
 ├── e2e/                              # Playwright specs (real browser, real API)
 ├── scripts/                          # check-bundle-secrets.mjs
 ├── docs/                             # back office, cart, wholesale guides
+├── next.config.ts                    # Images, and the security headers
 ├── .github/workflows/ci.yml          # lint, types, tests, build, bundle scan
-└── public/
+└── public/images/                    # Owned photography (mostly still to come)
 ```
+
+Three files carry decisions rather than code, and are worth reading before
+changing anything near them:
+
+| File | Decision it encodes |
+|---|---|
+| `next.config.ts` | Why the CSP allows inline script, and why `upgrade-insecure-requests` is conditional. Getting either wrong breaks the site silently. |
+| `components/layout/SiteChrome.tsx` | Why the header lives in the layout and not in pages |
+| `app/admin/AdminGuard.tsx` | Why it is explicitly *not* the security boundary |
 
 ## Rules
 
@@ -106,9 +136,23 @@ Two rules that are not stylistic:
 ### `lib/data/` is for copy, not for records
 
 Marketing text, FAQ entries, testimonials and service descriptions belong there.
-Products, classes, prices and stock do not — those come from the API. The
-prototype's habit of keeping business records in `lib/data` and `localStorage`
-is exactly what the rewrite removed.
+Products, classes, programmes, prices and stock do not — those come from the
+API. The prototype's habit of keeping business records in `lib/data` and
+`localStorage` is exactly what the rewrite removed.
+
+**This rule was already written down and got broken anyway,** which is why it
+now carries its example. `ACADEMY_PROGRAMS` sat in `lib/data/academy.ts` and
+the public academy page rendered *that* instead of `/academy/programs/`. A
+`fetchProgramsPublic()` existed in `lib/api/academy.ts` and was called from
+nowhere. So a staff member could create a programme in the back office, see it
+saved, see it listed in the admin — and no customer would ever see it. Nothing
+reported the gap; it simply did not show up.
+
+The test that catches this class of bug is not a unit test. Ask of anything in
+`lib/data/`: **can somebody change this in the back office?** If yes, it is a
+record and it belongs behind the API, including its presentation — a programme
+whose icon and outcomes stayed on the client would render as a broken card
+rather than a new one.
 
 ### Styling
 

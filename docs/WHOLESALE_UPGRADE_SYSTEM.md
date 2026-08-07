@@ -103,8 +103,9 @@ Staff endpoints under `/api/v1/staff/applications/`, all requiring `role` of
 Both decisions take a row lock and refuse to act on an application that has
 already been decided, so two reviewers clicking at once cannot both win.
 
-There is no React admin UI — this runs through Django Admin. See PRD §13 Q4,
-still an open decision.
+Reviewing happens in the **React back office** at `/admin/applications` (PRD
+§13 Q4 answered). Django Admin is off in production, so that screen is the only
+place an application can be decided.
 
 ## What the applicant can and cannot see
 
@@ -113,6 +114,12 @@ computed tier, and `decision_reason`.
 
 `decision_reason` is populated **only on rejection**, where the text was written
 for the applicant and has already been emailed to them. It is empty on approval.
+
+It is also **rendered** to them, on their profile, with a link to start a new
+application. That second half was missing for a while — the API sent the field
+and the frontend never declared or displayed it, so a rejected applicant saw a
+red chip reading "rejected" and nothing else. Sending a reason nobody shows is
+indistinguishable, from the applicant's side, from not having one.
 
 The reviewer's `review_notes` are **not** in that response. That field does
 double duty on the model — rejection reason on one path, private commentary to

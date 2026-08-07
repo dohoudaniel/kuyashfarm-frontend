@@ -32,10 +32,10 @@ backend, then build.
 | `npm run build` | Production build (needs the API up) |
 | `npm start` | Serve the production build |
 | `npm run lint` | eslint — currently 0 errors, 0 warnings |
-| `npm test` | Vitest, 35 specs |
+| `npm test` | Vitest, 182 specs |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run check:bundle` | After a build: fails if anything secret-shaped reached the client JS |
-| `npm run test:e2e` | Playwright, 14 specs — needs the API running |
+| `npm run test:e2e` | Playwright, 24 specs — needs the API running |
 | `npm run test:e2e:ui` | Playwright in watch/inspector mode |
 | `npx tsc --noEmit` | Typecheck |
 
@@ -114,28 +114,67 @@ rather than leaving an email address on a shared machine.
 /academy                             programmes and the live class schedule
 /academy/classes/[slug]              class detail and seat booking
 /academy/registrations/[reference]   booking receipt
-/services/[slug]                     
+/services/[slug]
+/admin  ·  /admin/*                  React back office (staff only)
+/driver                              delivery run, built for a phone
+/accept-invitation                   staff invitation
+/newsletter/confirm  ·  /unsubscribe double opt-in
+/privacy  ·  /terms  ·  /cookies     legal
 ```
 
 Interactive pages split into `page.tsx` (Server Component, metadata) and a
 `*Client.tsx`. Most routes carry sibling `loading.tsx` and `error.tsx` — keep
 them if you move a route.
 
+**The header and footer are mounted once, in the root layout**, by
+`components/layout/SiteChrome.tsx`. Do not add `<Navbar />` or `<Footer />` to
+a page. They used to live in twenty-four pages, and because a component inside
+a page remounts on every client-side navigation, the Navbar refetched the cart
+on *every page view* and the header re-animated each time. `SiteChrome` renders
+nothing on `/admin` and `/driver`, which bring their own chrome.
+
+`/admin` is guarded by `AdminGuard`, which is **not** a security boundary and
+says so in its own docstring — it exists so a customer who wanders there sees
+an explanation rather than a page full of 403s. Every `/staff/*` endpoint
+enforces permissions server-side, and that is what protects the data.
+
 ## Design tokens
 
 Tailwind v4 via `@import "tailwindcss"`; there is no `tailwind.config`. Tokens
 are CSS variables in `app/globals.css`, exposed through `@theme inline`.
 
-| Token | Value |
-|---|---|
-| primary | `#2d5f3f` |
-| secondary | `#4a7c59` |
-| accent | `#6b9d7a` |
-| earth | `#8b6f47` |
-| cream | `#faf8f5` |
+| Token | Value | Used for |
+|---|---|---|
+| `primary-dark` | `#1a3d2b` | Hero overlays, footer, pressed states |
+| `primary` | `#2d5f3f` | The brand. Buttons, links, headings |
+| `secondary` | `#4a7c59` | Hover on primary |
+| `accent` | `#6b9d7a` | Supporting marks, quiet text on dark |
+| `mist` | `#eef5f1` | Pale green wash behind cards and chips |
+| `edge` | `#c6dece` | The border that goes with `mist` |
+| `ink` | `#080f0a` | Headings. Near-black with a green cast |
+| `cream` | `#faf8f5` | Page background on marketing sections |
+| `earth` | `#8b6f47` | Harvest accent |
+| `wheat` | `#e8d5a3` | Harvest accent, light |
 
 Headings use Playfair Display, body uses Inter. Combine classes with `cn()`
 (clsx + tailwind-merge).
+
+**Use the token, never the hex.** There were 521 hex literals across the
+components in twenty distinct greens — including three off-whites and four
+dark greens no eye could tell apart — which made a rebrand a find-and-replace
+across the whole codebase. There are now none outside `app/globals.css`, and
+the only exceptions are deliberate and commented:
+
+- `app/opengraph-image.tsx`, `app/apple-icon.tsx`, `app/manifest.ts` — these
+  render outside a browser, where CSS custom properties do not exist.
+- `components/auth/GoogleSignInButton.tsx` — Google's own mark, which their
+  branding guidelines do not permit recolouring.
+
+**Semantic colour is not brand colour**, and the distinction is deliberate.
+Success banners stay Tailwind's `green-50/800`, errors stay red, and the
+approve/reject pair in the back office stays green/red — that pair has to read
+as go/stop. Recolouring feedback to brand green would make "saved" and "buy"
+look identical.
 
 ## Tests
 
@@ -186,11 +225,65 @@ Two things to know before believing a failure:
 Writing these found two production bugs that every other gate had missed —
 see the note in `e2e/checkout.spec.ts`.
 
+## Security headers
+
+Set in `next.config.ts` under `headers()`, on **every** route — a header that
+applies to most routes protects nothing, because an attacker picks the route it
+does not apply to.
+
+| Header | What it stops |
+|---|---|
+| `Content-Security-Policy` | Injected script phoning home; `/admin` being framed |
+| `X-Frame-Options: DENY` | The same, for browsers predating `frame-ancestors` |
+| `X-Content-Type-Options` | A browser second-guessing a declared type on an upload |
+| `Referrer-Policy` | Order references and reset tokens leaking in `Referer` |
+| `Permissions-Policy` | Embedded content asking for camera, mic or location |
+| `Strict-Transport-Security` | Downgrade to plain HTTP |
+
+### Two things to know before you touch the CSP
+
+**A CSP is the only header here that can break the product, and it breaks it
+invisibly.** The App Router streams its RSC payload through inline `<script>`
+tags. Under `script-src 'self'` the browser blocks every one of them: the HTML
+paints, React fails to hydrate with error #412, and every button on the page is
+dead while the page looks perfectly fine. **`curl` cannot see this** — only a
+browser enforces CSP. `e2e/security-headers.spec.ts` drives a real one and
+fails on any violation or page error; run it after any change here.
+
+`'unsafe-inline'` on `script-src` is therefore deliberate, and the full
+reasoning is in `next.config.ts` rather than summarised away. A per-request
+nonce from middleware is the alternative and was rejected because middleware
+makes every matched route render dynamically, and most of this site is static
+marketing meant to be served from cache. Revisit that if a third-party script
+or a rich-text field is ever introduced — either changes the calculation.
+
+**`upgrade-insecure-requests` is emitted only when the API is HTTPS.** It
+rewrites every `http://` subresource, including API calls. A production build
+pointed at an http API — which is exactly what the Playwright suite and any
+staging smoke test do — would have every request upgraded to a port nothing is
+listening on, surfacing as an unexplained network error rather than a policy
+decision.
+
+---
+
 ## Known gaps
 
-- The end-to-end suite covers guest and signed-in journeys. It does not cover
-  the Paystack card flow (that leaves our origin entirely) or any staff
-  journey.
-- 103 product images are Unsplash hotlinks awaiting owned photography.
-- There is no staff UI. Back-office work runs through Django Admin — see PRD
-  §13 Q4, which is still an open decision.
+- The end-to-end suite covers guest, signed-in, staff and driver journeys, plus
+  the security headers. It does not cover the Paystack card flow — that leaves
+  our origin entirely and cannot be driven from here.
+- **69 images are Unsplash hotlinks** awaiting owned photography. They are
+  photographs of somebody else's farm, served from a third party we do not
+  control, with no commercial licence. This is the largest remaining gap and it
+  is a legal one, not a cosmetic one.
+- **The landing page has not been redesigned.** What was demonstrably fake was
+  removed — another company's name in a source comment, three invented blog
+  articles with dead links, five create-next-app SVGs — but the page is still
+  eight stacked marketing sections rather than one clear promise and one
+  action. That is a design decision, not a cleanup.
+- **`SOCIAL_LINKS` is empty**, so the footer renders no social icons. Fill in
+  `lib/constants.ts` with the real accounts and they appear. It was four
+  `href="#"` links; an icon that goes nowhere is worse than an absent one.
+- **The legal pages await legal review.** `/privacy`, `/terms` and `/cookies`
+  describe accurately what this system does, checked against the code, and each
+  carries a visible banner saying so. They are documentation of the software,
+  not lawyer-drafted policy.

@@ -30,6 +30,20 @@ the client renders what it is told.
 not flicker on first paint. It is refreshed from the API and is never the source
 of truth. If it disagrees with the server, the server wins.
 
+**The cart is loaded once per session, not once per page.** `Navbar` calls
+`load()` from an effect, and `Navbar` lives in the root layout via
+`SiteChrome` — so it does not remount as the customer browses. It used to be
+imported by twenty-four individual pages, which meant a cart request on *every
+page view*. If you find yourself adding `<Navbar />` to a page, that is the bug
+coming back.
+
+**Cart lines carry a product image.** The API sends `image` on each line: an
+absolute URL, because the frontend is a different origin and a relative path
+would resolve against the Next server and 404 with nothing in the API log. A
+line without a photograph falls back to a basket glyph. It used to fall back to
+`create-next-app`'s grey document icon — for every line, unconditionally,
+because the API sent no image at all.
+
 ## Endpoints
 
 | Method | Path | Notes |
