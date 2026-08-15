@@ -37,6 +37,7 @@ export function Mission() {
             <Image
               src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=2070"
               alt="Agricultural landscape"
+              sizes="(max-width: 1024px) 100vw, 50vw"
               fill
               className="object-cover transition-transform duration-700 hover:scale-105"
             />

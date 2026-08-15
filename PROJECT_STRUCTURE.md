@@ -14,6 +14,8 @@ kuyashfarm-frontend/                  # the app lives at the repo root
 ├── app/                              # App Router. One directory per route.
 │   ├── layout.tsx                    # Root layout: fonts, metadata, providers,
 │   │                                 #   and SiteChrome (header + footer, once)
+│   ├── icon.tsx                      # Browser-tab icon — the brand monogram,
+│   │                                 #   replacing create-next-app's favicon
 │   ├── opengraph-image.tsx           # Share card, generated at build time
 │   ├── apple-icon.tsx                # Home-screen icon, generated
 │   ├── manifest.ts                   # Web app manifest

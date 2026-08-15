@@ -43,7 +43,14 @@ export default function ServicePage({ params }: ServicePageProps) {
               <source src={content.heroVideo} type="video/mp4" />
             </video>
           ) : (
-            <Image src={content.heroImage} alt={service.title} fill className="object-cover" priority />
+            <Image
+              src={content.heroImage}
+              alt={service.title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
           )}
           <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
 
@@ -112,7 +119,13 @@ export default function ServicePage({ params }: ServicePageProps) {
               <div className="relative">
                 <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-primary/20 to-accent/20 blur-2xl" />
                 <div className="relative aspect-square overflow-hidden rounded-3xl shadow-2xl">
-                  <Image src={content.heroImage} alt="Farm overview" fill className="object-cover" />
+                  <Image
+                    src={content.heroImage}
+                    alt="Farm overview"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -272,7 +285,13 @@ export default function ServicePage({ params }: ServicePageProps) {
                 <div className="relative grid gap-4 sm:grid-cols-2">
                   {content.gallery.slice(0, 4).map((image, i) => (
                     <div key={i} className="aspect-square overflow-hidden rounded-2xl shadow-lg">
-                      <Image src={image} alt={`Benefit ${i + 1}`} fill className="object-cover transition-transform duration-500 hover:scale-110" />
+                      <Image
+                        src={image}
+                        alt={`Benefit ${i + 1}`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-500 hover:scale-110"
+                      />
                     </div>
                   ))}
                 </div>
@@ -307,7 +326,13 @@ export default function ServicePage({ params }: ServicePageProps) {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {content.gallery.map((image, i) => (
                 <div key={i} className="group relative aspect-square overflow-hidden rounded-xl shadow-md ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:ring-accent/40">
-                  <Image src={image} alt={`Gallery ${i + 1}`} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <Image
+                    src={image}
+                    alt={`Gallery ${i + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <div className="absolute bottom-2 left-2 flex items-center gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <div className="h-1 w-1 rounded-full bg-white" />

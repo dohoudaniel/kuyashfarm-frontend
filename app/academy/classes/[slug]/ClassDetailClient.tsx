@@ -204,7 +204,14 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
         {/* Hero */}
         <div className="relative h-72 w-full overflow-hidden md:h-96">
           {cls.image ? (
-            <Image src={cls.image} alt={cls.title} fill priority className="object-cover" />
+            <Image
+              src={cls.image}
+              alt={cls.title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
           ) : (
             <div className="absolute inset-0 bg-primary-dark" />
           )}

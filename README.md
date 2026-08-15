@@ -165,8 +165,9 @@ dark greens no eye could tell apart — which made a rebrand a find-and-replace
 across the whole codebase. There are now none outside `app/globals.css`, and
 the only exceptions are deliberate and commented:
 
-- `app/opengraph-image.tsx`, `app/apple-icon.tsx`, `app/manifest.ts` — these
-  render outside a browser, where CSS custom properties do not exist.
+- `app/icon.tsx`, `app/apple-icon.tsx`, `app/opengraph-image.tsx` and
+  `app/manifest.ts` — these render outside a browser (Satori, or a JSON
+  manifest), where CSS custom properties do not exist.
 - `components/auth/GoogleSignInButton.tsx` — Google's own mark, which their
   branding guidelines do not permit recolouring.
 

@@ -40,14 +40,14 @@ export function BeforeAfterSlider({ before, after, title, description }: BeforeA
         onTouchEnd={() => setIsDragging(false)}
       >
         <div className="absolute inset-0">
-          <Image src={after} alt="After" fill className="object-cover" />
+          <Image src={after} alt="After" fill sizes="(max-width: 1280px) 100vw, 1280px" className="object-cover" />
           <div className="absolute bottom-4 right-4 rounded-full bg-white/90 px-4 py-2 font-sans text-sm font-semibold text-primary backdrop-blur-sm">
             After
           </div>
         </div>
 
         <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}>
-          <Image src={before} alt="Before" fill className="object-cover" />
+          <Image src={before} alt="Before" fill sizes="(max-width: 1280px) 100vw, 1280px" className="object-cover" />
           <div className="absolute bottom-4 left-4 rounded-full bg-white/90 px-4 py-2 font-sans text-sm font-semibold text-gray-700 backdrop-blur-sm">
             Before
           </div>

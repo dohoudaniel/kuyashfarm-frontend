@@ -47,6 +47,7 @@ export function Services() {
                 <Image
                   src={serviceImages[index % serviceImages.length]}
                   alt={service.title}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 25vw"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
