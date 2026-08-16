@@ -11,7 +11,7 @@ const EXPERIENCES = [
     tag: "01 — Practical Farm Training",
     title: "Real farm.\nReal skills.",
     description:
-      "You don't learn farming by reading about it. Every program at Kuyash Academy is built around direct, supervised work on our 40-acre farm — from soil testing to harvest. Our instructors are beside you, not behind a podium.",
+      "You don't learn farming by reading about it. Every program at Kuyash Farms Academy is built around direct, supervised work on our 40-acre farm — from soil testing to harvest. Our instructors are beside you, not behind a podium.",
     highlight: "60% hands-on fieldwork in every program",
     icon: Sprout,
     color: "var(--primary-green)",

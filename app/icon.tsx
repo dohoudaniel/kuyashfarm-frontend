@@ -9,8 +9,8 @@ import { ImageResponse } from "next/og";
  * left in the project, and the most visible: it sits in front of the customer
  * on every page.
  *
- * **A monogram rather than the wordmark.** The brand mark is the words "Kuyash
- * Integrated Farm" set in Playfair Display; at 16×16 that is a grey smear. The
+ * **A monogram rather than the wordmark.** The brand mark is the words
+ * "Kuyash Farms" set in Playfair Display; at 16×16 that is a grey smear. The
  * "K" is the same letterform in the same serif on the same green, which is the
  * most of the identity that survives at this size.
  *

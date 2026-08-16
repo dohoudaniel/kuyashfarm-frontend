@@ -244,7 +244,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                 {[
                   { icon: Calendar, label: "Date", value: date },
                   { icon: Clock, label: "Starts", value: `${time} · ${cls.duration}` },
-                  { icon: MapPin, label: "Location", value: cls.location || "Kuyash Farm" },
+                  { icon: MapPin, label: "Location", value: cls.location || "Kuyash Farms" },
                   {
                     icon: Users,
                     label: "Seats left",

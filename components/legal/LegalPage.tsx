@@ -39,7 +39,7 @@ export function LegalPage({
           className="mt-8 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
         >
           <strong className="font-semibold">Awaiting legal review.</strong> This page describes
-          accurately how the Kuyash Integrated Farm platform handles your information, and it is
+          accurately how the Kuyash Farms platform handles your information, and it is
           published so nothing here is hidden. It has not yet been reviewed by a qualified lawyer
           against the Nigeria Data Protection Act. If you need a binding assurance before sharing
           information with us, please contact us first.

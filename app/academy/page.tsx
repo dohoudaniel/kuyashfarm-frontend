@@ -26,11 +26,16 @@ import { AcademyFAQ } from "./sections/AcademyFAQ";
 import { AcademyNewsletter } from "./sections/AcademyNewsletter";
 
 export const metadata: Metadata = {
-  title: "Kuyash Farm Academy — Africa's Premier Agricultural Innovation Hub",
+  title: {
+    // `absolute` opts out of the root layout's "%s — Kuyash Farms"
+    // template. Without it this reads "…Innovation Hub — Kuyash Farms", which
+    // says the parent brand twice in one line.
+    absolute: "Kuyash Farms Academy — Africa's Premier Agricultural Innovation Hub",
+  },
   description:
     "Practical, technology-driven agricultural education. Train on a real 40-acre farm with Nigeria's leading practitioners. NABTEB certified programs in crop production, livestock, aquaculture, agribusiness, precision agriculture, and more.",
   openGraph: {
-    title: "Kuyash Farm Academy",
+    title: "Kuyash Farms Academy",
     description:
       "Building Africa's next generation of agricultural innovators. Hands-on training, smart farming tech, NABTEB certification, and career placement.",
     images: [{ url: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1200" }],

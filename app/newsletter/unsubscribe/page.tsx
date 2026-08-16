@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import NewsletterUnsubscribeClient from "./NewsletterUnsubscribeClient";
 
 export const metadata: Metadata = {
-  title: "Unsubscribe — Kuyash Integrated Farm",
+  title: "Unsubscribe",
   robots: { index: false, follow: false },
 };
 

@@ -34,7 +34,7 @@ export function WhyAcademy() {
             viewport={{ once: true }}
             className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-4"
           >
-            Why Kuyash Academy
+            Why Kuyash Farms Academy
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

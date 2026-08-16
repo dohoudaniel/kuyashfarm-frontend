@@ -423,7 +423,7 @@ export default function CheckoutClient() {
                   <p className="mt-4 flex items-start gap-2 rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
                     <Lock className="mt-0.5 h-4 w-4 shrink-0" />
                     You will be taken to Paystack to pay. Your card details are entered there and
-                    never reach Kuyash Farm.
+                    never reach Kuyash Farms.
                   </p>
                 )}
               </section>
@@ -503,7 +503,7 @@ export default function CheckoutClient() {
                 </button>
 
                 <p className="mt-4 text-center text-xs text-gray-500">
-                  Totals are calculated by Kuyash Farm and confirmed before payment.
+                  Totals are calculated by Kuyash Farms and confirmed before payment.
                 </p>
               </div>
             </aside>

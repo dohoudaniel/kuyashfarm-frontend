@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import ResetPasswordClient from "./ResetPasswordClient";
 
 export const metadata: Metadata = {
-  title: "Choose a new password — Kuyash Integrated Farm",
+  title: "Choose a new password",
   robots: { index: false, follow: false },
 };
 

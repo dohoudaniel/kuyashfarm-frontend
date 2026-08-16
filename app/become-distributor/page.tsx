@@ -12,9 +12,9 @@ import { Container } from "@/components/ui/Container";
 import { ApplicationForm } from "@/components/applications/ApplicationForm";
 
 export const metadata: Metadata = {
-  title: "Become a distributor — Kuyash Integrated Farm",
+  title: "Become a distributor",
   description:
-    "Apply to distribute Kuyash Integrated Farm produce across Nigeria. Tiered pricing, territory allocation and direct farm supply.",
+    "Apply to distribute Kuyash Farms produce across Nigeria. Tiered pricing, territory allocation and direct farm supply.",
 };
 
 export default function BecomeDistributorPage() {

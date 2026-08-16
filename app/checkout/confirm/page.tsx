@@ -11,7 +11,7 @@ import { Suspense } from "react";
 import ConfirmClient from "./ConfirmClient";
 
 export const metadata: Metadata = {
-  title: "Confirming your payment — Kuyash Integrated Farm",
+  title: "Confirming your payment",
   robots: { index: false, follow: false },
 };
 

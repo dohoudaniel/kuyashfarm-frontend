@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Kuyash Integrated Farm",
+  title: "Privacy Policy",
   description:
-    "What information Kuyash Integrated Farm collects, why, who else sees it, and how to have it removed.",
+    "What information Kuyash Farms collects, why, who else sees it, and how to have it removed.",
 };
 
 /**
@@ -26,8 +26,8 @@ export default function PrivacyPage() {
     <LegalPage title="Privacy Policy" updated="6 August 2026">
       <LegalSection heading="Who we are">
         <p>
-          Kuyash Integrated Farm operates this website, sells farm produce through it, and runs
-          the Kuyash Farm Academy. When this page says &ldquo;we&rdquo;, it means that business.
+          Kuyash Farms operates this website, sells farm produce through it, and runs
+          the Kuyash Farms Academy. When this page says &ldquo;we&rdquo;, it means that business.
         </p>
       </LegalSection>
 

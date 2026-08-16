@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import ProfileClient from "./ProfileClient";
 
 export const metadata: Metadata = {
-  title: "My account — Kuyash Integrated Farm",
+  title: "My account",
   robots: { index: false, follow: false },
 };
 

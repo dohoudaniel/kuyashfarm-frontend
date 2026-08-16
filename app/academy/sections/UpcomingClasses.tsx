@@ -149,7 +149,7 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 shrink-0 text-primary" />
-                      <span>{cls.location || "Kuyash Integrated Farm, Lagos"}</span>
+                      <span>{cls.location || "Kuyash Farms, Lagos"}</span>
                     </div>
                   </div>
 

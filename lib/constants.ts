@@ -3,7 +3,7 @@
  */
 
 export const SITE_CONFIG = {
-  name: "Kuyash Integrated Farm",
+  name: "Kuyash Farms",
   tagline: "Farming for a future",
   description:
     "Cultivating a sustainable future through innovative agriculture and empowering rural communities.",
@@ -91,12 +91,29 @@ export const GOALS = [
   },
 ] as const;
 
+/**
+ * Primary navigation.
+ *
+ * **Shop comes first**, and its absence was the real defect here. This is an
+ * e-commerce site with server-side pricing, wholesale tiers and a stock
+ * ledger, and the primary navigation did not link to any of it — a customer
+ * arriving on the homepage had no route to the products except the hero
+ * button. It was the navigation of a brochure.
+ *
+ * **Two entries pointed at nothing.** `#projects` had no matching section and
+ * never had; `#blog` lost its section when three invented articles linking to
+ * `href="#"` were deleted. Both scrolled nowhere, silently — an anchor with no
+ * target does not error, it simply does not move.
+ *
+ * Anything added here must resolve. An entry beginning `#` needs a section
+ * with that `id` on the homepage; anything else must be a real route.
+ * `tests/navigation.test.tsx` fails the build otherwise.
+ */
 export const NAV_LINKS = [
-  { label: "Home", href: "#home" },
+  { label: "Shop", href: "/categories" },
+  { label: "Wholesale", href: "/become-wholesaler" },
   { label: "Services", href: "#services" },
-  { label: "Projects", href: "#projects" },
-  { label: "About Us", href: "#about" },
-  { label: "Blog", href: "#blog" },
+  { label: "About", href: "#about" },
   { label: "Academy", href: "/academy" },
 ] as const;
 

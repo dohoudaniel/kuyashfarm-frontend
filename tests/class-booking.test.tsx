@@ -44,7 +44,7 @@ const BASE: AcademyClassDetail = {
   program_title: "",
   scheduled_date: "2026-08-18T09:00:00+01:00",
   duration: "1 day",
-  location: "Kuyash Integrated Farm, Lagos",
+  location: "Kuyash Farms, Lagos",
   format: "IN_PERSON",
   level: "BEGINNER",
   price: "25000.00",

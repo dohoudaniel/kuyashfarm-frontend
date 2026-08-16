@@ -176,7 +176,7 @@ export default function RegisterPage() {
             <h1 className="font-serif text-4xl font-bold text-gray-900 mb-2">
               Create Account
             </h1>
-            <p className="text-gray-600">Join Kuyash Farm community today</p>
+            <p className="text-gray-600">Join Kuyash Farms community today</p>
           </div>
 
           {/* Register Form */}

@@ -73,7 +73,7 @@ export function Footer() {
                 { label: "About Us", href: "#about" },
                 { label: "Our Services", href: "#services" },
                 { label: "Blog & News", href: "#blog" },
-                { label: "Kuyash Academy", href: "/academy" },
+                { label: "Kuyash Farms Academy", href: "/academy" },
                 { label: "Wholesale Pricing", href: "/become-wholesaler" },
                 { label: "Become a Distributor", href: "/become-distributor" },
               ].map((link) => (
@@ -134,7 +134,7 @@ export function Footer() {
                 },
                 {
                   icon: Mail,
-                  text: "hello@kuyashfarm.com",
+                  text: "hello@kuyashfarms.com",
                 },
                 {
                   icon: Clock,

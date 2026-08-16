@@ -49,7 +49,7 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      text: "Hello! I'm your Kuyash Farm assistant. How can I help you today?",
+      text: "Hello! I'm your Kuyash Farms assistant. How can I help you today?",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -147,7 +147,7 @@ export function ChatWidget() {
                 <Bot className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-semibold">Kuyash Farm Support</h3>
+                <h3 className="font-semibold">Kuyash Farms Support</h3>
                 <p className="text-xs text-white/80">Online • Typically replies instantly</p>
               </div>
             </div>
@@ -328,7 +328,7 @@ function generateBotResponse(
 
   // Greeting
   if (input.includes("hello") || input.includes("hi") || input.includes("hey")) {
-    return `Hello ${userName}! 👋 Welcome to Kuyash Integrated Farm. How can I assist you today? I can help with:\n\n• Product information\n• Order tracking\n• Wholesale applications\n• Shipping & delivery\n• Payment options\n\nWhat would you like to know?`;
+    return `Hello ${userName}! 👋 Welcome to Kuyash Farms. How can I assist you today? I can help with:\n\n• Product information\n• Order tracking\n• Wholesale applications\n• Shipping & delivery\n• Payment options\n\nWhat would you like to know?`;
   }
 
   // Thank you
@@ -338,7 +338,7 @@ function generateBotResponse(
 
   // Contact
   if (input.includes("contact") || input.includes("phone") || input.includes("email")) {
-    return `You can reach us through:\n\n📧 Email: support@kuyashfarm.com\n📱 Phone: +234 800 KUYASH (589274)\n⏰ Hours: Mon-Sat, 8AM-6PM WAT\n\nOr continue chatting with me here - I'm available 24/7!`;
+    return `You can reach us through:\n\n📧 Email: support@kuyashfarms.com\n📱 Phone: +234 800 KUYASH (589274)\n⏰ Hours: Mon-Sat, 8AM-6PM WAT\n\nOr continue chatting with me here - I'm available 24/7!`;
   }
 
   // Default response

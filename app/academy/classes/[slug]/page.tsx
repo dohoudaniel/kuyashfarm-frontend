@@ -34,13 +34,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const cls = await load(slug);
 
-  if (!cls) return { title: "Class not found | Kuyash Academy" };
+  if (!cls) return { title: { absolute: "Class not found — Kuyash Farms Academy" } };
 
   return {
-    title: `${cls.title} | Kuyash Academy`,
+    title: { absolute: `${cls.title} — Kuyash Farms Academy` },
     description: cls.description,
     openGraph: {
-      title: `${cls.title} | Kuyash Academy`,
+      title: `${cls.title} | Kuyash Farms Academy`,
       description: cls.description,
       images: cls.image ? [{ url: cls.image }] : undefined,
     },

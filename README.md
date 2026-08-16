@@ -1,7 +1,7 @@
-# Kuyash Integrated Farm — Frontend
+# Kuyash Farms — Frontend
 
 The customer-facing web app: shop, checkout, orders, wholesale and distributor
-applications, and the Kuyash Academy. Next.js 16 (App Router), React 19,
+applications, and the Kuyash Farms Academy. Next.js 16 (App Router), React 19,
 TypeScript and Tailwind v4.
 
 This repository is **frontend only**. The API is a separate Django project in

@@ -1,5 +1,5 @@
 /**
- * HTTP client for the Kuyash Farm API.
+ * HTTP client for the Kuyash Farms API.
  *
  * Rewritten because the previous version could never have worked. It called
  * `/auth/login` while the API serves `/auth/login/`, and Django cannot redirect

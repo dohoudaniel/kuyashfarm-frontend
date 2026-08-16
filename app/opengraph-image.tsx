@@ -23,7 +23,7 @@ import { ImageResponse } from "next/og";
  * They are the values from `app/globals.css`.
  */
 export const runtime = "nodejs";
-export const alt = "Kuyash Integrated Farm — fresh Nigerian produce, delivered";
+export const alt = "Kuyash Farms — fresh Nigerian produce, delivered";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -95,7 +95,7 @@ export default async function OpengraphImage() {
         <div style={{ display: "flex", fontSize: 24, color: ACCENT }}>
           <div style={{ display: "flex", marginRight: 28 }}>Shop</div>
           <div style={{ display: "flex", marginRight: 28 }}>Wholesale</div>
-          <div style={{ display: "flex" }}>Kuyash Farm Academy</div>
+          <div style={{ display: "flex" }}>Kuyash Farms Academy</div>
         </div>
       </div>
     ),

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const product = await fetchProductPublic(slug);
     return {
-      title: `${product.name} — Kuyash Integrated Farm`,
+      title: `${product.name} — Kuyash Farms`,
       description: product.description || product.long_description.slice(0, 160),
       openGraph: {
         title: product.name,
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     };
   } catch {
-    return { title: "Product — Kuyash Integrated Farm" };
+    return { title: "Product" };
   }
 }
 

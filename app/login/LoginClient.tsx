@@ -128,7 +128,7 @@ export default function LoginClient() {
             <h1 className="font-serif text-4xl font-bold text-gray-900 mb-2">
               Welcome Back
             </h1>
-            <p className="text-gray-600">Sign in to your Kuyash Farm account</p>
+            <p className="text-gray-600">Sign in to your Kuyash Farms account</p>
           </div>
 
           {/* Login Form */}

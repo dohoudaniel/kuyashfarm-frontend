@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions — Kuyash Integrated Farm",
+  title: "Terms & Conditions",
   description:
-    "The terms you agree to when ordering from Kuyash Integrated Farm or booking an academy class.",
+    "The terms you agree to when ordering from Kuyash Farms or booking an academy class.",
 };
 
 /**

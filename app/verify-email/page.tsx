@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import VerifyEmailClient from "./VerifyEmailClient";
 
 export const metadata: Metadata = {
-  title: "Verify your email — Kuyash Integrated Farm",
+  title: "Verify your email",
   robots: { index: false, follow: false },
 };
 

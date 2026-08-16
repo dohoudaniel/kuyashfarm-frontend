@@ -15,9 +15,9 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { fetchCategoriesPublic } from "@/lib/api/catalogue";
 
 export const metadata: Metadata = {
-  title: "Shop by category — Kuyash Integrated Farm",
+  title: "Shop by category",
   description:
-    "Fresh vegetables, fruits, poultry, dairy, grains and fish from Kuyash Integrated Farm.",
+    "Fresh vegetables, fruits, poultry, dairy, grains and fish from Kuyash Farms.",
 };
 
 export default async function CategoriesPage() {

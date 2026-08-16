@@ -86,7 +86,7 @@ describe("validatePersonName", () => {
 });
 
 describe("validateEmail", () => {
-  it.each(["ada@example.com", "ada.okoro+farm@kuyashfarm.com.ng", "a@b.co"])(
+  it.each(["ada@example.com", "ada.okoro+farm@kuyashfarms.com.ng", "a@b.co"])(
     "accepts %s",
     (input) => {
       expect(validateEmail(input)).toBeUndefined();

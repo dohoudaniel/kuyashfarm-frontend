@@ -300,7 +300,7 @@ export default function ProfileClient() {
                     onBlur={() => setFieldErrors((c) => ({ ...c, phone: (phone.trim() ? validatePhone(phone) : undefined) ?? "" }))}
                     error={fieldErrors.phone} autoComplete="tel" placeholder="08039876543" />
                   <p className="text-xs text-gray-500">
-                    Your email address and account type are set by Kuyash Farm and cannot be
+                    Your email address and account type are set by Kuyash Farms and cannot be
                     changed here.
                   </p>
                   <button type="submit" disabled={saving} className="rounded-lg bg-primary px-6 py-2.5 font-semibold text-white hover:bg-secondary disabled:opacity-60">

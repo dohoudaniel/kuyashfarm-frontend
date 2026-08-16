@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import OrderDetailClient from "./OrderDetailClient";
 
 export const metadata: Metadata = {
-  title: "Order — Kuyash Integrated Farm",
+  title: "Order",
   robots: { index: false, follow: false },
 };
 

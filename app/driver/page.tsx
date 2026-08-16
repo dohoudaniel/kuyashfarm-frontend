@@ -11,7 +11,7 @@ import type { Metadata } from "next";
 import DriverClient from "./DriverClient";
 
 export const metadata: Metadata = {
-  title: "My round — Kuyash Integrated Farm",
+  title: "My round",
   robots: { index: false, follow: false },
 };
 

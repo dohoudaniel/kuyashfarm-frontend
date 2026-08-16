@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy — Kuyash Integrated Farm",
+  title: "Cookie Policy",
   description: "The three things this site stores in your browser, and what each one is for.",
 };
 

@@ -32,19 +32,19 @@ const inter = Inter({
  * fetch it from their own servers with no idea what your origin is. Next warns
  * about this at build time in a line nobody reads.
  */
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kuyashfarm.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kuyashfarms.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Kuyash Integrated Farm — Fresh Nigerian produce, delivered",
-    // Page titles become "Shop — Kuyash Integrated Farm" without every page
+    default: "Kuyash Farms — Fresh Nigerian produce, delivered",
+    // Page titles become "Shop — Kuyash Farms" without every page
     // having to repeat the suffix and eventually getting it wrong.
-    template: "%s — Kuyash Integrated Farm",
+    template: "%s — Kuyash Farms",
   },
   description:
-    "Farm-fresh produce from our own 40-acre farm, delivered across Nigeria. Wholesale and distributor pricing available, plus practical agricultural training at Kuyash Farm Academy.",
-  applicationName: "Kuyash Integrated Farm",
+    "Farm-fresh produce from our own 40-acre farm, delivered across Nigeria. Wholesale and distributor pricing available, plus practical agricultural training at Kuyash Farms Academy.",
+  applicationName: "Kuyash Farms",
   keywords: [
     "Nigerian farm produce",
     "fresh vegetables Lagos",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     "agricultural training Nigeria",
     "farm to table Nigeria",
   ],
-  authors: [{ name: "Kuyash Integrated Farm" }],
+  authors: [{ name: "Kuyash Farms" }],
 
   /**
    * The share card.
@@ -66,14 +66,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_NG",
     url: SITE_URL,
-    siteName: "Kuyash Integrated Farm",
-    title: "Kuyash Integrated Farm — Fresh Nigerian produce, delivered",
+    siteName: "Kuyash Farms",
+    title: "Kuyash Farms — Fresh Nigerian produce, delivered",
     description:
       "Farm-fresh produce from our own 40-acre farm, delivered across Nigeria. Wholesale pricing and practical agricultural training.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kuyash Integrated Farm",
+    title: "Kuyash Farms",
     description:
       "Farm-fresh produce from our own 40-acre farm, delivered across Nigeria.",
   },

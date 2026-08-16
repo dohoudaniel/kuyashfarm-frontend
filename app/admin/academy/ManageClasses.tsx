@@ -43,7 +43,7 @@ const EMPTY = {
   title: "",
   instructor: "",
   scheduled_date: "",
-  location: "Kuyash Integrated Farm",
+  location: "Kuyash Farms",
   price: "",
   total_seats: "20",
   description: "",

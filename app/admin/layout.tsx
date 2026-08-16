@@ -12,7 +12,7 @@ import { AdminGuard } from "./AdminGuard";
 import { AdminShell } from "./AdminShell";
 
 export const metadata: Metadata = {
-  title: "Back office — Kuyash Integrated Farm",
+  title: "Back office",
   robots: { index: false, follow: false },
 };
 

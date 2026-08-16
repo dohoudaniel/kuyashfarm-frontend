@@ -12,8 +12,8 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Kuyash Integrated Farm",
-    short_name: "Kuyash Farm",
+    name: "Kuyash Farms",
+    short_name: "Kuyash Farms",
     description:
       "Farm-fresh Nigerian produce delivered, with wholesale pricing and agricultural training.",
     start_url: "/",

@@ -65,7 +65,7 @@ user.save()                # is_staff is derived from role on save
 Two things this deliberately makes impossible:
 
 - **No email address grants privilege.** The prototype gave admin rights to
-  anyone registering as `admin@kuyashfarm.com`. Nothing in the current system
+  anyone registering as `admin@kuyashfarms.com`. Nothing in the current system
   reads an address to decide permissions.
 - **No client-side flag grants anything.** `role` is read from the database on
   every request. Setting a value in `localStorage` — or in a JWT claim — changes

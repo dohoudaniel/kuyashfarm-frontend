@@ -13,7 +13,7 @@ import { Suspense } from "react";
 import LoginClient from "./LoginClient";
 
 export const metadata: Metadata = {
-  title: "Sign in — Kuyash Integrated Farm",
+  title: "Sign in",
 };
 
 export default function LoginPage() {

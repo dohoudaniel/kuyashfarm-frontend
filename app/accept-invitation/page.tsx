@@ -11,7 +11,7 @@ import { Suspense } from "react";
 import AcceptInvitationClient from "./AcceptInvitationClient";
 
 export const metadata: Metadata = {
-  title: "Accept your invitation — Kuyash Integrated Farm",
+  title: "Accept your invitation",
   robots: { index: false, follow: false },
 };
 

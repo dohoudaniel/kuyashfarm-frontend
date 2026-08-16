@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import NewsletterConfirmClient from "./NewsletterConfirmClient";
 
 export const metadata: Metadata = {
-  title: "Confirm your subscription — Kuyash Integrated Farm",
+  title: "Confirm your subscription",
   // The URL carries a signed token. Keeping it out of an index is the same
   // reason the reset-password page does.
   robots: { index: false, follow: false },

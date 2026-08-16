@@ -636,7 +636,7 @@ export function ProgramsClient() {
                 Apply Now <ArrowRight className="w-4 h-4" />
               </Link>
               <a
-                href="mailto:academy@kuyashfarm.com"
+                href="mailto:academy@kuyashfarms.com"
                 className="inline-flex items-center gap-2 border border-white/20 text-white/80 font-semibold px-7 py-3.5 rounded-full hover:border-white/40 hover:text-white transition-all text-sm"
               >
                 Contact Admissions

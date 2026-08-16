@@ -64,7 +64,7 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
     heroVideo: "/videos/farm-hero.mp4",
     shopHref: "/shop/vegetables",
     overview:
-      "At Kuyash Integrated Farm, we combine traditional agricultural wisdom with cutting-edge technology to grow premium-quality crops and fresh vegetables. Our commitment to sustainable innovation ensures superior produce while protecting the environment for future generations.",
+      "At Kuyash Farms, we combine traditional agricultural wisdom with cutting-edge technology to grow premium-quality crops and fresh vegetables. Our commitment to sustainable innovation ensures superior produce while protecting the environment for future generations.",
     stats: [
       { value: "500+", label: "Hectares Under Cultivation", description: "Across 3 climate-controlled zones" },
       { value: "50+", label: "Premium Crop Varieties", description: "Seasonally rotated selection" },
@@ -150,7 +150,7 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
     heroImage: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=2087",
     shopHref: "/shop/poultry",
     overview:
-      "At Kuyash Integrated Farm, we raise healthy, high-quality livestock and poultry using modern animal husbandry practices. From free-range chickens to well-fed cattle and sheep, every animal is cared for in a clean, humane, and stress-free environment — ensuring premium quality meat, eggs, and dairy for our customers.",
+      "At Kuyash Farms, we raise healthy, high-quality livestock and poultry using modern animal husbandry practices. From free-range chickens to well-fed cattle and sheep, every animal is cared for in a clean, humane, and stress-free environment — ensuring premium quality meat, eggs, and dairy for our customers.",
     stats: [
       { value: "5,000+", label: "Poultry Birds Raised", description: "Free-range chickens and layers" },
       { value: "200+", label: "Livestock Units", description: "Cattle, sheep, and goats" },
@@ -206,7 +206,7 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
     heroImage: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=2070",
     shopHref: "/shop/fishery",
     overview:
-      "Kuyash Integrated Farm operates a sustainable aquaculture system that produces fresh, high-quality fish year-round. Using recirculating aquaculture systems (RAS) and natural pond farming, we raise tilapia, catfish, and other species in a clean, controlled environment — ensuring premium freshness and flavour for every customer.",
+      "Kuyash Farms operates a sustainable aquaculture system that produces fresh, high-quality fish year-round. Using recirculating aquaculture systems (RAS) and natural pond farming, we raise tilapia, catfish, and other species in a clean, controlled environment — ensuring premium freshness and flavour for every customer.",
     stats: [
       { value: "10,000+", label: "Fish Produced Per Cycle", description: "Tilapia, catfish, and more" },
       { value: "95%", label: "Water Recycled", description: "Via closed-loop RAS systems" },
@@ -262,7 +262,7 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
     heroImage: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?q=80&w=2070",
     shopHref: "/shop",
     overview:
-      "Kuyash Integrated Farm cultivates oil palm plantations using responsible, high-yield agronomic practices. We produce premium-grade crude palm oil (CPO) and palm kernel oil (PKO) through modern milling and extraction processes — balancing productivity with environmental stewardship and community development.",
+      "Kuyash Farms cultivates oil palm plantations using responsible, high-yield agronomic practices. We produce premium-grade crude palm oil (CPO) and palm kernel oil (PKO) through modern milling and extraction processes — balancing productivity with environmental stewardship and community development.",
     stats: [
       { value: "1,000+", label: "Hectares Under Cultivation", description: "Mature and developing plantations" },
       { value: "92%", label: "Oil Extraction Rate", description: "Industry-leading mill efficiency" },

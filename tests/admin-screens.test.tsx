@@ -117,7 +117,7 @@ const SETTINGS = {
   id: "1",
   free_shipping_threshold: "80000.00",
   default_currency: "NGN",
-  support_email: "hello@kuyashfarm.com",
+  support_email: "hello@kuyashfarms.com",
   support_phone: "08039876543",
   cod_enabled: true,
   guest_checkout_enabled: true,
@@ -354,26 +354,26 @@ describe("staff invitations", () => {
     // them accept an invitation addressed to somebody else — including one
     // granting administrator.
     admin.listInvitations.mockResolvedValue([
-      { id: "i1", email: "new@kuyashfarm.com", role: "ADMIN", status: "PENDING",
-        invited_by_email: "ada@kuyashfarm.com", expires_at: new Date().toISOString(),
+      { id: "i1", email: "new@kuyashfarms.com", role: "ADMIN", status: "PENDING",
+        invited_by_email: "ada@kuyashfarms.com", expires_at: new Date().toISOString(),
         accepted_at: null, revoked_at: null, created_at: new Date().toISOString() },
     ]);
     render(<StaffClient />);
 
-    await screen.findByText("new@kuyashfarm.com");
+    await screen.findByText("new@kuyashfarms.com");
     expect(document.body.textContent).not.toMatch(/token/i);
   });
 
   it("only offers to withdraw an invitation that is still pending", async () => {
     admin.listInvitations.mockResolvedValue([
-      { id: "i1", email: "used@kuyashfarm.com", role: "STAFF", status: "ACCEPTED",
+      { id: "i1", email: "used@kuyashfarms.com", role: "STAFF", status: "ACCEPTED",
         invited_by_email: null, expires_at: new Date().toISOString(),
         accepted_at: new Date().toISOString(), revoked_at: null,
         created_at: new Date().toISOString() },
     ]);
     render(<StaffClient />);
 
-    await screen.findByText("used@kuyashfarm.com");
+    await screen.findByText("used@kuyashfarms.com");
     expect(screen.queryByRole("button", { name: /withdraw/i })).not.toBeInTheDocument();
   });
 

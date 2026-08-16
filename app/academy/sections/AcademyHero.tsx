@@ -135,7 +135,7 @@ export function AcademyHero() {
               </div>
               <div className="absolute bottom-5 left-6">
                 <p className="text-white/20 text-xs font-mono tracking-widest uppercase">
-                  Kuyash Farm Academy — Innovation Hub
+                  Kuyash Farms Academy — Innovation Hub
                 </p>
               </div>
             </motion.div>

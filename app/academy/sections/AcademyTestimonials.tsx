@@ -98,7 +98,7 @@ export function AcademyTestimonials() {
           </div>
           <div>
             <p className="font-sans font-semibold text-ink text-sm">Join 500+ graduates</p>
-            <p className="font-sans text-gray-400 text-xs">who transformed their agricultural careers with Kuyash Academy</p>
+            <p className="font-sans text-gray-400 text-xs">who transformed their agricultural careers with Kuyash Farms Academy</p>
           </div>
         </motion.div>
       </div>

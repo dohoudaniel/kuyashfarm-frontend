@@ -21,8 +21,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 const API = process.env.E2E_API_URL ?? "http://127.0.0.1:8000/api/v1";
 const PASSWORD = "AnE2eP4ssword!";
-const ADMIN = "e2e-admin@kuyashfarm.test";
-const DRIVER = "e2e-driver@kuyashfarm.test";
+const ADMIN = "e2e-admin@kuyashfarms.test";
+const DRIVER = "e2e-driver@kuyashfarms.test";
 
 /**
  * Sign in and land somewhere.

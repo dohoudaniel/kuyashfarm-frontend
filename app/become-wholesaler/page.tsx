@@ -11,9 +11,9 @@ import { Container } from "@/components/ui/Container";
 import { ApplicationForm } from "@/components/applications/ApplicationForm";
 
 export const metadata: Metadata = {
-  title: "Apply for wholesale pricing — Kuyash Integrated Farm",
+  title: "Apply for wholesale pricing",
   description:
-    "Buy from Kuyash Integrated Farm at wholesale rates. Apply with your business details and start ordering at bulk pricing.",
+    "Buy from Kuyash Farms at wholesale rates. Apply with your business details and start ordering at bulk pricing.",
 };
 
 export default function BecomeWholesalerPage() {

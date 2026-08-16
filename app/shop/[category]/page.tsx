@@ -29,16 +29,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const category = await fetchCategoryPublic(slug);
     return {
-      title: `${category.name} — Kuyash Integrated Farm`,
+      title: `${category.name} — Kuyash Farms`,
       description: category.description,
       openGraph: {
-        title: `${category.name} — Kuyash Integrated Farm`,
+        title: `${category.name} — Kuyash Farms`,
         description: category.description,
         images: category.image ? [category.image] : undefined,
       },
     };
   } catch {
-    return { title: "Shop — Kuyash Integrated Farm" };
+    return { title: "Shop" };
   }
 }
 

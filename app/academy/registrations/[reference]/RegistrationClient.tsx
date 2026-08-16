@@ -299,7 +299,7 @@ export default function RegistrationClient({ reference }: { reference: string })
                     })}
                     icon={Clock}
                   />
-                  <Row label="Location" value="Kuyash Integrated Farm, Lagos" icon={MapPin} />
+                  <Row label="Location" value="Kuyash Farms, Lagos" icon={MapPin} />
                 </div>
 
                 <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-6">

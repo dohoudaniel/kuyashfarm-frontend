@@ -11,7 +11,7 @@ import type { Metadata } from "next";
 import RegistrationClient from "./RegistrationClient";
 
 export const metadata: Metadata = {
-  title: "Your booking — Kuyash Academy",
+  title: { absolute: "Your booking — Kuyash Farms Academy" },
   robots: { index: false, follow: false },
 };
 

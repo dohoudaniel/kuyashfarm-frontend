@@ -32,7 +32,7 @@ export function InventoryShowcase() {
               </h2>
 
               <p className="text-lg text-gray-600 leading-relaxed">
-                With Kuyash Farm, you have complete flexibility in how you track and sell
+                With Kuyash Farms, you have complete flexibility in how you track and sell
                 your products. Track inventory by weight or by units, then choose to sell it
                 by weight, by unit, or any combination of the two. You can manage
                 inventory at the product level (pooled) or at the individual package level.
@@ -72,7 +72,7 @@ export function InventoryShowcase() {
                 </div>
                 <div className="flex-1 flex justify-center">
                   <div className="bg-white px-4 py-1 rounded-md text-xs text-gray-600 font-medium max-w-xs truncate">
-                    app.kuyashfarm.com/admin
+                    app.kuyashfarms.com/admin
                   </div>
                 </div>
               </div>
@@ -81,7 +81,7 @@ export function InventoryShowcase() {
               <div className="relative bg-gray-50">
                 <Image
                   src="/images/screenshots/admin-dashboard.png"
-                  alt="Kuyash Farm Inventory Management Dashboard"
+                  alt="Kuyash Farms Inventory Management Dashboard"
                   width={1600}
                   height={1200}
                   className="w-full h-auto"
