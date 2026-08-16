@@ -17,6 +17,7 @@ import { cancelOrder, getGuestOrder, getOrder, reorder } from "@/lib/api/orders"
 import { guestEmailFor } from "@/lib/api/guest-order";
 import { useCartStore } from "@/lib/store/useCartStore";
 import type { Order } from "@/lib/api/types";
+import { BuyAgainButton } from "@/components/orders/BuyAgainButton";
 import { formatPrice } from "@/lib/utils";
 
 export default function OrderDetailClient({ orderNumber }: { orderNumber: string }) {
@@ -175,6 +176,25 @@ export default function OrderDetailClient({ orderNumber }: { orderNumber: string
               <div className="flex justify-between"><dt className="text-gray-600">VAT</dt><dd>{formatPrice(order.tax_total)}</dd></div>
               <div className="flex justify-between border-t pt-2 text-base font-bold"><dt>Total</dt><dd>{formatPrice(order.grand_total)}</dd></div>
             </dl>
+          </section>
+
+          {/*
+            The highest-value retention control in the shop. Placed directly
+            under the items, which is where somebody looking at a past order is
+            already reading — not in the row of secondary actions below.
+          */}
+          <section className="mb-6 rounded-2xl bg-mist p-6">
+            <h2 className="mb-1 font-serif text-lg font-bold text-ink">Need these again?</h2>
+            <p className="mb-4 text-sm text-gray-600">
+              Add every item from this order back to your basket.
+            </p>
+            <BuyAgainButton
+              items={order.items.map((item) => ({
+                product_slug: item.product_slug,
+                product_name: item.product_name_snapshot,
+                quantity: item.quantity,
+              }))}
+            />
           </section>
 
           <div className="flex flex-wrap gap-4">

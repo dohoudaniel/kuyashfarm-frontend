@@ -25,12 +25,15 @@ import { Services } from "@/components/sections/Services";
 import { InventoryShowcase } from "@/components/sections/InventoryShowcase";
 import { Collaboration } from "@/components/sections/Collaboration";
 import { Goals } from "@/components/sections/Goals";
+import { RecentlyViewed } from "@/components/shop/RecentlyViewed";
 
 export default function Home() {
   return (
     <>
       <main>
         <Hero />
+        {/* Renders nothing for a first-time visitor. */}
+        <RecentlyViewed />
         <Stats />
         <Mission />
         <Services />

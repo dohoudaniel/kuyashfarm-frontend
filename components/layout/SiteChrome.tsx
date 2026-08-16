@@ -28,8 +28,12 @@
 
 import { usePathname } from "next/navigation";
 
+import { Suspense } from "react";
+
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { RouteProgress } from "@/components/layout/RouteProgress";
+import { PageTransition } from "@/components/layout/PageTransition";
 
 /**
  * Sections that bring their own chrome.
@@ -45,12 +49,33 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const bare = BARE.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
-  if (bare) return <>{children}</>;
+  // The progress bar rides above *everything*, including the back office and
+  // the driver screen — those navigate too, and the reason for it (no feedback
+  // between tap and paint) applies there just as much.
+  //
+  // `Suspense` because `RouteProgress` reads `useSearchParams`, which opts the
+  // whole subtree into client rendering without a boundary — and that would
+  // turn every static marketing page dynamic.
+  const chrome = (
+    <Suspense fallback={null}>
+      <RouteProgress />
+    </Suspense>
+  );
+
+  if (bare) {
+    return (
+      <>
+        {chrome}
+        {children}
+      </>
+    );
+  }
 
   return (
     <>
+      {chrome}
       <Navbar />
-      {children}
+      <PageTransition>{children}</PageTransition>
       <Footer />
     </>
   );

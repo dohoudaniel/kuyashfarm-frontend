@@ -7,15 +7,30 @@
  */
 
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { ClientProviders } from "@/components/providers/ClientProviders";
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+/**
+ * Display face.
+ *
+ * Fraunces replaces Playfair Display, which is the default "premium" pairing
+ * on generated landing pages and was doing every job at every size with
+ * default tracking. Fraunces is warmer and slightly irregular — it reads as a
+ * food brand rather than a fashion house — and being variable it can be tuned
+ * rather than merely chosen.
+ *
+ * `SOFT` and `WONK` are what make it not-Playfair. Soft rounds the terminals;
+ * wonk lets a few letterforms lean. Both are dialled low: enough character to
+ * be recognisable, not so much that it becomes a novelty face nobody can read
+ * at 14px.
+ */
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
   display: "swap",
+  axes: ["SOFT", "WONK", "opsz"],
 });
 
 const inter = Inter({
@@ -95,7 +110,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${playfair.variable} ${inter.variable} antialiased`}
+        className={`${fraunces.variable} ${inter.variable} antialiased`}
       >
         <ClientProviders>
           {/* Header and footer live here, not in each page. Mounted inside a

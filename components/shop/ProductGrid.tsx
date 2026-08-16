@@ -14,8 +14,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bell, Check, Loader2, ShoppingCart } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { StockBadge } from "@/components/ui/StockBadge";
+import { DURATION, EASE, tap } from "@/lib/motion";
 import { useAuth } from "@/lib/context/AuthContext";
 import { listProducts, subscribeToRestock } from "@/lib/api/catalogue";
 import { useCartStore } from "@/lib/store/useCartStore";
@@ -27,6 +29,14 @@ interface Props {
   categorySlug: string;
   categoryName: string;
 }
+
+/** Icon swap inside the add button: a fast cross-fade, no movement. */
+const swap = {
+  initial: { opacity: 0, scale: 0.7 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.7 },
+  transition: { duration: DURATION.quick, ease: EASE.out },
+} as const;
 
 export function ProductGrid({ initialProducts, categorySlug }: Props) {
   const [products, setProducts] = useState(initialProducts);
@@ -162,27 +172,46 @@ export function ProductGrid({ initialProducts, categorySlug }: Props) {
                       onClick={() => handleNotify(product)}
                       disabled={busy || !isAuthenticated}
                       title={isAuthenticated ? undefined : "Sign in to be notified"}
-                      className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+                      className="flex min-h-11 items-center gap-1.5 rounded-full bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50"
                     >
                       <Bell className="h-3 w-3" />
                       Notify me
                     </button>
                   ) : (
-                    <button
+                    <motion.button
                       type="button"
                       onClick={() => handleAdd(product)}
                       disabled={busy}
-                      className="flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-secondary disabled:opacity-60"
+                      whileTap={tap}
+                      // Green while idle, and *stays* green when added rather
+                      // than flipping to a success colour: the confirmation is
+                      // the word and the tick, and a second colour here
+                      // competes with the basket badge for the same message.
+                      className="flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-secondary disabled:opacity-60"
                     >
-                      {busy ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : addedSlug === product.slug ? (
-                        <Check className="h-3 w-3" />
-                      ) : (
-                        <ShoppingCart className="h-3 w-3" />
-                      )}
+                      {/* Width is held steady across the three states so the
+                          card does not reflow mid-tap — a button that resizes
+                          under the thumb is how a second, accidental tap
+                          happens. */}
+                      <span className="grid h-3 w-3 place-items-center">
+                        <AnimatePresence mode="wait" initial={false}>
+                          {busy ? (
+                            <motion.span key="busy" {...swap}>
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            </motion.span>
+                          ) : addedSlug === product.slug ? (
+                            <motion.span key="done" {...swap}>
+                              <Check className="h-3 w-3" />
+                            </motion.span>
+                          ) : (
+                            <motion.span key="idle" {...swap}>
+                              <ShoppingCart className="h-3 w-3" />
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </span>
                       {addedSlug === product.slug ? "Added" : "Add"}
-                    </button>
+                    </motion.button>
                   )}
                 </div>
               </article>

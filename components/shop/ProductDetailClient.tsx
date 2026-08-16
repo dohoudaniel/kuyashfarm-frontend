@@ -9,12 +9,16 @@
  * that quantity would cost rather than multiplying locally.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Loader2, ShoppingCart } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { StockBadge } from "@/components/ui/StockBadge";
+import { remember } from "@/lib/recently-viewed";
+import { StickyAddBar } from "@/components/shop/StickyAddBar";
+import { tap } from "@/lib/motion";
 import { getProduct, quoteProduct } from "@/lib/api/catalogue";
 import { useAuth } from "@/lib/context/AuthContext";
 import { useCartStore } from "@/lib/store/useCartStore";
@@ -35,7 +39,26 @@ export function ProductDetailClient({ initialProduct, categorySlug }: Props) {
 
   const { getsBulkPricing } = useAuth();
   const addToCart = useCartStore((state) => state.add);
+  // Watched by the sticky bar: it appears exactly when this leaves the screen.
+  const addButtonRef = useRef<HTMLButtonElement>(null);
   const cartError = useCartStore((state) => state.error);
+
+  /**
+   * Record the view for the "pick up where you left off" strip.
+   *
+   * Keyed on the slug rather than the whole product, so a re-fetch that
+   * returns the same item with a different price ladder does not rewrite the
+   * entry. Nothing here leaves the browser.
+   */
+  useEffect(() => {
+    remember({
+      slug: product.slug,
+      name: product.name,
+      image: product.primary_image ?? null,
+      category: categorySlug,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the slug is the identity
+  }, [product.slug, categorySlug]);
 
   // Re-fetch once we know who is asking, so an entitled customer sees their
   // own price ladder rather than the retail one rendered on the server.
@@ -165,15 +188,17 @@ export function ProductDetailClient({ initialProduct, categorySlug }: Props) {
                 />
               </label>
 
-              <button
+              <motion.button
+                ref={addButtonRef}
                 type="button"
                 onClick={handleAdd}
                 disabled={busy}
-                className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 font-semibold text-white hover:bg-secondary disabled:opacity-60"
+                whileTap={tap}
+                className="flex min-h-11 items-center gap-2 rounded-lg bg-primary px-6 py-2.5 font-semibold text-white transition-colors hover:bg-secondary disabled:opacity-60"
               >
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
                 {added ? "Added to cart" : "Add to cart"}
-              </button>
+              </motion.button>
             </div>
           )}
 
@@ -196,6 +221,17 @@ export function ProductDetailClient({ initialProduct, categorySlug }: Props) {
           )}
         </div>
       </div>
+
+      {/* Phones only, and only once the real button has scrolled away. */}
+      <StickyAddBar
+        watchRef={addButtonRef}
+        price={quote?.line_total ?? product.unit_price}
+        productName={product.name}
+        onAdd={handleAdd}
+        busy={busy}
+        added={added}
+        disabled={product.available_stock <= 0}
+      />
     </div>
   );
 }

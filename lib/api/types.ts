@@ -227,6 +227,16 @@ export type PaymentStatus =
 
 export interface OrderItem {
   id: string;
+  /**
+   * The product as it exists *now*, for "buy these again".
+   *
+   * Everything else on this line is a snapshot of the sale. This one is not,
+   * deliberately: reordering has to reach the live product, not the name it
+   * had at the time. Safe because a product with order history cannot be
+   * deleted — at worst the slug resolves to something deactivated, which the
+   * cart refuses with a message the customer can act on.
+   */
+  product_slug: string;
   product_name_snapshot: string;
   sku_snapshot: string;
   unit_snapshot: string;

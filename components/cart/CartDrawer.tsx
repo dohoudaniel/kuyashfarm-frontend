@@ -9,10 +9,12 @@
  */
 
 import { useEffect } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Loader2, Minus, Plus, ShoppingBag, ShoppingBasket, Trash2, X } from "lucide-react";
 
+import { DURATION, EASE } from "@/lib/motion";
 import { useCartStore } from "@/lib/store/useCartStore";
 import { formatPrice } from "@/lib/utils";
 
@@ -22,6 +24,7 @@ interface Props {
 }
 
 export function CartDrawer({ isOpen, onClose }: Props) {
+  const reduced = useReducedMotion();
   const { cart, isLoading, isMutating, error, load, updateQuantity, remove } = useCartStore();
 
   useEffect(() => {
@@ -40,24 +43,41 @@ export function CartDrawer({ isOpen, onClose }: Props) {
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   const items = cart?.items ?? [];
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      <button
-        type="button"
-        aria-label="Close cart"
-        onClick={onClose}
-        className="absolute inset-0 bg-black/50"
-      />
+    /*
+     * `AnimatePresence` rather than an early `return null`, so the drawer can
+     * animate *out*. Unmounting immediately is why it used to vanish — the
+     * panel appearing instantly is tolerable, but a panel that disappears
+     * between frames loses the connection between the basket and the button
+     * that opened it, and the customer has to re-orient.
+     */
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <motion.button
+            type="button"
+            aria-label="Close cart"
+            onClick={onClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: DURATION.base, ease: EASE.out }}
+            className="absolute inset-0 bg-black/50"
+          />
 
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label="Shopping cart"
-        className="relative flex h-full w-full max-w-md flex-col bg-white shadow-xl"
+          <motion.aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Shopping cart"
+            // Slides from the edge it is attached to. Reduced motion gets a
+            // fade in place — the panel still arrives, nothing travels.
+            initial={reduced ? { opacity: 0 } : { x: "100%" }}
+            animate={reduced ? { opacity: 1 } : { x: 0 }}
+            exit={reduced ? { opacity: 0 } : { x: "100%" }}
+            transition={{ duration: DURATION.slow, ease: EASE.out }}
+            className="relative flex h-full w-full max-w-md flex-col bg-white shadow-xl"
       >
         <header className="flex items-center justify-between border-b px-6 py-4">
           <h2 className="text-lg font-bold text-gray-900">
@@ -182,8 +202,10 @@ export function CartDrawer({ isOpen, onClose }: Props) {
             </Link>
           </footer>
         )}
-      </aside>
-    </div>
+          </motion.aside>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }
 

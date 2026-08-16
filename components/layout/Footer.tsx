@@ -54,7 +54,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all duration-200 hover:border-accent hover:text-accent"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all duration-200 hover:border-accent hover:text-accent"
                 >
                   <Icon className="h-3.5 w-3.5" />
                 </a>
@@ -69,18 +69,23 @@ export function Footer() {
             </h4>
             <ul className="space-y-3">
               {[
-                { label: "Home", href: "#home" },
-                { label: "About Us", href: "#about" },
+                // "Blog & News" pointed at `#blog`, a section deleted along
+                // with three invented articles. It survived the nav clean-up
+                // because that only touched NAV_LINKS — the footer keeps its
+                // own list, which is exactly how a dead link outlives the
+                // thing that killed it. "Shop" was missing here too.
+                { label: "Shop", href: "/categories" },
+                { label: "About", href: "#about" },
                 { label: "Our Services", href: "#services" },
-                { label: "Blog & News", href: "#blog" },
                 { label: "Kuyash Farms Academy", href: "/academy" },
                 { label: "Wholesale Pricing", href: "/become-wholesaler" },
                 { label: "Become a Distributor", href: "/become-distributor" },
+                { label: "My orders", href: "/orders" },
               ].map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="group inline-flex items-center gap-1.5 font-sans text-sm text-white/50 transition-colors duration-200 hover:text-white"
+                    className="group inline-flex min-h-11 items-center gap-1.5 py-1.5 font-sans text-sm text-white/50 transition-colors duration-200 hover:text-white"
                   >
                     <span className="h-px w-0 bg-accent transition-all duration-200 group-hover:w-3" />
                     {link.label}
@@ -107,7 +112,7 @@ export function Footer() {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="group inline-flex items-center gap-1.5 font-sans text-sm text-white/50 transition-colors duration-200 hover:text-white"
+                    className="group inline-flex min-h-11 items-center gap-1.5 py-1.5 font-sans text-sm text-white/50 transition-colors duration-200 hover:text-white"
                   >
                     <span className="h-px w-0 bg-accent transition-all duration-200 group-hover:w-3" />
                     {link.label}
@@ -175,7 +180,7 @@ export function Footer() {
               <Link
                 key={label}
                 href={href}
-                className="font-sans text-xs text-white/30 transition-colors duration-200 hover:text-accent"
+                className="inline-flex min-h-11 items-center font-sans text-xs text-white/30 transition-colors duration-200 hover:text-accent"
               >
                 {label}
               </Link>

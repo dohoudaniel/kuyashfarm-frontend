@@ -78,7 +78,7 @@ export function Navbar() {
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="font-serif text-2xl font-bold text-white">
+            <Link href="/" className="flex min-h-11 items-center font-serif text-2xl font-bold tracking-tight text-white">
               {SITE_CONFIG.name}
             </Link>
 
@@ -88,7 +88,7 @@ export function Navbar() {
                   key={link.label}
                   href={hrefFor(link)}
                   className={cn(
-                    "font-sans text-sm font-medium transition-colors duration-300",
+                    "inline-flex min-h-11 min-w-11 items-center justify-center px-1 font-sans text-sm font-medium transition-colors duration-200",
                     link.label === "Academy"
                       ? "rounded-full bg-wheat px-4 py-2 font-semibold text-primary-dark hover:bg-wheat"
                       : "text-white/90 hover:text-white",
