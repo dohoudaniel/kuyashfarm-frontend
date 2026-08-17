@@ -16,10 +16,12 @@ import Link from "next/link";
 import { Bell, Check, Loader2, ShoppingCart } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { SaveButton } from "@/components/shop/SaveButton";
 import { StockBadge } from "@/components/ui/StockBadge";
 import { DURATION, EASE, tap } from "@/lib/motion";
 import { useAuth } from "@/lib/context/AuthContext";
 import { listProducts, subscribeToRestock } from "@/lib/api/catalogue";
+import { useWishlistStore } from "@/lib/store/useWishlistStore";
 import { useCartStore } from "@/lib/store/useCartStore";
 import type { Product } from "@/lib/api/types";
 import { formatPrice } from "@/lib/utils";
@@ -42,10 +44,19 @@ export function ProductGrid({ initialProducts, categorySlug }: Props) {
   const [products, setProducts] = useState(initialProducts);
   const [search, setSearch] = useState("");
   const [addedSlug, setAddedSlug] = useState<string | null>(null);
+  /** Products this visitor has asked to be told about. Sticky for the session. */
+  const [notifiedSlugs, setNotifiedSlugs] = useState<Set<string>>(new Set());
   const [busySlug, setBusySlug] = useState<string | null>(null);
 
   const { isAuthenticated, getsBulkPricing } = useAuth();
   const addToCart = useCartStore((state) => state.add);
+  const loadWishlist = useWishlistStore((state) => state.load);
+
+  // Once per session — the store's own `loaded` guard stops several mounted
+  // grids each firing the same request.
+  useEffect(() => {
+    void loadWishlist();
+  }, [loadWishlist]);
   const cartError = useCartStore((state) => state.error);
 
   // Server-rendered prices are retail. Once we know the visitor is entitled to
@@ -81,10 +92,27 @@ export function ProductGrid({ initialProducts, categorySlug }: Props) {
     }
   }
 
+  /**
+   * "Tell me when this is back."
+   *
+   * This existed and said nothing: it fired the request and cleared the busy
+   * flag, so the customer got a brief spinner and then the same button back.
+   * With no confirmation the reasonable conclusion is that it did not work,
+   * and the reasonable response is to tap it again — which is why the request
+   * is the *least* important part of this handler.
+   *
+   * The confirmation is sticky rather than timed. Unlike "Added", which is
+   * reinforced by the basket count changing, nothing else on screen
+   * corroborates this one.
+   */
   async function handleNotify(product: Product) {
     setBusySlug(product.slug);
     try {
       await subscribeToRestock(product.slug);
+      setNotifiedSlugs((current) => new Set(current).add(product.slug));
+    } catch {
+      // Left alone deliberately: the button stays as it was, so a failed
+      // subscription does not claim to have worked.
     } finally {
       setBusySlug(null);
     }
@@ -123,7 +151,15 @@ export function ProductGrid({ initialProducts, categorySlug }: Props) {
             const busy = busySlug === product.slug;
 
             return (
-              <article key={product.id} className="group">
+              <article key={product.id} className="group relative">
+                {/* Overlaid on the image, above the link that wraps it — the
+                    button stops propagation so tapping the heart does not
+                    also open the product. */}
+                <SaveButton
+                  slug={product.slug}
+                  productName={product.name}
+                  className="absolute right-2 top-2 z-10 shadow-sm"
+                />
                 <Link
                   href={`/shop/${categorySlug}/${product.slug}`}
                   className="relative mb-3 block aspect-4/3 overflow-hidden rounded-2xl bg-gray-100"
@@ -170,12 +206,16 @@ export function ProductGrid({ initialProducts, categorySlug }: Props) {
                     <button
                       type="button"
                       onClick={() => handleNotify(product)}
-                      disabled={busy || !isAuthenticated}
+                      disabled={busy || !isAuthenticated || notifiedSlugs.has(product.slug)}
                       title={isAuthenticated ? undefined : "Sign in to be notified"}
                       className="flex min-h-11 items-center gap-1.5 rounded-full bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50"
                     >
-                      <Bell className="h-3 w-3" />
-                      Notify me
+                      {notifiedSlugs.has(product.slug) ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        <Bell className="h-3 w-3" />
+                      )}
+                      {notifiedSlugs.has(product.slug) ? "We'll tell you" : "Notify me"}
                     </button>
                   ) : (
                     <motion.button

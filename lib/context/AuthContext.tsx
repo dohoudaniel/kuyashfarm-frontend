@@ -26,6 +26,7 @@ import React, {
 import { apiClient } from "@/lib/api/client";
 import * as authApi from "@/lib/api/auth";
 import { clearCartSessionId, mergeCart } from "@/lib/api/cart";
+import { useWishlistStore } from "@/lib/store/useWishlistStore";
 import type { User } from "@/lib/api/types";
 
 /**
@@ -189,6 +190,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await authApi.logout();
     } finally {
       setUser(null);
+      // One person's saved products must not survive into the next session on
+      // a shared device. The store is module-level, so nothing else clears it.
+      useWishlistStore.getState().clear();
     }
   }, []);
 

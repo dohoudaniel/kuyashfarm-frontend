@@ -5,6 +5,7 @@
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import Image from "next/image";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Mission Section - Two-column layout with text and image
@@ -13,7 +14,7 @@ export function Mission() {
   return (
     <Section id="about" className="bg-cream">
       <Container>
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+        <Reveal className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           {/* Text Content */}
           <div className="space-y-6">
             <h2 className="font-serif text-3xl font-bold leading-tight text-primary md:text-4xl lg:text-5xl">
@@ -42,7 +43,7 @@ export function Mission() {
               className="object-cover transition-transform duration-700 hover:scale-105"
             />
           </div>
-        </div>
+        </Reveal>
       </Container>
     </Section>
   );

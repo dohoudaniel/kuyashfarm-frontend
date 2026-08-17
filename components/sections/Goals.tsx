@@ -5,6 +5,7 @@
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { GOALS } from "@/lib/constants";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Goals Section - Black and white layout with metrics
@@ -14,14 +15,14 @@ export function Goals() {
     <Section className="bg-gradient-to-br from-gray-50 to-white">
       <Container>
         {/* Section Title */}
-        <div className="mb-16 text-center">
+        <Reveal className="mb-16 text-center">
           <h2 className="mb-4 font-serif text-4xl font-bold text-primary md:text-5xl">
             Our Goals
           </h2>
           <p className="mx-auto max-w-2xl font-sans text-lg text-gray-600">
             We&apos;re making a measurable impact on sustainable farming worldwide
           </p>
-        </div>
+        </Reveal>
 
         {/* Goals Grid */}
         <div className="grid grid-cols-1 gap-12 md:grid-cols-3">

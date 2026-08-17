@@ -17,7 +17,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Package, Settings, ShieldCheck, User as UserIcon } from "lucide-react";
+import { Heart, LogOut, Package, Settings, ShieldCheck, User as UserIcon } from "lucide-react";
 
 import CartButton from "@/components/cart/CartButton";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -134,6 +134,9 @@ export function Navbar() {
                       <Link href="/profile" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
                         <UserIcon className="h-4 w-4" /> My profile
                       </Link>
+                      <Link href="/saved" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <Heart className="h-4 w-4" /> Saved items
+                      </Link>
                       <Link href="/orders" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100">
                         <Package className="h-4 w-4" /> My orders
                       </Link>
@@ -201,6 +204,7 @@ export function Navbar() {
                 {isAuthenticated ? (
                   <>
                     <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-white/90">My profile</Link>
+                    <Link href="/saved" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-white/90">Saved items</Link>
                     <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-white/90">My orders</Link>
                     <button type="button" onClick={handleSignOut} className="text-left text-sm font-medium text-red-300">
                       Sign out

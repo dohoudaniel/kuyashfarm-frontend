@@ -115,8 +115,16 @@ export interface Product {
   sku: string;
   name: string;
   slug: string;
+  /** The category's primary key. Not usable in a URL — see `category_slug`. */
   category: string;
   category_name: string;
+  /**
+   * The URL segment for `/shop/[category]/[product]`.
+   *
+   * Needed by anything rendering a product link without already knowing which
+   * category it came from — the wishlist, search, cross-category strips.
+   */
+  category_slug: string;
   description: string;
   unit: string;
   base_price: string;

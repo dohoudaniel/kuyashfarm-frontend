@@ -7,6 +7,7 @@ import { Section } from "@/components/ui/Section";
 import { SERVICES } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Services Section - Grid layout with proper responsive design and hover effects
@@ -23,7 +24,7 @@ export function Services() {
     <Section id="services" className="bg-white">
       <Container>
         {/* Section Header */}
-        <div className="mb-16 max-w-3xl">
+        <Reveal className="mb-16 max-w-3xl">
           <p className="mb-4 font-sans text-xs uppercase tracking-wider text-gray-500">
             Our Services for a Greener Future
           </p>
@@ -32,7 +33,7 @@ export function Services() {
             <br />
             sustainable agriculture and innovation.
           </h2>
-        </div>
+        </Reveal>
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
