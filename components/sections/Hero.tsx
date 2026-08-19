@@ -5,6 +5,8 @@
  */
 import { useState, useEffect } from "react";
 
+import { ScrollCue } from "@/components/ui/ScrollCue";
+
 /**
  * Hero Section - Full-width background with cross-fade image transition
  */
@@ -89,12 +91,9 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 animate-bounce">
-        <div className="flex h-12 w-8 items-start justify-center rounded-full border-2 border-white p-2">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-white" />
-        </div>
-      </div>
+      {/* A seed falling into a furrow, replacing the mouse-and-wheel icon.
+          Also scrolls, which the original only ever suggested. */}
+      <ScrollCue />
     </section>
   );
 }
