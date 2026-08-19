@@ -199,13 +199,19 @@ function ProgramCard({ program, index }: { program: CatalogProgram; index: numbe
             <p className="text-[10px] text-gray-400">per person</p>
           </div>
           <div className="flex gap-2">
-            <Link
-              href={href}
-              className="text-xs font-semibold text-[#2d5f3f] border border-[#2d5f3f]/25 px-3 py-2 rounded-lg hover:bg-[#eef5f1] transition-colors duration-200"
-            >
-              Learn More
-            </Link>
-            {isAvailable ? (
+            {program.classId ? (
+              <Link
+                href={href}
+                className="text-xs font-semibold text-[#2d5f3f] border border-[#2d5f3f]/25 px-3 py-2 rounded-lg hover:bg-[#eef5f1] transition-colors duration-200"
+              >
+                Learn More
+              </Link>
+            ) : (
+              <span className="text-xs font-semibold text-gray-300 border border-gray-100 px-3 py-2 rounded-lg cursor-not-allowed">
+                Learn More
+              </span>
+            )}
+            {isAvailable && program.classId ? (
               <Link
                 href={href}
                 className="text-xs font-semibold text-white bg-[#2d5f3f] px-3 py-2 rounded-lg hover:bg-[#4a7c59] transition-colors duration-200"

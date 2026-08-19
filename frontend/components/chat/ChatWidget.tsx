@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Bot, User as UserIcon } from "lucide-react";
+import { X, Leaf, User as UserIcon, ArrowRight } from "lucide-react";
 import { getCurrentUser } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {
   id: string;
@@ -11,16 +12,19 @@ interface Message {
   timestamp: Date;
 }
 
-/**
- * AI Chat Widget for Customer Service
- * Floating chat button in bottom-right corner
- */
+const QUICK_ACTIONS = [
+  { id: 1, label: "Order Status", text: "What's my order status?" },
+  { id: 2, label: "Our Products", text: "Tell me about your products" },
+  { id: 3, label: "Wholesale", text: "How do I apply for wholesale?" },
+  { id: 4, label: "Shipping", text: "What are your delivery options?" },
+];
+
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      text: "Hello! I'm your Kuyash Farm assistant. How can I help you today?",
+      text: "Hello! I'm the Kuyash Farm assistant. Ask me about our products, orders, wholesale or delivery.",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -29,18 +33,16 @@ export function ChatWidget() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
     const currentUser = getCurrentUser();
-    const userName = currentUser?.name || "Customer";
+    const userName = currentUser?.name || "there";
 
-    // Add user message
     const userMessage: Message = {
       id: `user_${Date.now()}`,
       text: inputMessage,
@@ -52,15 +54,11 @@ export function ChatWidget() {
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate AI response delay
-    await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 1000));
-
-    // Generate bot response based on user input
-    const botResponse = generateBotResponse(inputMessage, userName);
+    await new Promise((resolve) => setTimeout(resolve, 900 + Math.random() * 700));
 
     const botMessage: Message = {
       id: `bot_${Date.now()}`,
-      text: botResponse,
+      text: generateBotResponse(inputMessage, userName),
       sender: "bot",
       timestamp: new Date(),
     };
@@ -69,7 +67,7 @@ export function ChatWidget() {
     setIsTyping(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -78,214 +76,202 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* Chat Button */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bg-[#2d5f3f] text-white rounded-full p-3 sm:p-4 shadow-lg hover:bg-[#4a7c59] transition-all duration-300 hover:scale-110 group"
-          aria-label="Open chat"
-        >
-          <MessageCircle className="w-6 h-6" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-
-          {/* Tooltip - hidden on mobile */}
-          <span className="hidden sm:block absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            Chat with us
-          </span>
-        </button>
-      )}
-
-      {/* Chat Window */}
-      {isOpen && (
-        <div className="fixed inset-x-4 bottom-4 sm:inset-x-auto sm:bottom-6 sm:right-6 z-50 w-auto sm:w-96 h-[calc(100vh-2rem)] sm:h-[600px] max-h-[700px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-[#2d5f3f] to-[#4a7c59] text-white p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <Bot className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Kuyash Farm Support</h3>
-                <p className="text-xs text-white/80">Online • Typically replies instantly</p>
-              </div>
+      {/* ── Trigger button ── */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setIsOpen(true)}
+            aria-label="Open chat"
+            className="fixed bottom-6 right-6 z-50 group flex items-center gap-2.5 bg-[#080f0a] hover:bg-[#2d5f3f] text-white pl-4 pr-5 py-3 rounded-full shadow-xl transition-all duration-300"
+          >
+            <div className="w-6 h-6 rounded-full bg-[#2d5f3f] group-hover:bg-white/20 flex items-center justify-center transition-colors duration-300">
+              <Leaf className="w-3.5 h-3.5 text-white" />
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-white/80 hover:text-white transition-colors p-2 -m-2"
-              aria-label="Close chat"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+            <span className="font-sans font-semibold text-sm">Chat with us</span>
+            {/* live dot */}
+            <span className="w-2 h-2 rounded-full bg-[#6b9d7a] animate-pulse" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex gap-2 ${
-                  message.sender === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                {message.sender === "bot" && (
-                  <div className="w-8 h-8 bg-[#2d5f3f] rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-white" />
-                  </div>
-                )}
-                <div
-                  className={`max-w-[75%] rounded-2xl px-4 py-2 ${
-                    message.sender === "user"
-                      ? "bg-[#2d5f3f] text-white rounded-br-sm"
-                      : "bg-white text-gray-800 rounded-bl-sm shadow-sm"
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-                  <p
-                    className={`text-xs mt-1 ${
-                      message.sender === "user" ? "text-white/70" : "text-gray-500"
-                    }`}
-                  >
-                    {message.timestamp.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-                {message.sender === "user" && (
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-                    <UserIcon className="w-5 h-5 text-gray-600" />
-                  </div>
-                )}
-              </div>
-            ))}
+      {/* ── Chat window ── */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.97 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] h-[440px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#e8ede9]"
+          >
 
-            {/* Typing Indicator */}
-            {isTyping && (
-              <div className="flex gap-2 justify-start">
-                <div className="w-8 h-8 bg-[#2d5f3f] rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-white" />
+            {/* Header */}
+            <div className="bg-[#080f0a] px-4 py-3.5 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-[#2d5f3f] flex items-center justify-center">
+                  <Leaf className="w-4 h-4 text-white" />
                 </div>
-                <div className="bg-white text-gray-800 rounded-2xl rounded-bl-sm shadow-sm px-4 py-3">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                <div>
+                  <p className="font-serif font-bold text-white text-sm leading-none">Kuyash Farm</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6b9d7a]" />
+                    <p className="text-white/45 text-[10px] font-sans">Online — replies instantly</p>
                   </div>
                 </div>
               </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="px-4 py-2 bg-white border-t border-gray-200">
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {quickActions.map((action) => (
-                <button
-                  key={action.id}
-                  onClick={() => setInputMessage(action.text)}
-                  className="flex-shrink-0 px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors"
-                >
-                  {action.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Input */}
-          <div className="p-4 bg-white border-t border-gray-200">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#2d5f3f] focus:border-transparent text-sm"
-              />
               <button
-                onClick={handleSendMessage}
-                disabled={!inputMessage.trim()}
-                className="bg-[#2d5f3f] text-white rounded-full p-2 hover:bg-[#4a7c59] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Send message"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close chat"
+                className="text-white/40 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10"
               >
-                <Send className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
-          </div>
-        </div>
-      )}
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#faf8f5]">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex items-end gap-2 ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  {message.sender === "bot" && (
+                    <div className="w-6 h-6 rounded-lg bg-[#2d5f3f] flex items-center justify-center shrink-0 mb-0.5">
+                      <Leaf className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[78%] rounded-2xl px-3.5 py-2.5 ${
+                      message.sender === "user"
+                        ? "bg-[#2d5f3f] text-white rounded-br-sm"
+                        : "bg-white text-[#080f0a] rounded-bl-sm border border-[#e8ede9]"
+                    }`}
+                  >
+                    <p className="font-sans text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                    <p className={`text-[10px] mt-1 font-mono ${message.sender === "user" ? "text-white/50" : "text-gray-400"}`}>
+                      {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                  {message.sender === "user" && (
+                    <div className="w-6 h-6 rounded-lg bg-[#eef5f1] border border-[#c6dece] flex items-center justify-center shrink-0 mb-0.5">
+                      <UserIcon className="w-3 h-3 text-[#2d5f3f]" />
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* Typing indicator */}
+              {isTyping && (
+                <div className="flex items-end gap-2 justify-start">
+                  <div className="w-6 h-6 rounded-lg bg-[#2d5f3f] flex items-center justify-center shrink-0">
+                    <Leaf className="w-3 h-3 text-white" />
+                  </div>
+                  <div className="bg-white border border-[#e8ede9] rounded-2xl rounded-bl-sm px-4 py-3">
+                    <div className="flex gap-1 items-center">
+                      {[0, 150, 300].map((delay) => (
+                        <div
+                          key={delay}
+                          className="w-1.5 h-1.5 bg-[#6b9d7a] rounded-full animate-bounce"
+                          style={{ animationDelay: `${delay}ms` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Quick actions */}
+            <div className="px-3 py-2 bg-white border-t border-[#e8ede9] shrink-0">
+              <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+                {QUICK_ACTIONS.map((action) => (
+                  <button
+                    key={action.id}
+                    onClick={() => setInputMessage(action.text)}
+                    className="shrink-0 text-[10px] font-mono uppercase tracking-widest text-[#2d5f3f] bg-[#eef5f1] hover:bg-[#c6dece] border border-[#c6dece] px-3 py-1.5 rounded-full transition-colors duration-200 whitespace-nowrap"
+                  >
+                    {action.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Input */}
+            <div className="px-3 py-3 bg-white border-t border-[#e8ede9] shrink-0">
+              <div className="flex items-center gap-2 bg-[#faf8f5] border border-[#e8ede9] rounded-full px-3 py-1.5 focus-within:border-[#2d5f3f] transition-colors duration-200">
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Type your message..."
+                  className="flex-1 bg-transparent text-sm font-sans text-[#080f0a] placeholder:text-gray-400 focus:outline-none"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!inputMessage.trim()}
+                  aria-label="Send message"
+                  className="w-7 h-7 rounded-full bg-[#2d5f3f] hover:bg-[#4a7c59] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200 shrink-0"
+                >
+                  <ArrowRight className="w-3.5 h-3.5 text-white" />
+                </button>
+              </div>
+            </div>
+
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
 
-/**
- * Quick action buttons for common queries
- */
-const quickActions = [
-  { id: 1, label: "Order Status", text: "What's my order status?" },
-  { id: 2, label: "Product Info", text: "Tell me about your products" },
-  { id: 3, label: "Wholesale", text: "How do I apply for wholesale?" },
-  { id: 4, label: "Shipping", text: "What are your shipping options?" },
-];
-
-/**
- * Generate contextual bot responses based on user input
- */
 function generateBotResponse(userInput: string, userName: string): string {
   const input = userInput.toLowerCase();
 
-  // Order status queries
   if (input.includes("order") && (input.includes("status") || input.includes("track"))) {
-    return `Hi ${userName}! To check your order status, please visit your Orders page in the navigation menu. You can track all your orders there with real-time updates. If you need specific help with an order, please share your order number.`;
+    return `To check your order status, visit the Orders page from the navigation menu. You can track all orders there in real time. If you need help with a specific order, share your order number and I'll assist you.`;
   }
 
-  // Product queries
-  if (input.includes("product") || input.includes("vegetable") || input.includes("fruit") || input.includes("dairy")) {
-    return `We offer a wide range of fresh farm products including:\n\n🥬 Vegetables - Tomatoes, Carrots, Lettuce, Bell Peppers\n🍎 Fruits - Strawberries, Apples, Bananas, Oranges\n🐔 Poultry - Free-range Chicken, Fresh Eggs\n🥛 Dairy - Fresh Milk, Organic Cheese\n🌾 Grains - Brown Rice, Organic Wheat\n🐟 Fishery - Fresh Tilapia, Catfish\n\nAll products are grown using sustainable farming practices. Browse our shop to see full details!`;
+  if (input.includes("product") || input.includes("vegetable") || input.includes("fruit") || input.includes("fish") || input.includes("poultry")) {
+    return `We grow a wide range of farm produce at our Nasarawa farm:\n\nCrops & Vegetables — tomatoes, peppers, greens\nPoultry — free-range chicken, fresh eggs\nAquaculture — catfish, tilapia\nLivestock — cattle, sheep\nProcessed goods — packaged farm products\n\nBrowse our shop to see current availability and pricing.`;
   }
 
-  // Wholesale queries
   if (input.includes("wholesale") || input.includes("bulk")) {
-    return `Great question! We offer wholesale pricing for verified business customers:\n\n✅ Minimum quantities: 10-49 units or 50+ units\n✅ Discounted prices for bulk orders\n✅ Priority customer support\n\nTo apply for wholesale access:\n1. Click "Wholesale" in the navigation menu\n2. Fill out the business application form\n3. Our team will review (typically 1-2 business days)\n4. Once approved, you'll see wholesale prices automatically!\n\nWould you like me to guide you through the application?`;
+    return `We offer wholesale pricing for verified business buyers.\n\nTo apply:\n1. Go to "Become a Distributor" in the menu\n2. Fill out the business application\n3. Our team reviews within 1-2 business days\n4. Once approved, wholesale prices apply automatically.\n\nWould you like more details?`;
   }
 
-  // Shipping queries
   if (input.includes("ship") || input.includes("delivery") || input.includes("deliver")) {
-    return `Our shipping details:\n\n📦 Free shipping on orders over ₦200,000\n🚚 Standard shipping: ₦15,000\n⏱️ Delivery time: 2-5 business days\n🌍 We deliver across Nigeria\n\nYou can track your order in real-time after checkout. We also offer Cash on Delivery for your convenience!`;
+    return `We deliver across Nigeria.\n\nFree delivery on orders over ₦200,000\nStandard shipping — ₦15,000\nDelivery time — 2 to 5 business days\nCash on delivery is available.\n\nYou can track your delivery in real time after checkout.`;
   }
 
-  // Payment queries
   if (input.includes("payment") || input.includes("pay")) {
-    return `We accept multiple payment methods:\n\n💳 Credit/Debit Cards\n🌐 PayPal\n💵 Cash on Delivery\n\nAll online payments are secured with SSL encryption. Choose your preferred method at checkout!`;
+    return `We accept card payments, bank transfer and cash on delivery. All online payments are SSL secured. You can choose your preferred method at checkout.`;
   }
 
-  // Price queries
-  if (input.includes("price") || input.includes("cost") || input.includes("expensive")) {
-    return `Our prices vary by product and quantity. Retail customers see standard pricing, while verified wholesale customers automatically get bulk discounts when ordering 10+ units.\n\nVisit our shop to see current prices for all products. All prices are in Nigerian Naira (₦).`;
+  if (input.includes("academy") || input.includes("training") || input.includes("course") || input.includes("learn")) {
+    return `The Kuyash Academy offers NABTEB-certified agricultural training programmes — from crop production and aquaculture to agribusiness management.\n\nVisit the Academy page from the navigation menu to browse all 20+ programmes and enrol.`;
   }
 
-  // Account queries
-  if (input.includes("account") || input.includes("profile") || input.includes("login")) {
-    return `You can manage your account from the user menu (top-right corner):\n\n👤 View/Edit Profile\n📍 Manage Shipping Addresses\n📦 View Order History\n🔄 Reorder Previous Orders\n\nIf you're having trouble logging in, please make sure you're using the correct email address.`;
+  if (input.includes("farm") || input.includes("location") || input.includes("visit") || input.includes("nasarawa")) {
+    return `Our farm is located in Nasarawa State, Nigeria — 56 hectares of integrated farmland.\n\nWe welcome visitors, partners and institutions. Reach us at hello@kuyashfarm.com to schedule a visit or partnership discussion.`;
   }
 
-  // Greeting
-  if (input.includes("hello") || input.includes("hi") || input.includes("hey")) {
-    return `Hello ${userName}! 👋 Welcome to Kuyash Integrated Farm. How can I assist you today? I can help with:\n\n• Product information\n• Order tracking\n• Wholesale applications\n• Shipping & delivery\n• Payment options\n\nWhat would you like to know?`;
-  }
-
-  // Thank you
-  if (input.includes("thank")) {
-    return `You're very welcome, ${userName}! 😊 If you have any other questions, I'm here to help. Have a great day!`;
-  }
-
-  // Contact
   if (input.includes("contact") || input.includes("phone") || input.includes("email")) {
-    return `You can reach us through:\n\n📧 Email: support@kuyashfarm.com\n📱 Phone: +234 800 KUYASH (589274)\n⏰ Hours: Mon-Sat, 8AM-6PM WAT\n\nOr continue chatting with me here - I'm available 24/7!`;
+    return `You can reach us at:\n\nEmail — hello@kuyashfarm.com\nPhone — +234 800 000 0000\nHours — Monday to Saturday, 8AM to 6PM\n\nOr keep chatting here — I'm available around the clock.`;
   }
 
-  // Default response
-  return `Thanks for your message, ${userName}! I'm here to help with any questions about:\n\n• Our products and pricing\n• Order status and tracking\n• Wholesale applications\n• Shipping and delivery\n• Payment methods\n\nCould you please provide more details about what you need help with? Or try one of the quick action buttons below!`;
+  if (input.includes("hello") || input.includes("hi") || input.includes("hey") || input.includes("good")) {
+    return `Hello ${userName}! Welcome to Kuyash Integrated Farm. I can help with our products, orders, wholesale, delivery or the Academy. What would you like to know?`;
+  }
+
+  if (input.includes("thank")) {
+    return `You're welcome, ${userName}. If you need anything else, I'm right here.`;
+  }
+
+  return `Thanks for your message. I can help with our products and pricing, order tracking, wholesale applications, delivery and the Kuyash Academy.\n\nCould you give me a bit more detail about what you need? Or use one of the quick buttons above.`;
 }

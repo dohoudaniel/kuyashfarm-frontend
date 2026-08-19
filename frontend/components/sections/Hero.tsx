@@ -1,96 +1,235 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
-/**
- * Hero Section - Full-width background with cross-fade image transition
- */
+const SLIDES = [
+  {
+    url: "/images/backgrounds/hero-kuyash.jpg",
+    position: "center",
+    tagline: "Growing Better. Feeding Tomorrow.",
+  },
+  {
+    url: "/images/backgrounds/hero-transition.jpg",
+    position: "center",
+    tagline: "From Our Farm to Your Table.",
+  },
+  {
+    url: "/images/backgrounds/sunset.jpeg",
+    position: "top",
+    tagline: "Sustainable. Innovative. Kuyash.",
+  },
+  {
+    url: "/images/backgrounds/dam.jpeg",
+    position: "center",
+    tagline: "Integrated Farming at Scale.",
+  },
+];
+
 export function Hero() {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [current, setCurrent] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const DURATION = 6000;
+  const TICK = 50;
 
-  const heroImages = [
-    { url: '/images/backgrounds/hero-kuyash.jpg', position: 'center' },
-    { url: '/images/backgrounds/hero-transition.jpg', position: 'center' },
-    { url: '/images/backgrounds/sunset.jpeg', position: 'top' },
-    { url: '/images/backgrounds/dam.jpeg', position: 'center' },
-  ];
+  const startCycle = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (progressRef.current) clearInterval(progressRef.current);
+
+    setProgress(0);
+
+    progressRef.current = setInterval(() => {
+      setProgress(p => Math.min(p + (TICK / DURATION) * 100, 100));
+    }, TICK);
+
+    intervalRef.current = setInterval(() => {
+      setCurrent(c => (c + 1) % SLIDES.length);
+      setProgress(0);
+    }, DURATION);
+  };
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 5000); // Change image every 5 seconds
+    startCycle();
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (progressRef.current) clearInterval(progressRef.current);
+    };
+  }, []);
 
-    return () => clearInterval(intervalId);
-  }, [heroImages.length]);
+  const goTo = (index: number) => {
+    setCurrent(index);
+    startCycle();
+  };
 
   return (
     <section
       id="home"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden"
+      className="relative flex min-h-screen items-center overflow-hidden bg-[#080f0a]"
     >
-      {/* Background Images with Cross-Fade Transition */}
+      {/* ── Background slides ── */}
       <div className="absolute inset-0 z-0">
-        {heroImages.map((image, index) => (
+        {SLIDES.map((slide, index) => (
           <div
-            key={image.url}
+            key={slide.url}
             className={`absolute inset-0 h-full w-full bg-cover bg-no-repeat transition-opacity duration-1000 ease-in-out ${
-              index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+              index === current ? "opacity-100" : "opacity-0"
             }`}
             style={{
-              backgroundImage: `url('${image.url}')`,
-              backgroundPosition: image.position,
+              backgroundImage: `url('${slide.url}')`,
+              backgroundPosition: slide.position,
             }}
           />
         ))}
-        {/* Dark Overlay for text readability */}
-        <div className="absolute inset-0 bg-black/20" />
+
+        {/* Directional gradient — dark left where text lives, opens right */}
+        <div className="absolute inset-0 bg-linear-to-r from-[#080f0a]/90 via-[#080f0a]/55 to-[#080f0a]/20" />
+        {/* Bottom fade for scroll cue area */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-[#080f0a]/60 to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 px-4 text-center">
-        <h1 className="font-serif text-5xl font-bold leading-tight text-white sm:text-6xl md:text-7xl lg:text-8xl">
-          <span className="block">Farming</span>
-          <span className="block">for a future</span>
-        </h1>
+      {/* subtle grid */}
+      <div
+        className="absolute inset-0 z-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)`,
+          backgroundSize: "60px 60px",
+        }}
+      />
 
-        {/* CTA Buttons */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
-          <a
-            href="/categories"
-            className="group relative overflow-hidden rounded-full bg-green-600 px-8 py-4 font-sans text-base font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-green-700 hover:shadow-2xl"
+      {/* ── Content — left aligned ── */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-24 pb-20">
+        <div className="max-w-2xl">
+
+          {/* Eyebrow */}
+          <motion.p
+            key={`eyebrow-${current}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-[11px] font-mono uppercase tracking-[0.28em] text-[#6b9d7a] mb-5"
           >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              Shop Now
-              <svg
-                className="h-5 w-5 transition-transform group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
+            {SLIDES[current].tagline}
+          </motion.p>
+
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="font-serif font-bold text-white leading-[1.04]"
+            style={{ fontSize: "clamp(3rem, 6.5vw, 6rem)" }}
+          >
+            The future of{" "}
+            <span
+              className="text-transparent bg-clip-text"
+              style={{
+                backgroundImage: "linear-gradient(135deg, #6b9d7a 0%, #e8d5a3 100%)",
+              }}
+            >
+              farming
             </span>
-          </a>
+            <br />
+            starts here.
+          </motion.h1>
 
-          <a
-            href="#about"
-            className="rounded-full border-2 border-white/80 bg-white/10 px-8 py-4 font-sans text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-white hover:bg-white/20"
+          {/* Body copy */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-6 text-white/60 font-sans leading-relaxed max-w-lg"
+            style={{ fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)" }}
           >
-            Learn More
-          </a>
+            Rooted in Nasarawa, Kuyash grows food with care, develops people
+            through agriculture, and works to build a stronger future from the land.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="mt-10 flex flex-wrap items-center gap-4"
+          >
+            <Link
+              href="/categories"
+              className="group inline-flex items-center gap-2.5 bg-[#2d5f3f] hover:bg-[#4a7c59] text-white font-semibold px-8 py-4 rounded-full transition-all duration-300"
+              style={{ fontSize: "clamp(0.875rem, 1vw, 1rem)" }}
+            >
+              Explore Products
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+
+            <a
+              href="#about"
+              className="inline-flex items-center gap-2 border border-white/20 bg-white/8 hover:bg-white/14 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full transition-all duration-300"
+              style={{ fontSize: "clamp(0.875rem, 1vw, 1rem)" }}
+            >
+              Our Story
+            </a>
+          </motion.div>
+
+          {/* Slide indicators */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-14 flex items-center gap-3"
+          >
+            {SLIDES.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goTo(index)}
+                className="relative h-0.5 rounded-full overflow-hidden transition-all duration-300 focus:outline-none"
+                style={{ width: index === current ? 48 : 20 }}
+                aria-label={`Go to slide ${index + 1}`}
+              >
+                <div className="absolute inset-0 bg-white/25 rounded-full" />
+                {index === current && (
+                  <div
+                    className="absolute inset-y-0 left-0 bg-white rounded-full"
+                    style={{ width: `${progress}%` }}
+                  />
+                )}
+              </button>
+            ))}
+          </motion.div>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 animate-bounce">
-        <div className="flex h-12 w-8 items-start justify-center rounded-full border-2 border-white p-2">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-white" />
-        </div>
+      {/* ── Stats strip — bottom left ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.55 }}
+        className="absolute bottom-10 left-6 md:left-16 z-10 flex items-center gap-8 md:gap-10"
+      >
+        {[
+          { value: "40", label: "Acre Farm" },
+          { value: "6+", label: "Services" },
+          { value: "100%", label: "Organic" },
+        ].map((stat, i) => (
+          <div key={i} className="flex flex-col">
+            <span className="font-serif text-2xl font-bold text-white leading-none">
+              {stat.value}
+            </span>
+            <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-white/40 mt-1">
+              {stat.label}
+            </span>
+          </div>
+        ))}
+      </motion.div>
+
+      {/* ── Scroll cue — bottom right ── */}
+      <div className="absolute bottom-10 right-6 md:right-16 z-10 flex flex-col items-center gap-2">
+        <div className="w-px h-10 bg-linear-to-b from-transparent to-white/30" />
+        <span className="text-white/30 text-[10px] tracking-[0.2em] uppercase font-mono">
+          Scroll
+        </span>
       </div>
     </section>
   );

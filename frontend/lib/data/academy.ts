@@ -53,9 +53,9 @@ export interface FAQItem {
 }
 
 export const LEVEL_COLORS: Record<AcademyClass["level"], string> = {
-  Beginner: "bg-green-100 text-green-800",
-  Intermediate: "bg-amber-100 text-amber-800",
-  "All Levels": "bg-blue-100 text-blue-800",
+  Beginner:     "bg-[#eef5f1] text-[#2d5f3f] border border-[#c6dece]",
+  Intermediate: "bg-[#2d5f3f]/10 text-[#2d5f3f] border border-[#2d5f3f]/20",
+  "All Levels": "bg-[#e8d5a3]/20 text-[#1a3d2b] border border-[#e8d5a3]/40",
 };
 
 export const ACADEMY_CLASSES: AcademyClass[] = [

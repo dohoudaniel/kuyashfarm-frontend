@@ -266,8 +266,10 @@ export function ClassDetailClient({ cls }: { cls: AcademyClass }) {
 
               {/* Instructor */}
               <div className="bg-white rounded-2xl p-6 flex items-center gap-5">
-                <div className="w-14 h-14 rounded-full bg-[#eef5f1] flex items-center justify-center shrink-0">
-                  <span className="text-2xl">👨‍🌾</span>
+                <div className="w-14 h-14 rounded-full bg-[#2d5f3f] flex items-center justify-center shrink-0">
+                  <span className="text-white font-serif font-bold text-lg">
+                    {cls.instructor.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                  </span>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">

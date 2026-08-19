@@ -1,31 +1,46 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/sections/Hero";
-import { Stats } from "@/components/sections/Stats";
-import { Mission } from "@/components/sections/Mission";
-import { Services } from "@/components/sections/Services";
-import { InventoryShowcase } from "@/components/sections/InventoryShowcase";
-import { Collaboration } from "@/components/sections/Collaboration";
-import { Blog } from "@/components/sections/Blog";
-import { Goals } from "@/components/sections/Goals";
+import { HeroStatsBar } from "@/components/sections/HeroStatsBar";
+import { IdentityStrip } from "@/components/sections/IdentityStrip";
+import { OriginStory } from "@/components/sections/OriginStory";
+import { FiveSides } from "@/components/sections/FiveSides";
+import { KuyashModel } from "@/components/sections/KuyashModel";
+import { ProcessStrip } from "@/components/sections/ProcessStrip";
+import { PeopleSection } from "@/components/sections/PeopleSection";
+import { GrowingWithOthers } from "@/components/sections/GrowingWithOthers";
+import { ImpactNumbers } from "@/components/sections/ImpactNumbers";
+import { ThereIsMoreToGrow } from "@/components/sections/ThereIsMoreToGrow";
+import { VisitFarm } from "@/components/sections/VisitFarm";
 
-/**
- * Home Page - Betàni Farming Landing Page
- * Assembled with modular, reusable components following best practices
- */
 export default function Home() {
   return (
     <>
       <Navbar />
       <main>
+        {/* 1. Who we are */}
         <Hero />
-        <Stats />
-        <Mission />
-        <Services />
-        <InventoryShowcase />
-        <Collaboration />
-        <Blog />
-        <Goals />
+        <HeroStatsBar />
+        {/* 2. Instant identity */}
+        <IdentityStrip />
+        {/* 3. Where we started */}
+        <OriginStory />
+        {/* 3. How we work */}
+        <ProcessStrip />
+        {/* 4. What we grow */}
+        <FiveSides />
+        {/* 5. How it all connects */}
+        <KuyashModel />
+        {/* 6. The people */}
+        <PeopleSection />
+        {/* 7. Growing with others */}
+        <GrowingWithOthers />
+        {/* 8. Our impact */}
+        <ImpactNumbers />
+        {/* 9. Stay current */}
+        <ThereIsMoreToGrow />
+        {/* 10. Come visit */}
+        <VisitFarm />
       </main>
       <Footer />
     </>

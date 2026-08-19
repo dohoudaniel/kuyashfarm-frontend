@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Play, Cpu, Leaf, TrendingUp } from "lucide-react";
+import { ArrowRight, Cpu, Leaf, TrendingUp } from "lucide-react";
 
 const floatingCards = [
   { icon: Cpu, label: "Precision Agriculture", sub: "IoT & AI-powered", color: "#06b6d4", delay: 0 },
@@ -70,22 +70,12 @@ export function AcademyHero() {
               className="mt-10 flex flex-wrap gap-4"
             >
               <Link
-                href="/academy/classes/1"
+                href="/academy/programs"
                 className="group inline-flex items-center gap-3 bg-[#2d5f3f] text-white font-semibold px-8 py-4 rounded-full hover:bg-[#4a7c59] transition-all duration-300"
                 style={{ fontSize: "clamp(0.875rem, 1vw, 1rem)" }}
               >
-                Apply Now
-                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="/academy/programs"
-                className="group inline-flex items-center gap-3 border border-white/25 text-white/80 font-semibold px-8 py-4 rounded-full hover:border-white/50 hover:text-white transition-all duration-300"
-                style={{ fontSize: "clamp(0.875rem, 1vw, 1rem)" }}
-              >
-                <span className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                  <Play className="w-2.5 h-2.5 fill-white" />
-                </span>
                 Explore Programs
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
             </motion.div>
           </div>
