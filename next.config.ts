@@ -1,3 +1,5 @@
+import { networkInterfaces } from "node:os";
+
 import type { NextConfig } from "next";
 
 /**
@@ -34,7 +36,55 @@ function apiImagePatterns(): NonNullable<NextConfig["images"]>["remotePatterns"]
   }
 }
 
+/**
+ * Which origins the *development* server will serve its own assets to.
+ *
+ * Next refuses cross-origin requests for `/_next/static/*` in development.
+ * Under WSL that bites immediately: Windows reaches the dev server at the VM's
+ * IP rather than at localhost, every chunk comes back **403**, and React never
+ * hydrates — the page paints correctly and nothing on it works, which reads as
+ * a broken build rather than a network policy.
+ *
+ * It cannot be reproduced with curl. The check is on the `Origin` header, and
+ * curl does not send one, so the same URL that fails in a browser returns 200
+ * from the command line. Same shape as the CORS and CSP traps in CLAUDE.md:
+ * only a real browser can see it.
+ *
+ * **Read from the machine's own interfaces, not from configuration.** The
+ * first version derived this from `NEXT_PUBLIC_API_URL`, on the reasoning that
+ * the API host and the dev host have to match anyway. That is true and it was
+ * still the wrong source: pointing the app at `localhost` — a perfectly
+ * ordinary thing to do — silently removed the VM's own address from this list
+ * and put the 403s straight back. A setting whose correctness depends on an
+ * unrelated variable nobody connects to it will be wrong eventually.
+ *
+ * A network address is a fact about the machine, so it is asked of the
+ * machine. This also survives the WSL IP changing on every Windows reboot,
+ * which a hardcoded value does not.
+ *
+ * Development only. `next build` and `next start` ignore `allowedDevOrigins`
+ * entirely, so this widens nothing in production — and it only ever lists
+ * addresses this host already answers on.
+ */
+function devOrigins(): string[] {
+  const origins = new Set(["localhost", "127.0.0.1"]);
+
+  for (const addresses of Object.values(networkInterfaces())) {
+    for (const address of addresses ?? []) {
+      // Non-internal IPv4 only: under WSL that is the VM address Windows
+      // reaches the dev server on, which is exactly the origin being blocked.
+      if (address.family === "IPv4" && !address.internal) {
+        origins.add(address.address);
+      }
+    }
+  }
+
+  return [...origins];
+}
+
 const nextConfig: NextConfig = {
+  allowedDevOrigins: devOrigins(),
+
   images: {
     remotePatterns: [
       ...(apiImagePatterns() ?? []),
