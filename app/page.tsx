@@ -1,46 +1,67 @@
 /**
- * Landing page. Assembles the marketing sections; no business data.
+ * Landing page.
  *
- * Two things were removed here rather than tidied.
+ * The section order is the frontend redesign's, and the ordering is the point:
+ * it tells a story rather than listing features. Who we are, what we stand
+ * for, where we started, how we work, what we grow, how it connects, the
+ * people, our partners, our impact, what is new, come and visit. The previous
+ * arrangement — hero, stats, mission, services, showcase, collaboration,
+ * goals — was a list of headings with no argument running through it.
  *
- * The file carried a header comment reading "Home Page - Betàni Farming
- * Landing Page / Assembled with modular, reusable components following best
- * practices" — another company's name, followed by filler. It was the
- * clearest single piece of evidence in the codebase that this page was
- * generated rather than designed.
+ * `Navbar` and `Footer` are deliberately absent: they live in the root layout
+ * via `SiteChrome`, because a header mounted inside a page remounts on every
+ * client-side navigation and re-fetches the cart each time.
  *
- * The `Blog` section listed three invented articles dated March 2024, every
- * one linking to `href="#"`, under the heading "Blog is a vibrant space where
- * farming meets innovation" and a subheading — "Experience beauty redefined by
- * effortless elegance in every application" — that was written for a
- * cosmetics product. There is no blog. Three dead links above the footer cost
- * more credibility than the section could ever earn back, so it is gone until
- * there is something real to put there.
+ * `RecentlyViewed` is ours and renders nothing for a first-time visitor. It
+ * sits directly under the hero so a returning customer meets what they were
+ * last looking at before the marketing narrative starts — for them the story
+ * is already told, and the shop is what they came back for.
  */
 
 import { Hero } from "@/components/sections/Hero";
-import { Stats } from "@/components/sections/Stats";
-import { Mission } from "@/components/sections/Mission";
-import { Services } from "@/components/sections/Services";
-import { InventoryShowcase } from "@/components/sections/InventoryShowcase";
-import { Collaboration } from "@/components/sections/Collaboration";
-import { Goals } from "@/components/sections/Goals";
+import { HeroStatsBar } from "@/components/sections/HeroStatsBar";
+import { IdentityStrip } from "@/components/sections/IdentityStrip";
+import { OriginStory } from "@/components/sections/OriginStory";
+import { ProcessStrip } from "@/components/sections/ProcessStrip";
+import { FiveSides } from "@/components/sections/FiveSides";
+import { KuyashModel } from "@/components/sections/KuyashModel";
+import { PeopleSection } from "@/components/sections/PeopleSection";
+import { GrowingWithOthers } from "@/components/sections/GrowingWithOthers";
+import { ImpactNumbers } from "@/components/sections/ImpactNumbers";
+import { ThereIsMoreToGrow } from "@/components/sections/ThereIsMoreToGrow";
+import { VisitFarm } from "@/components/sections/VisitFarm";
 import { RecentlyViewed } from "@/components/shop/RecentlyViewed";
 
 export default function Home() {
   return (
-    <>
-      <main>
-        <Hero />
-        {/* Renders nothing for a first-time visitor. */}
-        <RecentlyViewed />
-        <Stats />
-        <Mission />
-        <Services />
-        <InventoryShowcase />
-        <Collaboration />
-        <Goals />
-      </main>
-    </>
+    <main>
+      {/* 1. Who we are */}
+      <Hero />
+      <HeroStatsBar />
+
+      {/* Returning customers first: renders nothing for anybody else. */}
+      <RecentlyViewed />
+
+      {/* 2. Instant identity */}
+      <IdentityStrip />
+      {/* 3. Where we started */}
+      <OriginStory />
+      {/* 4. How we work */}
+      <ProcessStrip />
+      {/* 5. What we grow */}
+      <FiveSides />
+      {/* 6. How it all connects */}
+      <KuyashModel />
+      {/* 7. The people */}
+      <PeopleSection />
+      {/* 8. Growing with others */}
+      <GrowingWithOthers />
+      {/* 9. Our impact */}
+      <ImpactNumbers />
+      {/* 10. Stay current */}
+      <ThereIsMoreToGrow />
+      {/* 11. Come and visit */}
+      <VisitFarm />
+    </main>
   );
 }

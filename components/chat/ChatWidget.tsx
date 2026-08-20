@@ -10,7 +10,7 @@
  */
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { MessageCircle, X, Send, Bot, User as UserIcon } from "lucide-react";
+import { Leaf, X, Send, Bot, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { getStoreConfig } from "@/lib/api/cart";
 import type { StoreConfig } from "@/lib/api/types";
@@ -124,16 +124,20 @@ export function ChatWidget() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bg-primary text-white rounded-full p-3 sm:p-4 shadow-lg hover:bg-secondary transition-all duration-300 hover:scale-110 group"
           aria-label="Open chat"
+          className="group fixed bottom-4 right-4 z-50 flex min-h-11 items-center gap-2.5 rounded-full bg-[#080f0a] py-3 pl-4 pr-5 text-white shadow-xl transition-colors duration-300 hover:bg-[#2d5f3f] sm:bottom-6 sm:right-6"
         >
-          <MessageCircle className="w-6 h-6" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-
-          {/* Tooltip - hidden on mobile */}
-          <span className="hidden sm:block absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            Chat with us
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2d5f3f] transition-colors duration-300 group-hover:bg-white/20">
+            <Leaf className="h-3.5 w-3.5 text-white" />
           </span>
+          <span className="font-sans text-sm font-semibold">Chat with us</span>
+          {/*
+            A presence dot, not an unread badge. The previous version showed a
+            red notification dot on a keyword-matching bot that has never had a
+            message waiting — a badge that promises something to read and has
+            nothing is a small dishonesty the whole site pays for.
+          */}
+          <span className="h-2 w-2 rounded-full bg-[#6b9d7a]" />
         </button>
       )}
 

@@ -92,28 +92,34 @@ export const GOALS = [
 ] as const;
 
 /**
- * Primary navigation.
+ * Primary navigation — the frontend redesign's set, with every link resolving.
  *
- * **Shop comes first**, and its absence was the real defect here. This is an
- * e-commerce site with server-side pricing, wholesale tiers and a stock
- * ledger, and the primary navigation did not link to any of it — a customer
- * arriving on the homepage had no route to the products except the hero
- * button. It was the navigation of a brochure.
+ * Matches main's header so the two branches read as one product. One
+ * correction was necessary rather than optional: on main, `#projects`,
+ * `#services` and `#about` all point at nothing, because the sections that
+ * carried those ids (Services, Mission, Blog) are not on its new homepage.
+ * Here they are mapped onto the sections that carry the equivalent content —
+ * Services to what we grow, About Us to the origin story, Projects to the
+ * Kuyash Model — so the header works rather than merely looking right.
  *
- * **Two entries pointed at nothing.** `#projects` had no matching section and
- * never had; `#blog` lost its section when three invented articles linking to
- * `href="#"` were deleted. Both scrolled nowhere, silently — an anchor with no
- * target does not error, it simply does not move.
+ * `tests/navigation.test.tsx` reads the filesystem and fails the build if any
+ * entry points at a section or route that does not exist.
  *
- * Anything added here must resolve. An entry beginning `#` needs a section
- * with that `id` on the homepage; anything else must be a real route.
- * `tests/navigation.test.tsx` fails the build otherwise.
+ * Shop is the one addition to main's set. Main has no link to the catalogue,
+ * which is defensible on a brochure site and not on this one — the basket, the
+ * checkout and the whole trade-pricing system sit behind it.
  */
 export const NAV_LINKS = [
+  { label: "Home", href: "#home" },
+  // Second, and deliberately so. This is an e-commerce site and the shop was
+  // previously reachable only from the hero's call to action and the basket
+  // icon — a customer who scrolled past the hero had no route to the products
+  // at all.
   { label: "Shop", href: "/categories" },
-  { label: "Wholesale", href: "/become-wholesaler" },
   { label: "Services", href: "#services" },
-  { label: "About", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "About Us", href: "#about" },
+  { label: "Blog", href: "/blog" },
   { label: "Academy", href: "/academy" },
 ] as const;
 

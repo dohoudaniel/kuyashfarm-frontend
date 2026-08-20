@@ -165,9 +165,33 @@ dark greens no eye could tell apart — which made a rebrand a find-and-replace
 across the whole codebase. There are now none outside `app/globals.css`, and
 the only exceptions are deliberate and commented:
 
-- `app/icon.tsx`, `app/apple-icon.tsx`, `app/opengraph-image.tsx` and
-  `app/manifest.ts` — these render outside a browser (Satori, or a JSON
-  manifest), where CSS custom properties do not exist.
+- `app/opengraph-image.tsx` and `app/manifest.ts` — these render outside a
+  browser (Satori, or a JSON manifest), where CSS custom properties do not
+  exist.
+
+### The tab icons are static PNGs, on purpose
+
+`app/icon.png` (32×32) and `app/apple-icon.png` (180×180) are committed
+binaries rather than `ImageResponse` routes.
+
+They *were* generated — a `#2d5f3f` square with a `#e8d5a3` serif "K", sized
+against cap height so the glyph fills the square at 16px. The rendered output
+is byte-identical to what those routes produced; only the delivery changed.
+
+**Why they stopped being generated.** A browser requests the favicon on every
+single page load, so an `ImageResponse` route is a Satori render per page view
+in development and a build-time render in production — real cost for an image
+that never changes. Worse, under `next dev` with Turbopack the route fails
+outright: `@vercel/og` throws `Input buffer contains unsupported image format`
+after the first compile, and the route returns a 500 for the rest of the
+session. Production builds prerendered it correctly the whole time, which is
+what made it easy to dismiss as cosmetic — it is not, it is every tab in
+development showing a broken icon and every page view logging a stack trace.
+
+To change the mark, render a new PNG at these two sizes and replace the files.
+The palette values are `--primary-green` and `--wheat` from `app/globals.css`;
+keep them in step by hand, which is the one thing the generated version did
+for free.
 - `components/auth/GoogleSignInButton.tsx` — Google's own mark, which their
   branding guidelines do not permit recolouring.
 

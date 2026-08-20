@@ -182,11 +182,45 @@ export function setOrderStatus(
   return apiClient.post(`/staff/orders/${orderNumber}/status/`, { status, notes });
 }
 
+export interface RefundInput {
+  /**
+   * Omit for the full remaining balance.
+   *
+   * A decimal string, like every other money value crossing this boundary.
+   * Typing it as `number` here would invite `Number(total)` at the call site,
+   * and a refund is the last place to discover binary floating point.
+   */
+  amount?: string;
+  reason: string;
+  /** Only true when the goods physically came back. */
+  return_stock?: boolean;
+}
+
+/**
+ * Send money back.
+ *
+ * **Administrator-only, and the API is what enforces it** — `StaffRefundView`
+ * uses `IsAdmin`, not `IsStaff`, because this is the one operation that moves
+ * money *out* of the business. Hiding the control from a warehouse hand is
+ * courtesy; the permission class is the control.
+ *
+ * `reason` is mandatory server-side and recorded against the order, so every
+ * refund names who authorised it and why. `return_stock` is separate from the
+ * money on purpose: a customer refunded for a damaged crate is not a crate
+ * coming back onto the shelf, and conflating the two silently invents stock.
+ */
 export function refundOrder(
   orderNumber: string,
-  reason: string,
+  input: RefundInput,
 ): Promise<Record<string, unknown>> {
-  return apiClient.post(`/staff/orders/${orderNumber}/refund/`, { reason });
+  return apiClient.post(`/staff/orders/${orderNumber}/refund/`, {
+    reason: input.reason,
+    // Sent only when given. An explicit `null` and an absent key mean the same
+    // thing to the serializer, but omitting it keeps the request honest about
+    // what was actually asked for.
+    ...(input.amount ? { amount: input.amount } : {}),
+    return_stock: input.return_stock ?? false,
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -819,4 +853,71 @@ export function createTaxRule(input: Partial<TaxRule>): Promise<TaxRule> {
 
 export function updateTaxRule(id: string, input: Partial<TaxRule>): Promise<TaxRule> {
   return apiClient.patch<TaxRule>(`/staff/tax-rules/${id}/`, input);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Blog
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A post as the back office sees it — drafts and scheduled pieces included.
+ *
+ * `slug` is read-only: the server derives it from the title on create and
+ * never rewrites it afterwards. That is deliberate, and worth not "fixing" —
+ * a published URL that changes when somebody corrects a typo in the headline
+ * breaks every link anyone has already shared.
+ */
+export interface StaffPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  body: string;
+  category: string;
+  cover_image: string;
+  author_name: string;
+  author_role: string;
+  read_minutes: number;
+  is_featured: boolean;
+  /** Null means draft. A future date publishes itself when it arrives. */
+  published_at: string | null;
+}
+
+export type PostInput = Omit<StaffPost, "id" | "slug">;
+
+/**
+ * The categories, copied from `core.models.BlogCategory`.
+ *
+ * Fixed choices rather than free text, so the public page does not end up
+ * grouping "Poultry", "poultry farming" and "Poultry Farming" as three
+ * different things. Adding one is a migration on the server *and* a line here
+ * — the server rejects anything it does not recognise, so the two cannot
+ * drift silently in the direction that matters.
+ */
+export const POST_CATEGORIES = [
+  { value: "POULTRY", label: "Poultry farming" },
+  { value: "LIVESTOCK", label: "Livestock" },
+  { value: "CROPS", label: "Crop production" },
+  { value: "FISHERIES", label: "Fisheries and aquaculture" },
+  { value: "SOIL", label: "Soil and plant science" },
+  { value: "MANAGEMENT", label: "Farm management" },
+  { value: "AGRIBUSINESS", label: "Agribusiness" },
+] as const;
+
+/** Every post, drafts included. Paginated — this list grows without limit. */
+export function listStaffPosts(page?: number): Promise<Paginated<StaffPost>> {
+  const suffix = page && page > 1 ? `?page=${page}` : "";
+  return apiClient.get<Paginated<StaffPost>>(`/staff/blog/${suffix}`);
+}
+
+export function createPost(input: Partial<PostInput>): Promise<StaffPost> {
+  return apiClient.post<StaffPost>("/staff/blog/", input);
+}
+
+export function updatePost(slug: string, input: Partial<PostInput>): Promise<StaffPost> {
+  return apiClient.patch<StaffPost>(`/staff/blog/${slug}/`, input);
+}
+
+export function deletePost(slug: string): Promise<null> {
+  return apiClient.delete<null>(`/staff/blog/${slug}/`);
 }

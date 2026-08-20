@@ -21,6 +21,7 @@ import {
   LogOut,
   Mail,
   Package,
+  PenLine,
   SlidersHorizontal,
   Truck,
   Users,
@@ -46,6 +47,7 @@ const NAV: NavItem[] = [
   { href: "/admin/delivery", label: "Delivery", icon: Truck },
   { href: "/admin/applications", label: "Applications", icon: Package },
   { href: "/admin/academy", label: "Academy", icon: GraduationCap },
+  { href: "/admin/blog", label: "Blog", icon: PenLine },
   { href: "/admin/subscribers", label: "Newsletter", icon: Mail },
   { href: "/admin/staff", label: "Staff", icon: Users, adminOnly: true },
   { href: "/admin/settings", label: "Settings", icon: SlidersHorizontal, adminOnly: true },
@@ -64,7 +66,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-gray-200 bg-primary-dark">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 2xl:max-w-[1720px]">
           <Link href="/admin" className="font-serif text-lg font-bold text-white">
-            Kuyash <span className="font-sans text-xs font-normal text-white/60">back office</span>
+            Kuyash Farms{" "}
+            <span className="font-sans text-xs font-normal text-white/60">back office</span>
           </Link>
 
           <div className="flex items-center gap-4">

@@ -17,7 +17,9 @@ import { RefreshCw } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import { listStaffOrders, setOrderStatus, type StaffOrder } from "@/lib/api/admin";
 import { DataScreen, ScrollableTable, StatusPill } from "@/components/admin/DataScreen";
+import { useAuth } from "@/lib/context/AuthContext";
 import { formatPrice } from "@/lib/utils";
+import { RefundDialog } from "./RefundDialog";
 
 /**
  * `OrderStatus`, copied from the server.
@@ -33,6 +35,15 @@ import { formatPrice } from "@/lib/utils";
  * choosing one returned a 400 the screen displayed as the server's refusal.
  * The end-to-end run is what found it.
  */
+/**
+ * The payment states from which money can still come back.
+ *
+ * `PaymentStatus` in `orders.models`, minus the three that never took money
+ * (`UNPAID`, `AUTHORIZED`, `FAILED`) and minus `REFUNDED`, which has already
+ * given all of it back. `PARTIALLY_REFUNDED` stays: there is a balance left.
+ */
+const REFUNDABLE = new Set(["PAID", "PARTIALLY_REFUNDED"]);
+
 const STATUSES = [
   "PENDING",
   "CONFIRMED",
@@ -51,6 +62,19 @@ export default function OrdersClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [refunding, setRefunding] = useState<StaffOrder | null>(null);
+
+  /**
+   * Refunds are administrator-only.
+   *
+   * `StaffRefundView` uses `IsAdmin` while the rest of this screen is
+   * `IsStaff`, so a warehouse hand can move an order along but cannot pay
+   * anybody. Hiding the button matches what the API would answer; it is not
+   * the control, and is not relied on as one — the server refuses regardless
+   * of what this renders.
+   */
+  const { user } = useAuth();
+  const canRefund = user?.role === "ADMIN";
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -135,6 +159,7 @@ export default function OrdersClient() {
             <th className="px-4 py-3">Payment</th>
             <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3">Move to</th>
+            {canRefund && <th className="px-4 py-3 text-right">Refund</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -178,10 +203,48 @@ export default function OrdersClient() {
                   ))}
                 </select>
               </td>
+              {canRefund && (
+                <td className="px-4 py-3 text-right">
+                  {/* Only for an order that has actually taken money. Offering
+                      it on an unpaid one invites a refusal that reads as a
+                      bug rather than as the obvious truth it is.
+
+                      Exact membership, not a pattern. This was written as
+                      `/paid|part/i.test(...)` and offered a refund on every
+                      order in the queue, because **"UNPAID" contains "paid"**.
+                      A substring test against a status enum is a trap
+                      wherever one value is a negation of another, and it fails
+                      in the expensive direction: the button appeared on
+                      seventeen orders that had never taken a naira. */}
+                  {REFUNDABLE.has(order.payment_status) ? (
+                    <button
+                      type="button"
+                      onClick={() => setRefunding(order)}
+                      className="rounded-lg px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50"
+                    >
+                      Refund…
+                    </button>
+                  ) : (
+                    <span className="text-xs text-gray-400">—</span>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </ScrollableTable>
+
+      {refunding && (
+        <RefundDialog
+          order={refunding}
+          onCancel={() => setRefunding(null)}
+          onDone={(text) => {
+            setRefunding(null);
+            setMessage(text);
+            void load();
+          }}
+        />
+      )}
     </DataScreen>
   );
 }

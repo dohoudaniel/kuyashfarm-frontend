@@ -33,6 +33,7 @@ import {
   listShippingRules,
   listStaffCategories,
   listTaxRules,
+  updateCategory,
   updateSettings,
   updateTaxRule,
   type ShippingRule,
@@ -308,14 +309,39 @@ export default function SettingsClient() {
                     {!category.is_active && " · hidden"}
                   </span>
                 </span>
-                <button
-                  type="button"
-                  aria-label={`Delete ${category.name}`}
-                  onClick={() => void run(() => deleteCategory(category.slug), "Category removed.")}
-                  className="text-gray-400 hover:text-red-600"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                <span className="flex shrink-0 items-center gap-2">
+                  {/*
+                    The paragraph above has always told staff to "deactivate
+                    it" — and until now there was nothing to click. The
+                    endpoint existed and no screen reached it, so a category
+                    holding products could neither be deleted (correctly
+                    refused) nor hidden (the advice given), which left the only
+                    working answer as moving every product by hand.
+                  */}
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() =>
+                      void run(
+                        () => updateCategory(category.slug, { is_active: !category.is_active }),
+                        category.is_active
+                          ? `${category.name} is hidden from the shop.`
+                          : `${category.name} is back in the shop.`,
+                      )
+                    }
+                    className="rounded-lg px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50"
+                  >
+                    {category.is_active ? "Hide" : "Show"}
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Delete ${category.name}`}
+                    onClick={() => void run(() => deleteCategory(category.slug), "Category removed.")}
+                    className="text-gray-400 hover:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </span>
               </li>
             ))}
           </ul>

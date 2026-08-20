@@ -197,35 +197,6 @@ body {
   background: var(--secondary-green);
 }
 
-/*
- * The seed falling into the furrow, in the hero's scroll cue.
- *
- * A CSS animation rather than a JavaScript one, deliberately. This is an
- * infinite decorative loop, which is exactly what CSS animations are for: it
- * runs on the compositor, costs no main-thread work, and — the part that
- * matters most here — the `prefers-reduced-motion` block above neutralises it
- * automatically, with no hook and no branch in the component.
- *
- * The JavaScript version of this was subtly broken in a way that took a
- * frame-by-frame capture to see: it settled on its final keyframe at opacity 0
- * and never looped, so the seed was present in the DOM, the right colour and
- * the right size, and invisible on every single frame.
- *
- * The 82% hold is the pause between drops. Continuous movement in the corner
- * of the eye is what makes a page tiring to sit on.
- */
-@keyframes seed-fall {
-  0%   { transform: translate(-50%, 0);    opacity: 0; }
-  12%  { transform: translate(-50%, 4px);  opacity: 1; }
-  70%  { transform: translate(-50%, 32px); opacity: 1; }
-  82%  { transform: translate(-50%, 32px); opacity: 0; }
-  100% { transform: translate(-50%, 32px); opacity: 0; }
-}
-
-.seed-fall {
-  animation: seed-fall 2.8s cubic-bezier(0.55, 0, 0.85, 0.4) infinite;
-}
-
 /* Notification toast animations */
 @keyframes slide-in-right {
   from {

@@ -108,7 +108,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // `data-scroll-behavior="smooth"` tells the router that the smooth
+    // scrolling declared in `globals.css` is deliberate, so it can suppress it
+    // during a route change. Without it a navigation *animates* the jump to
+    // the top of the new page — on a long page that is a visible scroll
+    // through content the visitor never asked to see, reading as the page
+    // loading twice. In-page anchors keep their smooth scroll, which is the
+    // part that was wanted.
+    <html lang="en" data-scroll-behavior="smooth">
       <body
         className={`${fraunces.variable} ${inter.variable} antialiased`}
       >

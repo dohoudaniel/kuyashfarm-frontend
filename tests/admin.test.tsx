@@ -28,6 +28,11 @@ const admin = {
   deleteProductImage: vi.fn(),
   listStaffOrders: vi.fn(),
   setOrderStatus: vi.fn(),
+  refundOrder: vi.fn(),
+  listStaffPosts: vi.fn(),
+  createPost: vi.fn(),
+  updatePost: vi.fn(),
+  deletePost: vi.fn(),
   listStaffApplications: vi.fn(),
   approveApplication: vi.fn(),
   rejectApplication: vi.fn(),
@@ -46,6 +51,15 @@ vi.mock("@/lib/api/admin", () => ({
   deleteProductImage: (...a: unknown[]) => admin.deleteProductImage(...a),
   listStaffOrders: (...a: unknown[]) => admin.listStaffOrders(...a),
   setOrderStatus: (...a: unknown[]) => admin.setOrderStatus(...a),
+  refundOrder: (...a: unknown[]) => admin.refundOrder(...a),
+  listStaffPosts: (...a: unknown[]) => admin.listStaffPosts(...a),
+  createPost: (...a: unknown[]) => admin.createPost(...a),
+  updatePost: (...a: unknown[]) => admin.updatePost(...a),
+  deletePost: (...a: unknown[]) => admin.deletePost(...a),
+  POST_CATEGORIES: [
+    { value: "POULTRY", label: "Poultry farming" },
+    { value: "CROPS", label: "Crop production" },
+  ],
   listStaffApplications: (...a: unknown[]) => admin.listStaffApplications(...a),
   approveApplication: (...a: unknown[]) => admin.approveApplication(...a),
   rejectApplication: (...a: unknown[]) => admin.rejectApplication(...a),
@@ -65,12 +79,14 @@ vi.mock("next/navigation", () => ({
 const { AdminGuard } = await import("@/app/admin/AdminGuard");
 const OrdersClient = (await import("@/app/admin/orders/OrdersClient")).default;
 const ApplicationsClient = (await import("@/app/admin/applications/ApplicationsClient")).default;
+const BlogAdminClient = (await import("@/app/admin/blog/BlogAdminClient")).default;
 
 beforeEach(() => {
   vi.clearAllMocks();
   auth = { isLoading: false, isAuthenticated: true, isBackOffice: true, user: { role: "ADMIN" } };
   admin.listStaffOrders.mockResolvedValue({ results: [], count: 0 });
   admin.listStaffApplications.mockResolvedValue({ results: [], count: 0 });
+  admin.listStaffPosts.mockResolvedValue({ results: [], count: 0 });
 });
 
 describe("AdminGuard", () => {
@@ -298,5 +314,156 @@ describe("applications", () => {
 
     expect(admin.rejectApplication).not.toHaveBeenCalled();
     prompts.mockRestore();
+  });
+});
+
+describe("refunds are administrator-only", () => {
+  /**
+   * `StaffRefundView` uses `IsAdmin` while the rest of the orders screen is
+   * `IsStaff`. The button is courtesy, not the control — but if it appears for
+   * a warehouse hand, they get a 403 for doing what the screen invited, which
+   * reads as a broken back office rather than as a permission boundary.
+   */
+  const paidOrder = {
+    id: "1",
+    order_number: "KF-1001",
+    status: "PROCESSING",
+    payment_status: "PAID",
+    currency: "NGN",
+    grand_total: "7500.00",
+    item_count: 2,
+    placed_at: "2026-08-01T10:00:00Z",
+  };
+
+  it("offers the control to an administrator", async () => {
+    admin.listStaffOrders.mockResolvedValue({ results: [paidOrder], count: 1 });
+
+    render(<OrdersClient />);
+
+    expect(await screen.findByRole("button", { name: /refund/i })).toBeInTheDocument();
+  });
+
+  it("hides it from staff, who the API would refuse", async () => {
+    auth = { ...auth, user: { role: "STAFF" } };
+    admin.listStaffOrders.mockResolvedValue({ results: [paidOrder], count: 1 });
+
+    render(<OrdersClient />);
+
+    // The row still renders — staff can still move the order along.
+    expect(await screen.findByText("KF-1001")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /refund/i })).not.toBeInTheDocument();
+  });
+
+  /**
+   * The values here are the real ones from `orders.models.PaymentStatus`, and
+   * that matters more than it looks.
+   *
+   * This was first written with an invented `"PENDING"` and passed while the
+   * screen was offering a refund on every order in the queue — the check was
+   * `/paid/i`, and **"UNPAID" contains "paid"**. A test using a status the
+   * server never sends cannot catch a bug about the statuses it does.
+   */
+  it.each([
+    ["UNPAID", false],
+    ["AUTHORIZED", false],
+    ["FAILED", false],
+    ["REFUNDED", false],
+    ["PAID", true],
+    ["PARTIALLY_REFUNDED", true],
+  ])("payment_status %s -> refund offered: %s", async (payment_status, offered) => {
+    admin.listStaffOrders.mockResolvedValue({
+      results: [{ ...paidOrder, payment_status }],
+      count: 1,
+    });
+
+    render(<OrdersClient />);
+
+    expect(await screen.findByText("KF-1001")).toBeInTheDocument();
+    const button = screen.queryByRole("button", { name: /refund/i });
+    if (offered) expect(button).toBeInTheDocument();
+    else expect(button).not.toBeInTheDocument();
+  });
+});
+
+describe("the blog's three states come from one date", () => {
+  /**
+   * Draft, scheduled and live are derived from `published_at` alone — there is
+   * no boolean beside it that could disagree. If these labels ever stop
+   * matching what the public queryset does, a post reads as live in the back
+   * office while nobody outside can see it, which is the failure the whole
+   * single-field design exists to prevent.
+   */
+  const base = {
+    id: "p1",
+    slug: "a-post",
+    title: "A post",
+    excerpt: "…",
+    body: "",
+    category: "CROPS",
+    cover_image: "",
+    author_name: "Ejiro",
+    author_role: "",
+    read_minutes: 4,
+    is_featured: false,
+  };
+
+  it("calls an empty date a draft, a future one scheduled, and a past one live", async () => {
+    const future = new Date(Date.now() + 7 * 864e5).toISOString();
+    const past = new Date(Date.now() - 7 * 864e5).toISOString();
+
+    admin.listStaffPosts.mockResolvedValue({
+      count: 3,
+      results: [
+        { ...base, id: "1", slug: "draft", title: "Draft one", published_at: null },
+        { ...base, id: "2", slug: "sched", title: "Scheduled one", published_at: future },
+        { ...base, id: "3", slug: "live", title: "Live one", published_at: past },
+      ],
+    });
+
+    render(<BlogAdminClient />);
+
+    expect(await screen.findByText("Draft one")).toBeInTheDocument();
+    expect(screen.getByText("Draft")).toBeInTheDocument();
+    expect(screen.getByText("Scheduled")).toBeInTheDocument();
+    expect(screen.getByText("Live")).toBeInTheDocument();
+  });
+
+  it("only links to the public page for a post the public can reach", async () => {
+    admin.listStaffPosts.mockResolvedValue({
+      count: 2,
+      results: [
+        { ...base, id: "1", slug: "hidden", title: "Draft one", published_at: null },
+        {
+          ...base,
+          id: "2",
+          slug: "visible",
+          title: "Live one",
+          published_at: new Date(Date.now() - 864e5).toISOString(),
+        },
+      ],
+    });
+
+    render(<BlogAdminClient />);
+
+    // A "view on site" link for a draft is a 404, which reads as a bug.
+    expect(await screen.findByText("Live one")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /view live one on the site/i })).toHaveAttribute(
+      "href",
+      "/blog/visible",
+    );
+    expect(screen.queryByRole("link", { name: /view draft one on the site/i })).toBeNull();
+  });
+
+  it("reads the paginated envelope rather than a bare array", async () => {
+    // `/staff/blog/` is paginated. Typing it as an array is not a type error
+    // at the network boundary — it is a silently empty screen.
+    admin.listStaffPosts.mockResolvedValue({
+      count: 1,
+      results: [{ ...base, title: "From results", published_at: null }],
+    });
+
+    render(<BlogAdminClient />);
+
+    expect(await screen.findByText("From results")).toBeInTheDocument();
   });
 });

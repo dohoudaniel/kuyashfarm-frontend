@@ -36,6 +36,7 @@ import {
   type StaffProduct,
 } from "@/lib/api/admin";
 import { ProductForm } from "./ProductForm";
+import { BulkTiers } from "./BulkTiers";
 import { cn } from "@/lib/utils";
 
 /** Mirrors the server's allow-list, so an obvious refusal happens before the upload. */
@@ -386,6 +387,11 @@ export default function ProductImagesClient() {
                   ))}
                 </ul>
               )}
+
+              {/* Keyed on the slug so switching products builds a fresh panel
+                  rather than showing the previous product's tiers until its
+                  own request lands. */}
+              <BulkTiers key={selected.slug} slug={selected.slug} unit={selected.unit} />
             </>
           )}
         </section>
