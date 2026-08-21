@@ -10,6 +10,8 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { fetchPublic } from "@/lib/api/client";
+import type { StoreConfig } from "@/lib/api/types";
 import { ClientProviders } from "@/components/providers/ClientProviders";
 
 /**
@@ -102,11 +104,38 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+/**
+ * Store settings, fetched once per revalidation window on the server.
+ *
+ * The footer's contact details come from here rather than from literals in the
+ * component. Doing it in the layout means one cached server fetch for the whole
+ * site instead of a request from every visitor's browser, and the values are in
+ * the HTML on first paint rather than appearing a moment later.
+ *
+ * `offlineFallback` keeps the build working when the API is unreachable — CI
+ * builds with `NEXT_PRERENDER_OFFLINE=1` and no backend — and an outage in
+ * production degrades the footer to fewer lines rather than taking the page
+ * down. Stale contact details would be worse than absent ones: a phone number
+ * nobody answers is a promise the business does not keep.
+ */
+async function storeConfig(): Promise<StoreConfig | null> {
+  try {
+    return await fetchPublic<StoreConfig>("/config/", {
+      revalidate: 300,
+      offlineFallback: null as unknown as StoreConfig,
+    });
+  } catch {
+    return null;
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const config = await storeConfig();
+
   return (
     // `data-scroll-behavior="smooth"` tells the router that the smooth
     // scrolling declared in `globals.css` is deliberate, so it can suppress it
@@ -123,7 +152,7 @@ export default function RootLayout({
           {/* Header and footer live here, not in each page. Mounted inside a
               page they remount on every navigation, which made the Navbar
               refetch the cart on every page view. */}
-          <SiteChrome>{children}</SiteChrome>
+          <SiteChrome config={config}>{children}</SiteChrome>
         </ClientProviders>
       </body>
     </html>

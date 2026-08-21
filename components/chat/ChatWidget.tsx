@@ -341,8 +341,28 @@ function generateBotResponse(
   }
 
   // Contact
+  //
+  // From `/config/`, like every other store fact this bot quotes. It used to
+  // recite a hardcoded address, a "+234 800 KUYASH" vanity number and
+  // "Mon-Sat, 8AM-6PM WAT" — a third set of contact details, agreeing with
+  // neither the footer nor the back office, and reachable by nobody. Same
+  // failure as the threshold this file already documents: the bot quoted
+  // N200,000 against a configured N80,000 because it held its own copy.
   if (input.includes("contact") || input.includes("phone") || input.includes("email")) {
-    return `You can reach us through:\n\n📧 Email: support@kuyashfarms.com\n📱 Phone: +234 800 KUYASH (589274)\n⏰ Hours: Mon-Sat, 8AM-6PM WAT\n\nOr continue chatting with me here - I'm available 24/7!`;
+    const lines = [
+      config?.support_email && `\u{1F4E7} Email: ${config.support_email}`,
+      config?.support_phone && `\u{1F4F1} Phone: ${config.support_phone}`,
+      config?.opening_hours && `\u{23F0} Hours: ${config.opening_hours}`,
+      config?.address && `\u{1F4CD} ${config.address}`,
+    ].filter(Boolean);
+
+    // An outage must not make the bot invent details. Saying it cannot reach
+    // them is honest; quoting a number nobody answers is not.
+    if (lines.length === 0) {
+      return `I can't reach our contact details right now, ${userName} — but keep chatting with me here and I'll help however I can.`;
+    }
+
+    return `You can reach us through:\n\n${lines.join("\n")}\n\nOr continue chatting with me here - I'm available 24/7!`;
   }
 
   // Default response

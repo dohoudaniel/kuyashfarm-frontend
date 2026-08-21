@@ -307,4 +307,7 @@ export interface StoreConfig {
   guest_checkout_enabled: boolean;
   support_email: string;
   support_phone: string;
+  /** Footer contact details. Editable in the back office, never in a component. */
+  address: string;
+  opening_hours: string;
 }

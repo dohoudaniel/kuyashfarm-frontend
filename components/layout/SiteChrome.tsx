@@ -34,6 +34,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { RouteProgress } from "@/components/layout/RouteProgress";
 import { PageTransition } from "@/components/layout/PageTransition";
+import type { StoreConfig } from "@/lib/api/types";
 
 /**
  * Sections that bring their own chrome.
@@ -45,7 +46,21 @@ import { PageTransition } from "@/components/layout/PageTransition";
  */
 const BARE = ["/admin", "/driver"];
 
-export function SiteChrome({ children }: { children: React.ReactNode }) {
+export function SiteChrome({
+  children,
+  config = null,
+}: {
+  children: React.ReactNode;
+  /**
+   * Store settings, fetched once by the root layout on the server.
+   *
+   * Passed down rather than fetched here: this component is a Client
+   * Component (it reads `usePathname`), so fetching would mean a request from
+   * every visitor's browser on every page load for a value that changes
+   * perhaps monthly.
+   */
+  config?: StoreConfig | null;
+}) {
   const pathname = usePathname();
   const bare = BARE.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
@@ -76,7 +91,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       {chrome}
       <Navbar />
       <PageTransition>{children}</PageTransition>
-      <Footer />
+      <Footer config={config} />
     </>
   );
 }

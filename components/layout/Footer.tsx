@@ -10,8 +10,39 @@ import Link from "next/link";
  */
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube, MessageCircle } from "lucide-react";
 import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/constants";
+import type { StoreConfig } from "@/lib/api/types";
 
-export function Footer() {
+/**
+ * Contact details, from the back office rather than from this file.
+ *
+ * All four of these were literals here — an address, a phone number, an email
+ * and opening hours the business could not change without a developer and a
+ * deploy. The phone number was also a *different* number from `support_phone`
+ * in the store settings, so the site advertised one and the back office
+ * believed another, with nothing to reconcile them. That is the failure the
+ * `/config/` endpoint already exists to prevent: the free-shipping threshold
+ * once read N80,000 at checkout and N200,000 in the chatbot for exactly this
+ * reason.
+ *
+ * `config` arrives as a prop from the root layout, which is a Server
+ * Component, so this costs no client request and no round trip on first paint.
+ * It is nullable because an API outage must not take the footer down — a
+ * missing line is better than a broken page, and better than a stale
+ * hardcoded one that contradicts the shop.
+ */
+function contactLines(config: StoreConfig | null) {
+  if (!config) return [];
+
+  return [
+    { icon: MapPin, text: config.address },
+    { icon: Phone, text: config.support_phone },
+    { icon: Mail, text: config.support_email },
+    { icon: Clock, text: config.opening_hours },
+    // An empty setting renders nothing rather than an icon beside a blank.
+  ].filter((line) => Boolean(line.text));
+}
+
+export function Footer({ config = null }: { config?: StoreConfig | null }) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -141,24 +172,7 @@ export function Footer() {
               Contact
             </h4>
             <ul className="space-y-4">
-              {[
-                {
-                  icon: MapPin,
-                  text: "12 Farm Road, Abuja, Nigeria",
-                },
-                {
-                  icon: Phone,
-                  text: "+234 800 000 0000",
-                },
-                {
-                  icon: Mail,
-                  text: "hello@kuyashfarms.com",
-                },
-                {
-                  icon: Clock,
-                  text: "Mon – Fri: 8:00 AM – 6:00 PM",
-                },
-              ].map(({ icon: Icon, text }) => (
+                {contactLines(config).map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3">
                   <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
                   <span className="font-sans text-sm leading-snug text-white/50">{text}</span>
