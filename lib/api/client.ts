@@ -91,6 +91,26 @@ function resolveApiBaseUrl(): string {
 
 const API_BASE_URL = resolveApiBaseUrl();
 
+/**
+ * The guest cart session id, read directly rather than imported.
+ *
+ * `lib/api/cart.ts` owns this value and imports *this* module, so importing it
+ * back would be a cycle. Reading the key is a two-line duplication; the cycle
+ * would be a runtime failure that only shows in a production build.
+ */
+const CART_SESSION_KEY = "kuyash_cart_session";
+
+function cartSessionId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    return window.localStorage.getItem(CART_SESSION_KEY) ?? "";
+  } catch {
+    // Private browsing or storage disabled. Falls back to IP keying, which is
+    // the behaviour this replaces rather than a regression.
+    return "";
+  }
+}
+
 /** A request that reached the server and came back with an error envelope. */
 /**
  * Response header carrying the unread-notification count.
@@ -183,6 +203,34 @@ export class ApiClient {
     const { method = "GET", body, headers = {}, skipRefresh = false } = options;
 
     const requestHeaders: Record<string, string> = { ...headers };
+
+    /**
+     * Identify this browser on every request, not just cart ones.
+     *
+     * The API's anonymous throttle (`SessionAwareAnonThrottle`) keys on
+     * `X-Cart-Session` when it is present and falls back to the IP address when
+     * it is not. Only `lib/api/cart.ts` was sending it, so browsing the shop —
+     * products, categories, a product page — was rate-limited **per IP**.
+     *
+     * That is fine on a laptop and wrong for this market. Nigerian mobile
+     * carriers put very large numbers of subscribers behind a handful of public
+     * addresses (CGNAT), and one page view costs several requests. At any real
+     * concurrency the 60/min anonymous bucket is exhausted by strangers sharing
+     * a carrier, and genuine customers get 429s that look like the site being
+     * broken rather than like a policy.
+     *
+     * The id already exists in localStorage and is an opaque random handle —
+     * no identity, nothing to leak — so sending it everywhere costs nothing and
+     * gives each browser its own bucket, which is what the server-side throttle
+     * was built to use.
+     *
+     * Never overrides an explicit header: `cart.ts` still passes its own, and a
+     * caller that sets one deliberately keeps it.
+     */
+    if (!requestHeaders["X-Cart-Session"]) {
+      const session = cartSessionId();
+      if (session) requestHeaders["X-Cart-Session"] = session;
+    }
     if (body !== undefined) requestHeaders["Content-Type"] = "application/json";
     if (this.accessToken) requestHeaders["Authorization"] = `Bearer ${this.accessToken}`;
 
