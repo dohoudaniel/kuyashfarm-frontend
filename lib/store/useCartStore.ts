@@ -36,6 +36,28 @@ interface CartState {
   subtotal: () => string;
 }
 
+/**
+ * Which `load()` is the current one.
+ *
+ * **A basket is not a place for last-response-wins.** `load()` is called from
+ * an effect keyed on `isAuthenticated`, so signing in fires a second load while
+ * the first is still in flight — and `afterSignIn` is concurrently running
+ * `mergeCart()`, which changes the very thing both are fetching. Whichever
+ * response happened to arrive last used to win, so a customer who had just
+ * signed in could be left looking at their *pre-merge* basket: the guest items
+ * gone from the screen, still present on the server, reappearing on the next
+ * navigation.
+ *
+ * A counter rather than an `isLoading` early-return, deliberately. Bailing out
+ * while a request is in flight would drop the post-sign-in reload — the one
+ * that actually matters — and leave the stale basket on screen permanently.
+ * Every call still runs; only the newest is allowed to write.
+ *
+ * Module scope is correct here: the store is a singleton, and this is only
+ * ever read in the browser.
+ */
+let loadSequence = 0;
+
 export const useCartStore = create<CartState>()((set, get) => ({
   cart: null,
   isLoading: false,
@@ -43,10 +65,15 @@ export const useCartStore = create<CartState>()((set, get) => ({
   error: null,
 
   load: async () => {
+    const sequence = ++loadSequence;
     set({ isLoading: true, error: null });
     try {
-      set({ cart: await cartApi.getCart(), isLoading: false });
+      const cart = await cartApi.getCart();
+      // A newer load started while this one was in flight; it owns the result.
+      if (sequence !== loadSequence) return;
+      set({ cart, isLoading: false });
     } catch (error) {
+      if (sequence !== loadSequence) return;
       set({ isLoading: false, error: messageFor(error) });
     }
   },
@@ -98,7 +125,18 @@ export const useCartStore = create<CartState>()((set, get) => ({
   },
 
   /** Drop cached state without a round-trip — used on sign-out. */
-  reset: () => set({ cart: null, error: null }),
+  /**
+   * Drop the basket, on sign-out.
+   *
+   * Bumping the sequence is the point: without it, a `load()` already in flight
+   * resolves *after* the clear and writes the signed-out user's basket back
+   * onto the screen of whoever is now sitting at the browser. Invalidating
+   * here means any request that started before the reset can no longer write.
+   */
+  reset: () => {
+    loadSequence += 1;
+    set({ cart: null, error: null });
+  },
 
   itemCount: () => get().cart?.item_count ?? 0,
   subtotal: () => get().cart?.subtotal ?? "0.00",

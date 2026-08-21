@@ -129,6 +129,37 @@ describe("response handling", () => {
 });
 
 describe("token refresh", () => {
+  /**
+   * A refresh is only attempted when the browser holds `kuyash_session`.
+   *
+   * The client used to try unconditionally, which meant every anonymous page
+   * load spent a guaranteed 401 discovering there was nothing to refresh. The
+   * server now sets that readable cookie beside the HttpOnly refresh token, so
+   * the question is answered locally — and these tests, which are all about
+   * what happens *when there is a session*, have to say so.
+   */
+  beforeEach(() => {
+    document.cookie = "kuyash_session=1";
+  });
+
+  it("does not attempt a refresh when no session cookie is present", async () => {
+    // The saving this whole mechanism exists for: an anonymous visitor must
+    // cost zero auth round trips, not one 401 per page load.
+    document.cookie = "kuyash_session=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    const fetchMock = vi.fn().mockResolvedValue(failure(401, "Unauthenticated"));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = new ApiClient("http://api.test/api/v1");
+    await expect(client.get("/auth/me/")).rejects.toBeInstanceOf(ApiError);
+
+    // One call — the original. No /auth/refresh/ behind it.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls.every(([url]) => !String(url).includes("/auth/refresh/"))).toBe(
+      true,
+    );
+  });
+
   it("replays the original request once after a successful refresh", async () => {
     const fetchMock = vi
       .fn()

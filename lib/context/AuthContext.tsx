@@ -23,7 +23,7 @@ import React, {
   useState,
 } from "react";
 
-import { apiClient } from "@/lib/api/client";
+import { apiClient, hasSessionHint } from "@/lib/api/client";
 import * as authApi from "@/lib/api/auth";
 import { clearCartSessionId, mergeCart } from "@/lib/api/cart";
 import { useWishlistStore } from "@/lib/store/useWishlistStore";
@@ -79,6 +79,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * if that cookie is still good.
    */
   const bootstrap = useCallback(async () => {
+    // Most visitors are not signed in, and for them this whole exchange was
+    // two guaranteed 401s — `/auth/me/`, then the silent `/auth/refresh/` it
+    // provokes — before the page could do anything useful. The server sets a
+    // readable `kuyash_session` cookie beside the HttpOnly refresh cookie so
+    // that question can be answered locally; see `hasSessionHint`.
+    //
+    // Only an optimisation, and only in the safe direction: a false negative
+    // costs a signed-in visitor nothing, because the first 401 from any real
+    // request still runs the normal refresh path. Nothing is authorised on the
+    // strength of this cookie.
+    if (!hasSessionHint()) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setUser(await authApi.getCurrentUser());
     } catch {

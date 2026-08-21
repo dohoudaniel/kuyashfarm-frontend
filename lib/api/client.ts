@@ -40,8 +40,43 @@ import type { ApiEnvelope } from "./types";
  * is almost always right and the cost of being wrong is a page refresh.
  */
 function resolveApiBaseUrl(): string {
-  const configured = process.env.NEXT_PUBLIC_API_URL;
-  if (configured) return configured;
+  const configured = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  if (configured) {
+    /**
+     * `0.0.0.0` is a *bind* address, never a destination.
+     *
+     * It means "listen on every interface" to a server — `make run` uses it for
+     * exactly that reason — and it is a natural thing to copy into here after
+     * reading it in the backend's startup banner. But no client can connect to
+     * it: it is not routable, and a browser given it simply fails.
+     *
+     * Caught explicitly because the symptom is so misleading. The Content
+     * Security Policy is built from this same value at build time, so the
+     * browser blocks the request at the CSP layer first and reports
+     * "Refused to connect ... violates the document's Content Security Policy"
+     * — which reads as a policy bug, sends you into next.config.ts, and says
+     * nothing about the address being unusable. Better to refuse it here, by
+     * name, with the fix in the message.
+     */
+    try {
+      if (new URL(configured).hostname === "0.0.0.0") {
+        throw new Error(
+          "NEXT_PUBLIC_API_URL is set to 0.0.0.0, which is a bind address and " +
+            "cannot be connected to. Use the address the browser should reach " +
+            "the API on — http://localhost:8000/api/v1, or this machine's IP " +
+            "(`hostname -I`) when the browser is on another host, as under WSL. " +
+            "The server may still *bind* 0.0.0.0; that is a separate setting.",
+        );
+      }
+    } catch (error) {
+      // Rethrow our own diagnosis; a malformed URL falls through to the
+      // existing behaviour rather than being reported as this problem.
+      if (error instanceof Error && error.message.includes("bind address")) throw error;
+    }
+
+    return configured;
+  }
 
   if (process.env.NODE_ENV === "production") {
     throw new Error(
@@ -242,6 +277,16 @@ export class ApiClient {
   private refreshAccessToken(): Promise<boolean> {
     if (this.refreshInFlight) return this.refreshInFlight;
 
+    // Nothing to exchange. The server sets a readable `kuyash_session` cookie
+    // beside the HttpOnly refresh cookie precisely so this can be known
+    // without asking; its absence means an attempt would be a guaranteed 401.
+    // Skipping it is the difference between an anonymous page load costing two
+    // round trips and costing none.
+    if (!hasSessionHint()) {
+      this.accessToken = null;
+      return Promise.resolve(false);
+    }
+
     this.refreshInFlight = (async () => {
       try {
         const data = await this.request<{ access_token: string }>("/auth/refresh/", {
@@ -381,3 +426,29 @@ export async function fetchPublic<T>(
 }
 
 export default apiClient;
+
+/**
+ * Does this browser hold a session worth trying to restore?
+ *
+ * Reads `kuyash_session`, the readable companion the server sets beside the
+ * HttpOnly refresh cookie. It contains the literal "1" — no token, no
+ * identity, no claim — so this answers exactly one question: is a refresh
+ * attempt worth a round trip?
+ *
+ * **It is a hint, never a decision.** Nothing is authorised on the strength of
+ * it. A forged one costs an attacker a wasted 401; a missing one costs a
+ * signed-in user nothing, because any subsequent 401 from a real request still
+ * triggers the normal refresh path. Treating it as proof of anything would be
+ * the mistake — HttpOnly exists so that script cannot hold credentials, and
+ * this deliberately holds none.
+ *
+ * Server-side it returns false: `document` does not exist, and a Server
+ * Component has no business restoring anybody's session anyway.
+ */
+export function hasSessionHint(): boolean {
+  if (typeof document === "undefined") return false;
+
+  // Matched on a cookie boundary rather than with `includes`, so a cookie
+  // merely *ending* in the name — `other_kuyash_session` — cannot satisfy it.
+  return /(?:^|;\s*)kuyash_session=1(?:;|$)/.test(document.cookie);
+}
