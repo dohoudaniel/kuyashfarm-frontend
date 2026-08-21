@@ -11,14 +11,14 @@ import { TESTIMONIALS } from "@/lib/data/academy";
 export function AcademyTestimonials() {
   return (
     <section className="bg-cream py-28 md:py-36">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-4"
+            className="text-xs font-mono uppercase tracking-[0.2em] text-primary mb-4"
           >
             Student Success
           </motion.p>
@@ -61,7 +61,7 @@ export function AcademyTestimonials() {
               {/* Outcome stat */}
               <div className="bg-mist rounded-xl px-4 py-3 inline-flex items-center gap-2">
                 <span className="text-primary font-semibold text-sm">{t.stat}</span>
-                <span className="text-gray-400 text-xs">· {t.program}</span>
+                <span className="text-gray-500 text-xs">· {t.program}</span>
               </div>
 
               {/* Author */}
@@ -71,7 +71,7 @@ export function AcademyTestimonials() {
                 </div>
                 <div>
                   <p className="font-sans font-semibold text-sm text-ink">{t.name}</p>
-                  <p className="font-sans text-xs text-gray-400">{t.role}</p>
+                  <p className="font-sans text-xs text-gray-500">{t.role}</p>
                 </div>
               </div>
             </motion.div>
@@ -98,7 +98,7 @@ export function AcademyTestimonials() {
           </div>
           <div>
             <p className="font-sans font-semibold text-ink text-sm">Join 500+ graduates</p>
-            <p className="font-sans text-gray-400 text-xs">who transformed their agricultural careers with Kuyash Farms Academy</p>
+            <p className="font-sans text-gray-500 text-xs">who transformed their agricultural careers with Kuyash Farms Academy</p>
           </div>
         </motion.div>
       </div>

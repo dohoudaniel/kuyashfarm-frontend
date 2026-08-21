@@ -200,7 +200,7 @@ export default function LoginClient() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="email"
@@ -245,7 +245,7 @@ export default function LoginClient() {
                 </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="password"
@@ -287,7 +287,7 @@ export default function LoginClient() {
               <>
                 <div className="my-6 flex items-center gap-3">
                   <span className="h-px flex-1 bg-gray-200" />
-                  <span className="text-xs uppercase tracking-wide text-gray-400">or</span>
+                  <span className="text-xs uppercase tracking-wide text-gray-500">or</span>
                   <span className="h-px flex-1 bg-gray-200" />
                 </div>
                 {/* Renders nothing unless NEXT_PUBLIC_GOOGLE_CLIENT_ID is set:

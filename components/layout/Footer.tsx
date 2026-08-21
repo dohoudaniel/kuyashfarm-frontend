@@ -46,15 +46,15 @@ export function Footer({ config = null }: { config?: StoreConfig | null }) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#080f0a] text-white">
+    <footer className="bg-ink text-white">
       {/* Main Footer */}
-      <div className="mx-auto max-w-7xl px-6 pt-16 pb-10 lg:px-8 lg:pt-20">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-6 pt-16 pb-10 lg:px-8 lg:pt-20">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8 xl:gap-12">
 
           {/* Col 1 — Brand */}
           <div className="lg:col-span-1">
             <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#2d5f3f]">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -98,7 +98,7 @@ export function Footer({ config = null }: { config?: StoreConfig | null }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all duration-200 hover:border-accent hover:text-accent"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white/60 transition-all duration-200 hover:border-accent hover:text-accent"
                 >
                   <Icon className="h-3.5 w-3.5" />
                 </a>
@@ -131,7 +131,7 @@ export function Footer({ config = null }: { config?: StoreConfig | null }) {
                     href={link.href}
                     className="group inline-flex min-h-11 items-center gap-1.5 py-1.5 font-sans text-sm text-white/50 transition-colors duration-200 hover:text-white"
                   >
-                    <span className="h-px w-0 bg-[#6b9d7a] transition-all duration-200 group-hover:w-3" />
+                    <span className="h-px w-0 bg-accent transition-all duration-200 group-hover:w-3" />
                     {link.label}
                   </a>
                 </li>
@@ -158,7 +158,7 @@ export function Footer({ config = null }: { config?: StoreConfig | null }) {
                     href={link.href}
                     className="group inline-flex min-h-11 items-center gap-1.5 py-1.5 font-sans text-sm text-white/50 transition-colors duration-200 hover:text-white"
                   >
-                    <span className="h-px w-0 bg-[#6b9d7a] transition-all duration-200 group-hover:w-3" />
+                    <span className="h-px w-0 bg-accent transition-all duration-200 group-hover:w-3" />
                     {link.label}
                   </a>
                 </li>
@@ -184,14 +184,14 @@ export function Footer({ config = null }: { config?: StoreConfig | null }) {
       </div>
 
       {/* Divider */}
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-6 lg:px-8">
         <div className="h-px bg-white/8" />
       </div>
 
       {/* Bottom Bar */}
-      <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-6 py-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="font-sans text-xs text-white/30">
+          <p className="font-sans text-xs text-white/60">
             © {currentYear} {SITE_CONFIG.name}. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
@@ -207,7 +207,7 @@ export function Footer({ config = null }: { config?: StoreConfig | null }) {
               <Link
                 key={label}
                 href={href}
-                className="inline-flex min-h-11 items-center font-sans text-xs text-white/30 transition-colors duration-200 hover:text-accent"
+                className="inline-flex min-h-11 items-center font-sans text-xs text-white/60 transition-colors duration-200 hover:text-accent"
               >
                 {label}
               </Link>

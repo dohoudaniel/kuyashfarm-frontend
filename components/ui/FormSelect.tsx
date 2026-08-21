@@ -42,7 +42,7 @@ export function FormSelect({
       </label>
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+          <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
         )}
         <select
           id={name}
@@ -70,7 +70,7 @@ export function FormSelect({
         {/* Custom dropdown arrow */}
         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
           <svg
-            className="w-5 h-5 text-gray-400"
+            className="w-5 h-5 text-gray-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

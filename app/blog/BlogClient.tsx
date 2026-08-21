@@ -58,7 +58,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 /* ─── author avatar ─── */
 function AuthorAvatar({ initials }: { initials: string }) {
   return (
-    <span className="inline-flex w-7 h-7 rounded-full bg-[#2d5f3f] items-center justify-center text-white text-[10px] font-bold shrink-0">
+    <span className="inline-flex w-7 h-7 rounded-full bg-primary items-center justify-center text-white text-[10px] font-bold shrink-0">
       {initials}
     </span>
   );
@@ -67,7 +67,7 @@ function AuthorAvatar({ initials }: { initials: string }) {
 /* ─── category pill ─── */
 function CategoryPill({ name }: { name: string }) {
   return (
-    <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#2d5f3f] text-white">
+    <span className="inline-block text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary text-white">
       {name}
     </span>
   );
@@ -81,7 +81,7 @@ function ArticleCard({ post, index }: { post: BlogPost; index: number }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
-      className="group bg-white border border-gray-100 hover:border-[#c6dece] hover:shadow-lg rounded-2xl overflow-hidden transition-all duration-300 flex flex-col"
+      className="group bg-white border border-gray-100 hover:border-edge hover:shadow-lg rounded-2xl overflow-hidden transition-all duration-300 flex flex-col"
     >
       {/* Image */}
       <div className="relative h-52 overflow-hidden shrink-0">
@@ -98,7 +98,7 @@ function ArticleCard({ post, index }: { post: BlogPost; index: number }) {
 
       {/* Content */}
       <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-serif text-lg font-bold text-[#080f0a] leading-tight mb-2 group-hover:text-[#2d5f3f] transition-colors duration-200">
+        <h3 className="font-serif text-lg font-bold text-ink leading-tight mb-2 group-hover:text-primary transition-colors duration-200">
           {post.title}
         </h3>
         <p className="text-gray-500 text-sm leading-relaxed font-sans mb-4 flex-1 line-clamp-3">
@@ -111,10 +111,10 @@ function ArticleCard({ post, index }: { post: BlogPost; index: number }) {
             <AuthorAvatar initials={post.authorInitials} />
             <div>
               <p className="text-[11px] font-semibold text-gray-700 leading-none">{post.author}</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">{post.date}</p>
+              <p className="text-[10px] text-gray-500 mt-0.5">{post.date}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-gray-400 font-sans">
+          <div className="flex items-center gap-1 text-[11px] text-gray-500 font-sans">
             <Clock className="w-3 h-3" />
             {post.readTime}
           </div>
@@ -122,7 +122,7 @@ function ArticleCard({ post, index }: { post: BlogPost; index: number }) {
 
         <Link
           href={`/blog/${post.slug}`}
-          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2d5f3f] group-hover:gap-3 transition-all duration-200"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary group-hover:gap-3 transition-all duration-200"
         >
           Read More <ArrowRight className="w-4 h-4" />
         </Link>
@@ -179,7 +179,7 @@ export function BlogClient({
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
+    <div className="min-h-screen bg-cream">
 
       {/*
         Said out loud when the API could not be reached and these are the
@@ -197,7 +197,7 @@ export function BlogClient({
       )}
 
       {/* ══ HERO ══ */}
-      <section className="relative bg-[#080f0a] overflow-hidden">
+      <section className="relative bg-ink overflow-hidden">
         {/* background image */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -210,7 +210,7 @@ export function BlogClient({
             className="object-cover opacity-30"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-r from-[#080f0a] via-[#080f0a]/80 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-ink via-ink/80 to-transparent" />
         </div>
 
         {/* subtle grid */}
@@ -220,12 +220,12 @@ export function BlogClient({
             backgroundSize: "60px 60px",
           }} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-24 md:py-32">
+        <div className="relative z-10 max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16 py-24 md:py-32">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-xs font-mono uppercase tracking-[0.25em] text-[#6b9d7a] mb-4"
+            className="text-xs font-mono uppercase tracking-[0.25em] text-primary mb-4"
           >
             Practical Knowledge for Modern Agriculture
           </motion.p>
@@ -239,7 +239,7 @@ export function BlogClient({
           >
             Knowledge that{" "}
             <span className="text-transparent bg-clip-text"
-              style={{ backgroundImage: "linear-gradient(135deg, #6b9d7a 0%, #e8d5a3 100%)" }}>
+              style={{ backgroundImage: "linear-gradient(135deg, var(--accent-green) 0%, var(--wheat) 100%)" }}>
               grows
             </span>{" "}
             with farmers.
@@ -262,19 +262,19 @@ export function BlogClient({
             transition={{ duration: 0.6, delay: 0.3 }}
             className="relative max-w-lg"
           >
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search articles, guides, research..."
-              className="w-full pl-11 pr-4 py-4 bg-white/10 border border-white/15 backdrop-blur-md text-white placeholder:text-white/35 rounded-xl text-sm font-sans outline-none focus:border-[#6b9d7a] focus:bg-white/15 transition-all duration-200"
+              className="w-full pl-11 pr-4 py-4 bg-white/10 border border-white/15 backdrop-blur-md text-white placeholder:text-white/35 rounded-xl text-sm font-sans outline-none focus:border-accent focus:bg-white/15 transition-all duration-200"
             />
           </motion.div>
         </div>
       </section>
 
       {/* ══ MAIN BODY ══ */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-14">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16 py-14">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
 
           {/* ── LEFT COLUMN ── */}
@@ -283,14 +283,14 @@ export function BlogClient({
             {/* FEATURED ARTICLE */}
             {!search && activeCategory === "All" && (
               <section className="mb-14">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6b9d7a] mb-5 font-mono">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary mb-5 font-mono">
                   Featured Article
                 </p>
                 <motion.article
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="group grid grid-cols-1 md:grid-cols-2 gap-0 bg-white border border-gray-100 hover:border-[#c6dece] hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300"
+                  className="group grid grid-cols-1 md:grid-cols-2 gap-0 bg-white border border-gray-100 hover:border-edge hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300"
                 >
                   {/* Image */}
                   <div className="relative h-64 md:h-full min-h-[280px] overflow-hidden">
@@ -306,7 +306,7 @@ export function BlogClient({
                   {/* Content */}
                   <div className="p-8 flex flex-col justify-center">
                     <CategoryPill name={featuredPost.category} />
-                    <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#080f0a] leading-tight mt-4 mb-3 group-hover:text-[#2d5f3f] transition-colors duration-200">
+                    <h2 className="font-serif text-2xl md:text-3xl font-bold text-ink leading-tight mt-4 mb-3 group-hover:text-primary transition-colors duration-200">
                       {featuredPost.title}
                     </h2>
                     <p className="text-gray-500 text-sm leading-relaxed font-sans mb-6 line-clamp-3">
@@ -316,12 +316,12 @@ export function BlogClient({
                       <AuthorAvatar initials={featuredPost.authorInitials} />
                       <div>
                         <p className="text-xs font-semibold text-gray-700">{featuredPost.author}</p>
-                        <p className="text-[10px] text-gray-400">{featuredPost.date} · {featuredPost.readTime}</p>
+                        <p className="text-[10px] text-gray-500">{featuredPost.date} · {featuredPost.readTime}</p>
                       </div>
                     </div>
                     <Link
                       href={`/blog/${featuredPost.slug}`}
-                      className="inline-flex items-center gap-2 bg-[#2d5f3f] text-white font-semibold text-sm px-6 py-3 rounded-full hover:bg-[#4a7c59] transition-colors duration-200 self-start"
+                      className="inline-flex items-center gap-2 bg-primary text-white font-semibold text-sm px-6 py-3 rounded-full hover:bg-secondary transition-colors duration-200 self-start"
                     >
                       Read Article <ArrowRight className="w-4 h-4" />
                     </Link>
@@ -333,7 +333,7 @@ export function BlogClient({
             {/* LATEST ARTICLES */}
             <section>
               <div className="flex items-center justify-between mb-6">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6b9d7a] font-mono">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary font-mono">
                   {search || activeCategory !== "All" ? "Search Results" : "Latest Articles"}
                 </p>
               </div>
@@ -351,9 +351,9 @@ export function BlogClient({
                     className="text-center py-16 bg-white rounded-2xl border border-gray-100"
                   >
                     <p className="font-serif text-lg font-bold text-gray-900 mb-2">No articles found</p>
-                    <p className="text-sm text-gray-400 font-sans">Try a different search term or category.</p>
+                    <p className="text-sm text-gray-500 font-sans">Try a different search term or category.</p>
                     <button onClick={() => { setSearch(""); setActiveCategory("All"); }}
-                      className="mt-5 text-sm font-semibold text-[#2d5f3f] border border-[#c6dece] px-4 py-2 rounded-full hover:bg-[#eef5f1] transition-colors">
+                      className="mt-5 text-sm font-semibold text-primary border border-edge px-4 py-2 rounded-full hover:bg-mist transition-colors">
                       Clear filters
                     </button>
                   </motion.div>
@@ -367,21 +367,21 @@ export function BlogClient({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   {BLOG_GUIDE_SECTIONS.map((section) => (
                     <div key={section.title}
-                      className="group relative rounded-2xl overflow-hidden border border-gray-100 hover:border-[#c6dece] hover:shadow-lg transition-all duration-300 bg-white">
+                      className="group relative rounded-2xl overflow-hidden border border-gray-100 hover:border-edge hover:shadow-lg transition-all duration-300 bg-white">
                       {/* Image */}
                       <div className="relative h-36 overflow-hidden">
                         <Image src={section.image} alt={section.title} fill
                           sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,25vw"
                           className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                        <div className="absolute inset-0 bg-[#080f0a]/25" />
-                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#2d5f3f]" />
+                        <div className="absolute inset-0 bg-ink/25" />
+                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary" />
                       </div>
                       {/* Content */}
                       <div className="p-5">
-                        <h3 className="font-serif font-bold text-[#080f0a] text-sm mb-2">{section.title}</h3>
-                        <p className="text-xs text-gray-400 font-sans leading-relaxed mb-4">{section.description}</p>
+                        <h3 className="font-serif font-bold text-ink text-sm mb-2">{section.title}</h3>
+                        <p className="text-xs text-gray-500 font-sans leading-relaxed mb-4">{section.description}</p>
                         <Link href={section.href}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2d5f3f] border border-[#c6dece] px-3 py-1.5 rounded-full hover:bg-[#eef5f1] transition-colors">
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary border border-edge px-3 py-1.5 rounded-full hover:bg-mist transition-colors">
                           {section.cta} <ArrowRight className="w-3 h-3" />
                         </Link>
                       </div>
@@ -398,20 +398,20 @@ export function BlogClient({
             {/* BROWSE CATEGORIES */}
             <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-50">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6b9d7a] font-mono">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary font-mono">
                   Browse Categories
                 </p>
               </div>
               <div className="divide-y divide-gray-50">
                 <button
                   onClick={() => setActiveCategory("All")}
-                  className={`w-full flex items-center justify-between px-5 py-3 text-sm font-sans transition-colors duration-150 ${activeCategory === "All" ? "bg-[#eef5f1] text-[#2d5f3f] font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
+                  className={`w-full flex items-center justify-between px-5 py-3 text-sm font-sans transition-colors duration-150 ${activeCategory === "All" ? "bg-mist text-primary font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
                 >
                   <span className="flex items-center gap-3">
-                    <Leaf className="w-4 h-4 text-[#6b9d7a]" />
+                    <Leaf className="w-4 h-4 text-accent" />
                     All Articles
                   </span>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${activeCategory === "All" ? "bg-[#2d5f3f] text-white" : "bg-gray-100 text-gray-500"}`}>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${activeCategory === "All" ? "bg-primary text-white" : "bg-gray-100 text-gray-500"}`}>
                     {categoryCounts["All"]}
                   </span>
                 </button>
@@ -422,13 +422,13 @@ export function BlogClient({
                     <button
                       key={cat.slug}
                       onClick={() => setActiveCategory(isActive ? "All" : cat.name)}
-                      className={`w-full flex items-center justify-between px-5 py-3 text-sm font-sans transition-colors duration-150 ${isActive ? "bg-[#eef5f1] text-[#2d5f3f] font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
+                      className={`w-full flex items-center justify-between px-5 py-3 text-sm font-sans transition-colors duration-150 ${isActive ? "bg-mist text-primary font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
                     >
                       <span className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 ${isActive ? "text-[#2d5f3f]" : "text-[#6b9d7a]"}`} />
+                        <Icon className={`w-4 h-4 ${isActive ? "text-primary" : "text-accent"}`} />
                         {cat.name}
                       </span>
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isActive ? "bg-[#2d5f3f] text-white" : "bg-gray-100 text-gray-500"}`}>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isActive ? "bg-primary text-white" : "bg-gray-100 text-gray-500"}`}>
                         {categoryCounts[cat.name] ?? 0}
                       </span>
                     </button>
@@ -438,14 +438,14 @@ export function BlogClient({
             </div>
 
             {/* STAY INFORMED */}
-            <div className="bg-[#080f0a] rounded-2xl p-6 relative overflow-hidden">
+            <div className="bg-ink rounded-2xl p-6 relative overflow-hidden">
               <div className="absolute inset-0 opacity-[0.04]"
                 style={{
                   backgroundImage: `linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)`,
                   backgroundSize: "32px 32px",
                 }} />
               <div className="relative z-10">
-                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#6b9d7a] mb-3">
+                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary mb-3">
                   Stay Informed
                 </p>
                 <p className="font-serif font-bold text-white text-base leading-snug mb-2">
@@ -455,7 +455,7 @@ export function BlogClient({
                   Subscribe to get the latest agricultural insights and practical guides.
                 </p>
                 {subscribed ? (
-                  <div className="bg-[#2d5f3f]/30 border border-[#2d5f3f]/50 rounded-xl px-4 py-3 text-center">
+                  <div className="bg-primary/30 border border-primary/50 rounded-xl px-4 py-3 text-center">
                     <p className="text-white font-semibold text-sm">You&apos;re subscribed!</p>
                     <p className="text-white/50 text-xs mt-0.5">Look out for your first email.</p>
                   </div>
@@ -467,10 +467,10 @@ export function BlogClient({
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required
-                      className="w-full bg-white/10 border border-white/15 text-white placeholder:text-white/30 rounded-xl px-4 py-3 text-sm font-sans outline-none focus:border-[#6b9d7a] transition-all"
+                      className="w-full bg-white/10 border border-white/15 text-white placeholder:text-white/60 rounded-xl px-4 py-3 text-sm font-sans outline-none focus:border-accent transition-all"
                     />
                     <button type="submit"
-                      className="w-full bg-[#2d5f3f] hover:bg-[#4a7c59] text-white font-semibold text-sm py-3 rounded-xl transition-colors duration-200">
+                      className="w-full bg-primary hover:bg-secondary text-white font-semibold text-sm py-3 rounded-xl transition-colors duration-200">
                       Subscribe
                     </button>
                     <p className="text-white/25 text-[10px] font-sans text-center">No spam. Unsubscribe anytime.</p>
@@ -482,7 +482,7 @@ export function BlogClient({
             {/* POPULAR ARTICLES */}
             <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-50">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6b9d7a] font-mono">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary font-mono">
                   Popular Articles
                 </p>
               </div>
@@ -494,12 +494,12 @@ export function BlogClient({
                       <Image src={post.image} alt={post.title} fill className="object-cover" sizes="56px" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-[#080f0a] leading-snug group-hover:text-[#2d5f3f] transition-colors line-clamp-2 mb-1">
+                      <p className="text-xs font-semibold text-ink leading-snug group-hover:text-primary transition-colors line-clamp-2 mb-1">
                         {post.title}
                       </p>
-                      <p className="text-[10px] text-gray-400 font-sans">{post.date}</p>
+                      <p className="text-[10px] text-gray-500 font-sans">{post.date}</p>
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#2d5f3f] shrink-0 mt-1 transition-colors" />
+                    <ChevronRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-primary shrink-0 mt-1 transition-colors" />
                   </Link>
                 ))}
               </div>

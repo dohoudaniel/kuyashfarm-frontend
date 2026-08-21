@@ -122,7 +122,7 @@ export function ProductDetailClient({ initialProduct, categorySlug }: Props) {
               priority
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-gray-400">
+            <div className="flex h-full items-center justify-center text-gray-500">
               No photograph yet
             </div>
           )}

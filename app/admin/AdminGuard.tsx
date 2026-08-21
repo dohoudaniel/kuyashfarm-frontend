@@ -37,7 +37,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
       </div>
     );
   }
@@ -56,7 +56,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
         <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
-          <ShieldAlert className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+          <ShieldAlert className="mx-auto mb-4 h-12 w-12 text-gray-500" />
           <h1 className="mb-2 font-serif text-2xl font-bold text-gray-900">
             This area is for staff
           </h1>

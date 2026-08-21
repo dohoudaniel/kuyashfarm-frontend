@@ -187,7 +187,7 @@ export default function BlogAdminClient() {
                 <td className="px-4 py-3 text-gray-600">
                   {post.author_name}
                   {post.author_role && (
-                    <span className="block text-xs text-gray-400">{post.author_role}</span>
+                    <span className="block text-xs text-gray-500">{post.author_role}</span>
                   )}
                 </td>
                 <td className="px-4 py-3">

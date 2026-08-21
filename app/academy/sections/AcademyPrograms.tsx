@@ -59,7 +59,7 @@ function ProgramCard({ program, index }: { program: Program; index: number }) {
       </div>
 
       {/* Meta row */}
-      <div className="px-6 py-3 border-t border-gray-50 flex gap-4 text-xs text-gray-400 font-sans">
+      <div className="px-6 py-3 border-t border-gray-50 flex gap-4 text-xs text-gray-500 font-sans">
         <span className="flex items-center gap-1.5">
           <Clock className="w-3.5 h-3.5" />
           {program.duration}
@@ -118,7 +118,7 @@ export function AcademyPrograms({ programs }: { programs: Program[] }) {
 
   return (
     <section id="programs" className="bg-cream py-28 md:py-36">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-14">
           <div>
@@ -126,7 +126,7 @@ export function AcademyPrograms({ programs }: { programs: Program[] }) {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-4"
+              className="text-xs font-mono uppercase tracking-[0.2em] text-primary mb-4"
             >
               Learning Pathways
             </motion.p>

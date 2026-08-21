@@ -60,7 +60,7 @@ export default async function ShopPage({ params }: PageProps) {
   return (
     <>
       <main className="min-h-screen bg-white pt-20 pb-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
           <div className="border-b border-gray-200 pb-6 pt-8">
             <h1 className="font-serif text-3xl font-bold text-gray-900 md:text-4xl">
               {category.name}

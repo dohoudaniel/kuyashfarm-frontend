@@ -96,7 +96,7 @@ export default function ServicePage({ params }: ServicePageProps) {
 
         {/* Overview */}
         <section className="py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
               <div>
                 <div className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1">
@@ -134,7 +134,7 @@ export default function ServicePage({ params }: ServicePageProps) {
 
         {/* Stats */}
         <section className="bg-gradient-to-br from-primary to-secondary py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
               <h2 className="mb-4 font-serif text-3xl font-bold text-white md:text-4xl">Impact by the Numbers</h2>
               <p className="font-sans text-lg text-white/80">Measurable results from our innovative farming practices</p>
@@ -154,7 +154,7 @@ export default function ServicePage({ params }: ServicePageProps) {
 
         {/* Farming Process */}
         <section className="py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
               <div className="mb-4 inline-block rounded-full bg-accent/10 px-4 py-1">
                 <span className="font-sans text-sm font-semibold uppercase tracking-wide text-primary">
@@ -202,7 +202,7 @@ export default function ServicePage({ params }: ServicePageProps) {
 
         {/* Technology */}
         <section className="bg-cream py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
               <div className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-1">
                 <span className="font-sans text-sm font-semibold uppercase tracking-wide text-primary">Innovation</span>
@@ -241,7 +241,7 @@ export default function ServicePage({ params }: ServicePageProps) {
         {/* Before / After */}
         {content.beforeAfter && (
           <section className="py-24">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
               <BeforeAfterSlider {...content.beforeAfter} />
             </div>
           </section>
@@ -249,7 +249,7 @@ export default function ServicePage({ params }: ServicePageProps) {
 
         {/* Features */}
         <section className="py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
               <h2 className="mb-6 font-serif text-4xl font-bold text-gray-900 md:text-5xl">Why Choose Kuyash</h2>
               <p className="mx-auto max-w-2xl font-sans text-lg text-gray-600">
@@ -278,7 +278,7 @@ export default function ServicePage({ params }: ServicePageProps) {
 
         {/* Benefits */}
         <section className="bg-white py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="relative">
                 <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-accent/20 to-primary/20 blur-2xl" />
@@ -316,7 +316,7 @@ export default function ServicePage({ params }: ServicePageProps) {
 
         {/* Gallery */}
         <section className="bg-[var(--light-gray)] py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
               <h2 className="mb-6 font-serif text-4xl font-bold text-gray-900 md:text-5xl">See Our Farm in Action</h2>
               <p className="mx-auto max-w-2xl font-sans text-lg text-gray-600">

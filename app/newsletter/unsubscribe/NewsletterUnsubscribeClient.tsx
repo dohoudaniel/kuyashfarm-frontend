@@ -79,7 +79,7 @@ export default function NewsletterUnsubscribeClient() {
             </>
           ) : !token ? (
             <>
-              <MailX className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+              <MailX className="mx-auto mb-4 h-12 w-12 text-gray-500" />
               <h1 className="mb-2 font-serif text-2xl font-bold text-gray-900">Incomplete link</h1>
               <p className="text-gray-600">
                 That unsubscribe link is missing part of its address. Copy the whole link from your
@@ -88,7 +88,7 @@ export default function NewsletterUnsubscribeClient() {
             </>
           ) : (
             <>
-              <MailX className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+              <MailX className="mx-auto mb-4 h-12 w-12 text-gray-500" />
               <h1 className="mb-2 font-serif text-2xl font-bold text-gray-900">
                 Unsubscribe from the newsletter?
               </h1>

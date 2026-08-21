@@ -179,7 +179,7 @@ export default function RegistrationClient({ reference }: { reference: string })
 
             {loading ? (
               <div className="rounded-2xl bg-white p-12 text-center">
-                <Loader2 className="mx-auto h-8 w-8 animate-spin text-gray-400" />
+                <Loader2 className="mx-auto h-8 w-8 animate-spin text-gray-500" />
               </div>
             ) : needsEmail ? (
               <div className="rounded-2xl bg-white p-8">

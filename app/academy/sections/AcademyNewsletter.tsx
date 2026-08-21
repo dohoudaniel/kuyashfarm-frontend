@@ -52,7 +52,7 @@ export function AcademyNewsletter() {
 
   return (
     <section className="bg-ink py-28">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         <div className="relative rounded-3xl overflow-hidden border border-white/8 p-12 md:p-16"
           style={{ background: "linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-dark) 60%, var(--primary-dark) 100%)" }}
         >
@@ -73,7 +73,7 @@ export function AcademyNewsletter() {
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-4"
+                className="text-xs font-mono uppercase tracking-[0.2em] text-primary mb-4"
               >
                 Stay Connected
               </motion.p>
@@ -134,7 +134,7 @@ export function AcademyNewsletter() {
                     required
                     aria-invalid={!!error}
                     aria-describedby={error ? "newsletter-error" : undefined}
-                    className={`flex-1 bg-white/[0.06] border text-white placeholder:text-white/30 rounded-xl px-5 py-4 text-sm font-sans outline-none focus:bg-white/[0.09] transition-all duration-200 ${
+                    className={`flex-1 bg-white/[0.06] border text-white placeholder:text-white/60 rounded-xl px-5 py-4 text-sm font-sans outline-none focus:bg-white/[0.09] transition-all duration-200 ${
                       error ? "border-red-400/70" : "border-white/15 focus:border-primary"
                     }`}
                   />

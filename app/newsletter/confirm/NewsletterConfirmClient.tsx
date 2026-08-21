@@ -59,7 +59,7 @@ export default function NewsletterConfirmClient() {
         <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm">
           {state === "working" ? (
             <>
-              <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-gray-400" />
+              <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-gray-500" />
               <p className="text-gray-600">Confirming your subscription…</p>
             </>
           ) : state === "done" ? (
@@ -81,7 +81,7 @@ export default function NewsletterConfirmClient() {
             </>
           ) : (
             <>
-              <MailX className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+              <MailX className="mx-auto mb-4 h-12 w-12 text-gray-500" />
               <h1 className="mb-2 font-serif text-2xl font-bold text-gray-900">
                 That link didn&apos;t work
               </h1>

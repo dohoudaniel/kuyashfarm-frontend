@@ -97,7 +97,7 @@ export function ManageClasses() {
   if (loading) {
     return (
       <p className="py-16 text-center">
-        <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-500" />
       </p>
     );
   }
@@ -247,7 +247,7 @@ export function ManageClasses() {
               </span>
               <button type="button" aria-label={`Delete ${person.name}`}
                 onClick={() => void run(() => deleteInstructor(person.id), "Instructor removed.")}
-                className="text-gray-400 hover:text-red-600">
+                className="text-gray-500 hover:text-red-600">
                 <Trash2 className="h-4 w-4" />
               </button>
             </li>

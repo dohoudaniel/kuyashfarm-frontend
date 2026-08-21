@@ -302,7 +302,7 @@ export default function CheckoutClient() {
   return (
     <>
       <main className="min-h-screen bg-gray-50 pt-24 pb-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
           <Link href="/categories" className="mb-8 inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
             <ArrowLeft className="h-5 w-5" /> Continue shopping
           </Link>
@@ -404,7 +404,7 @@ export default function CheckoutClient() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <button type="button" onClick={() => setPaymentMethod("PAYSTACK")}
                     className={`rounded-lg border-2 p-4 text-left transition-all ${paymentMethod === "PAYSTACK" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
-                    <Wallet className={`mb-2 h-6 w-6 ${paymentMethod === "PAYSTACK" ? "text-green-600" : "text-gray-400"}`} />
+                    <Wallet className={`mb-2 h-6 w-6 ${paymentMethod === "PAYSTACK" ? "text-green-600" : "text-gray-500"}`} />
                     <p className="font-semibold">Card or transfer</p>
                     <p className="text-xs text-gray-600">Secured by Paystack</p>
                   </button>
@@ -412,7 +412,7 @@ export default function CheckoutClient() {
                   {config?.cod_enabled && (
                     <button type="button" onClick={() => setPaymentMethod("COD")}
                       className={`rounded-lg border-2 p-4 text-left transition-all ${paymentMethod === "COD" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
-                      <Banknote className={`mb-2 h-6 w-6 ${paymentMethod === "COD" ? "text-green-600" : "text-gray-400"}`} />
+                      <Banknote className={`mb-2 h-6 w-6 ${paymentMethod === "COD" ? "text-green-600" : "text-gray-500"}`} />
                       <p className="font-semibold">Cash on delivery</p>
                       <p className="text-xs text-gray-600">Pay when it arrives</p>
                     </button>

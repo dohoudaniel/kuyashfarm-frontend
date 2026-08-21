@@ -44,7 +44,7 @@ export function RecentlyViewed({
 
   return (
     <section aria-label="Recently viewed" className="border-t border-gray-100 bg-white py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
         <h2 className="display-sm mb-6 font-serif font-bold text-ink">{title}</h2>
 
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4">

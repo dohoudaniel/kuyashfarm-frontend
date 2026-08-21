@@ -31,7 +31,7 @@ function AnimatedCounter({ target, suffix, duration = 2000 }: { target: number; 
 export function AcademyStats() {
   return (
     <section className="bg-ink border-t border-b border-white/5 py-20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
           {ACADEMY_STATS.map((stat, i) => (
             <motion.div
@@ -45,7 +45,7 @@ export function AcademyStats() {
               <p className="font-serif text-3xl md:text-4xl font-bold text-white">
                 <AnimatedCounter target={stat.value} suffix={stat.suffix} />
               </p>
-              <p className="mt-2 text-white/40 text-xs font-sans tracking-wide">{stat.label}</p>
+              <p className="mt-2 text-white/60 text-xs font-sans tracking-wide">{stat.label}</p>
             </motion.div>
           ))}
         </div>

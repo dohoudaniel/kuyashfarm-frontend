@@ -28,7 +28,7 @@ export function AcademyHero() {
       <div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] rounded-full bg-secondary/15 blur-[100px] z-0" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-6 lg:px-8 pt-28 pb-16">
+      <div className="relative z-10 max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-6 lg:px-8 pt-28 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center w-full">
 
           {/* LEFT */}
@@ -161,7 +161,7 @@ export function AcademyHero() {
                     </div>
                     <div>
                       <p className="text-white text-xs font-semibold leading-tight">{card.label}</p>
-                      <p className="text-white/40 text-[10px] mt-0.5">{card.sub}</p>
+                      <p className="text-white/60 text-[10px] mt-0.5">{card.sub}</p>
                     </div>
                   </div>
                 </motion.div>

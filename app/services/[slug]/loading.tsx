@@ -19,7 +19,7 @@ export default function ServiceLoading() {
       </div>
 
       {/* Overview skeleton */}
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-6 py-20 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2">
           <div className="space-y-4">
             <div className="h-3 w-24 animate-pulse rounded-full bg-gray-100" />
@@ -37,7 +37,7 @@ export default function ServiceLoading() {
 
       {/* Stats skeleton */}
       <div className="bg-primary/5 py-16">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-6 lg:px-8">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="rounded-2xl bg-white p-8 text-center shadow-sm">

@@ -70,7 +70,7 @@ export function SavedClient() {
   if (authLoading || (isAuthenticated && items === null)) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-cream">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
       </main>
     );
   }
@@ -97,7 +97,7 @@ export function SavedClient() {
 
   return (
     <main className="min-h-screen bg-cream pb-24 pt-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
         <h1 className="display-md mb-2 font-serif font-bold text-ink">Saved for later</h1>
         <p className="mb-8 text-gray-600">
           {visible.length === 0
@@ -157,7 +157,7 @@ export function SavedClient() {
                       <h2 className="text-sm font-semibold text-ink">{item.product.name}</h2>
                       <p className="text-sm text-gray-600">
                         {formatPrice(item.product.unit_price)}
-                        <span className="text-gray-400"> / {item.product.unit}</span>
+                        <span className="text-gray-500"> / {item.product.unit}</span>
                       </p>
                     </Link>
                   </motion.div>

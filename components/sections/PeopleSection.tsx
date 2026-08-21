@@ -41,8 +41,8 @@ const TEAM_IMAGES = [
 
 export function PeopleSection() {
   return (
-    <section className="bg-[#080f0a] py-24 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+    <section className="bg-ink py-24 overflow-hidden">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
           {/* LEFT — copy */}
@@ -52,7 +52,7 @@ export function PeopleSection() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#6b9d7a] mb-4">
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent mb-4">
               Our People
             </p>
             <h2
@@ -60,7 +60,7 @@ export function PeopleSection() {
               style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)" }}
             >
               The People Behind<br />Our Harvest.
-              <span className="inline-block ml-2 text-[#6b9d7a]">
+              <span className="inline-block ml-2 text-accent">
                 <svg viewBox="0 0 24 24" className="inline w-6 h-6 fill-none stroke-current stroke-[1.5]">
                   <path d="M12 2C9 2 6 5 6 9c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-.5-7.5C16.5 13.5 18 11.5 18 9c0-4-3-7-6-7z" />
                 </svg>
@@ -74,7 +74,7 @@ export function PeopleSection() {
             </p>
             <Link
               href="/about"
-              className="inline-flex items-center gap-2 text-[#6b9d7a] font-semibold text-sm hover:gap-3 transition-all duration-200"
+              className="inline-flex items-center gap-2 text-accent font-semibold text-sm hover:gap-3 transition-all duration-200"
             >
               Meet Our Team <ArrowRight className="w-4 h-4" />
             </Link>
@@ -104,7 +104,7 @@ export function PeopleSection() {
                   className="object-cover"
                   sizes="(max-width:1024px) 50vw, 25vw"
                 />
-                <div className="absolute inset-0 bg-[#080f0a]/20" />
+                <div className="absolute inset-0 bg-ink/20" />
               </motion.div>
             ))}
           </motion.div>

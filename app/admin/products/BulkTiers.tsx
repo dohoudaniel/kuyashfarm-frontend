@@ -129,7 +129,7 @@ export function BulkTiers({ slug, unit }: { slug: string; unit: string }) {
       )}
 
       {loading ? (
-        <Loader2 className="mt-4 h-5 w-5 animate-spin text-gray-400" />
+        <Loader2 className="mt-4 h-5 w-5 animate-spin text-gray-500" />
       ) : tiers.length === 0 ? (
         <p className="mt-4 rounded-lg border border-dashed border-gray-300 py-6 text-center text-xs text-gray-500">
           No bulk pricing. Wholesale accounts pay the base price for this product.
@@ -150,7 +150,7 @@ export function BulkTiers({ slug, unit }: { slug: string; unit: string }) {
                 disabled={busy}
                 onClick={() => void remove(tier)}
                 aria-label={`Remove the ${tier.min_quantity}+ tier`}
-                className="text-gray-400 hover:text-red-600 disabled:opacity-50"
+                className="text-gray-500 hover:text-red-600 disabled:opacity-50"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

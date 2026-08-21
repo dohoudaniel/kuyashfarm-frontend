@@ -13,7 +13,7 @@ export function AcademyFAQ() {
 
   return (
     <section className="bg-white py-28 md:py-36">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
           {/* Left — sticky header */}
           <div className="lg:sticky lg:top-32">
@@ -21,7 +21,7 @@ export function AcademyFAQ() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-4"
+              className="text-xs font-mono uppercase tracking-[0.2em] text-primary mb-4"
             >
               Frequently Asked
             </motion.p>

@@ -209,7 +209,7 @@ export default function DeliveryClient() {
                 <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="flex items-center gap-2 font-semibold text-gray-900">
-                      <Truck className="h-4 w-4 text-gray-400" />
+                      <Truck className="h-4 w-4 text-gray-500" />
                       {entry.driver_name}
                       <StatusPill status={entry.status} />
                     </h2>
@@ -264,7 +264,7 @@ export default function DeliveryClient() {
                         key={stop.id}
                         className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 px-3 py-2 text-sm"
                       >
-                        <span className="w-6 shrink-0 text-center font-mono text-gray-400">
+                        <span className="w-6 shrink-0 text-center font-mono text-gray-500">
                           {index + 1}
                         </span>
                         <div className="min-w-0 flex-1">

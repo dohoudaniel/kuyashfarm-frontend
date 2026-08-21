@@ -34,8 +34,8 @@ const PROGRAMMES = [
 
 export function GrowingWithOthers() {
   return (
-    <section className="bg-[#faf8f5] py-24 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+    <section className="bg-cream py-24 overflow-hidden">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-16 items-start">
 
@@ -47,11 +47,11 @@ export function GrowingWithOthers() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="lg:sticky lg:top-24"
           >
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#2d5f3f] mb-4">
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary mb-4">
               Growing With Others
             </p>
             <h2
-              className="font-serif font-bold text-[#080f0a] leading-[1.06] mb-5"
+              className="font-serif font-bold text-ink leading-[1.06] mb-5"
               style={{ fontSize: "clamp(1.8rem, 2.8vw, 2.6rem)" }}
             >
               We believe in shared knowledge and strong partnerships for a better future.
@@ -61,7 +61,7 @@ export function GrowingWithOthers() {
             </p>
             <Link
               href="/academy"
-              className="inline-flex items-center gap-2 mt-4 text-[#2d5f3f] font-semibold text-sm hover:gap-3 transition-all duration-200"
+              className="inline-flex items-center gap-2 mt-4 text-primary font-semibold text-sm hover:gap-3 transition-all duration-200"
             >
               Explore Our Academy <ArrowRight className="w-4 h-4" />
             </Link>
@@ -78,7 +78,7 @@ export function GrowingWithOthers() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                  className="group bg-white border border-[#e8ede9] hover:border-[#c6dece] hover:shadow-md rounded-2xl overflow-hidden transition-all duration-300"
+                  className="group bg-white border border-[#e8ede9] hover:border-edge hover:shadow-md rounded-2xl overflow-hidden transition-all duration-300"
                 >
                   {/* image */}
                   <div className="relative h-36 overflow-hidden">
@@ -94,13 +94,13 @@ export function GrowingWithOthers() {
 
                   {/* content */}
                   <div className="p-5">
-                    <div className="w-8 h-8 rounded-lg bg-[#eef5f1] flex items-center justify-center mb-3 group-hover:bg-[#2d5f3f] transition-colors duration-300">
-                      <Icon className="w-4 h-4 text-[#2d5f3f] group-hover:text-white transition-colors duration-300" />
+                    <div className="w-8 h-8 rounded-lg bg-mist flex items-center justify-center mb-3 group-hover:bg-primary transition-colors duration-300">
+                      <Icon className="w-4 h-4 text-primary group-hover:text-white transition-colors duration-300" />
                     </div>
-                    <h3 className="font-serif font-bold text-[#080f0a] text-base mb-1.5">
+                    <h3 className="font-serif font-bold text-ink text-base mb-1.5">
                       {prog.title}
                     </h3>
-                    <p className="text-xs text-gray-400 font-sans leading-relaxed">
+                    <p className="text-xs text-gray-500 font-sans leading-relaxed">
                       {prog.description}
                     </p>
                   </div>

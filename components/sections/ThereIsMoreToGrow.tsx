@@ -8,7 +8,7 @@ import Link from "next/link";
 export function ThereIsMoreToGrow() {
   return (
     <section className="bg-white py-16 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
           {/* LEFT — copy */}
@@ -19,11 +19,11 @@ export function ThereIsMoreToGrow() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             <h2
-              className="font-serif font-bold text-[#080f0a] leading-[1.06] mb-4"
+              className="font-serif font-bold text-ink leading-[1.06] mb-4"
               style={{ fontSize: "clamp(1.8rem, 3vw, 2.6rem)" }}
             >
               There Is More
-              <span className="inline-block ml-2 text-[#2d5f3f]">
+              <span className="inline-block ml-2 text-primary">
                 <svg viewBox="0 0 24 24" className="inline w-6 h-6 fill-none stroke-current stroke-[1.5]">
                   <path d="M12 2C9 2 6 5 6 9c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-.5-7.5C16.5 13.5 18 11.5 18 9c0-4-3-7-6-7z" />
                 </svg>
@@ -35,7 +35,7 @@ export function ThereIsMoreToGrow() {
             </p>
             <Link
               href="/about"
-              className="inline-flex items-center gap-2 text-[#2d5f3f] font-semibold text-sm hover:gap-3 transition-all duration-200"
+              className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all duration-200"
             >
               Our Vision For The Future <ArrowRight className="w-4 h-4" />
             </Link>

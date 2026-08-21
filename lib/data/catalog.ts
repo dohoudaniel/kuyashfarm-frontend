@@ -138,7 +138,7 @@ export const CATALOG_PROGRAMS: CatalogProgram[] = [
     image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=800",
     icon: "Fish",
     color: "#3b82f6",
-    trending: "High Employment Rate",
+    trending: "Practical, farm-based",
     featured: true,
     careerPaths: ["Aquaculture Specialist", "Agricultural Entrepreneur"],
     learningPathway: "Aquatic Farming",
@@ -675,7 +675,7 @@ export const CATALOG_PROGRAMS: CatalogProgram[] = [
     image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800",
     icon: "Rocket",
     color: "#f43f5e",
-    trending: "High Employment Rate",
+    trending: "Practical, farm-based",
     featured: false,
     careerPaths: ["Agricultural Entrepreneur", "Agribusiness Founder"],
     learningPathway: "Agribusiness Track",
@@ -740,11 +740,16 @@ export const CAREER_PATHS = [
   { id: "agri-tech-consultant", title: "Agricultural Tech Consultant", programs: ["agri-tech", "irrigation", "greenhouse"] },
 ];
 
+/**
+ * Facts about the programme catalogue. See the note on ACADEMY_STATS — the
+ * enrolment and employment figures that were here described a cohort history
+ * that does not exist.
+ */
 export const CATALOG_STATS = [
-  { value: 20, suffix: "", label: "Total Programs" },
-  { value: 3170, suffix: "+", label: "Students Enrolled" },
-  { value: 500, suffix: "+", label: "Graduates" },
-  { value: 8, suffix: "", label: "Industry Partners" },
-  { value: 98, suffix: "%", label: "Certification Rate" },
-  { value: 89, suffix: "%", label: "Employment Rate" },
+  { value: 8, suffix: "", label: "Programmes" },
+  { value: 4, suffix: "", label: "Scheduled Classes" },
+  { value: 4, suffix: "", label: "Instructors" },
+  { value: 40, suffix: " acres", label: "Campus" },
+  { value: 13, suffix: "", label: "Screen Houses" },
+  { value: 100, suffix: "%", label: "Practical Training" },
 ];

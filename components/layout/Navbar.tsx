@@ -110,23 +110,23 @@ export function Navbar() {
         className={cn(
           "fixed left-0 right-0 top-0 z-40 transition-all duration-500",
           solid
-            ? "bg-[#080f0a]/95 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md"
+            ? "bg-ink/95 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md"
             : "bg-transparent",
         )}
       >
         {/* A thin brand rule, revealed once the header goes solid. */}
         <div
           className={cn(
-            "absolute inset-x-0 top-0 h-[2px] bg-[#2d5f3f] transition-opacity duration-500",
+            "absolute inset-x-0 top-0 h-[2px] bg-primary transition-opacity duration-500",
             solid ? "opacity-100" : "opacity-0",
           )}
         />
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Wordmark */}
             <Link href="/" className="group flex min-h-11 items-center gap-2.5">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#2d5f3f] transition-transform duration-300 group-hover:scale-105">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary transition-transform duration-300 group-hover:scale-105">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -152,7 +152,7 @@ export function Navbar() {
                   <Link
                     key={link.label}
                     href={hrefFor(link)}
-                    className="ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[#e8d5a3] px-4 text-sm font-semibold text-[#1a3d2b] transition-colors hover:bg-[#dfc98a]"
+                    className="ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-wheat px-4 text-sm font-semibold text-primary-dark transition-colors hover:bg-[#dfc98a]"
                   >
                     {link.label}
                   </Link>
@@ -163,7 +163,7 @@ export function Navbar() {
                     className="group relative inline-flex min-h-11 min-w-11 items-center justify-center px-3 font-sans text-sm font-medium text-white/75 transition-colors duration-200 hover:text-white"
                   >
                     {link.label}
-                    <span className="absolute bottom-2 left-3 right-3 h-px origin-left scale-x-0 bg-[#6b9d7a] transition-transform duration-200 group-hover:scale-x-100" />
+                    <span className="absolute bottom-2 left-3 right-3 h-px origin-left scale-x-0 bg-accent transition-transform duration-200 group-hover:scale-x-100" />
                   </Link>
                 ),
               )}
@@ -182,7 +182,7 @@ export function Navbar() {
                     aria-haspopup="menu"
                     className="flex min-h-11 items-center gap-2.5 rounded-full border border-white/15 bg-white/8 px-3 backdrop-blur-sm transition-colors hover:bg-white/14"
                   >
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#2d5f3f] text-[10px] font-bold text-white">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
                       {initials}
                     </span>
                     <span className="max-w-[100px] truncate font-sans text-sm font-medium text-white">
@@ -207,7 +207,7 @@ export function Navbar() {
                         className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-gray-100 bg-white py-1.5 shadow-xl"
                       >
                         <div className="border-b border-gray-50 px-4 py-3">
-                          <p className="truncate text-xs font-semibold text-[#080f0a]">
+                          <p className="truncate text-xs font-semibold text-ink">
                             {user?.full_name || "Your account"}
                           </p>
                           <p className="truncate text-xs text-gray-500">{user?.email}</p>
@@ -295,7 +295,7 @@ export function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden border-t border-white/10 bg-[#080f0a] md:hidden"
+              className="overflow-hidden border-t border-white/10 bg-ink md:hidden"
             >
               <div className="flex flex-col gap-1 px-4 py-4">
                 {NAV_LINKS.map((link) => (
@@ -357,7 +357,7 @@ export function Navbar() {
                     <Link
                       href="/login"
                       onClick={() => setMobileOpen(false)}
-                      className="flex min-h-11 items-center text-sm font-semibold text-[#e8d5a3]"
+                      className="flex min-h-11 items-center text-sm font-semibold text-wheat"
                     >
                       Sign in
                     </Link>

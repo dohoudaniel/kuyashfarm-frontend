@@ -2,27 +2,28 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 const SLIDES = [
   {
-    url: "/images/backgrounds/hero-kuyash.jpg",
+    url: "/images/backgrounds/hero-kuyash.webp",
     position: "center",
     tagline: "Growing Better. Feeding Tomorrow.",
   },
   {
-    url: "/images/backgrounds/hero-transition.jpg",
+    url: "/images/backgrounds/hero-transition.webp",
     position: "center",
     tagline: "From Our Farm to Your Table.",
   },
   {
-    url: "/images/backgrounds/sunset.jpeg",
+    url: "/images/backgrounds/sunset.webp",
     position: "top",
     tagline: "Sustainable. Innovative. Kuyash.",
   },
   {
-    url: "/images/backgrounds/dam.jpeg",
+    url: "/images/backgrounds/dam.webp",
     position: "center",
     tagline: "Integrated Farming at Scale.",
   },
@@ -77,27 +78,51 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="relative flex min-h-screen items-center overflow-hidden bg-[#080f0a]"
+      className="relative flex min-h-screen items-center overflow-hidden bg-ink"
     >
       {/* ── Background slides ── */}
       <div className="absolute inset-0 z-0">
-        {SLIDES.map((slide, index) => (
-          <div
-            key={slide.url}
-            className={`absolute inset-0 h-full w-full bg-cover bg-no-repeat transition-opacity duration-1000 ease-in-out ${
-              index === current ? "opacity-100" : "opacity-0"
-            }`}
-            style={{
-              backgroundImage: `url('${slide.url}')`,
-              backgroundPosition: slide.position,
-            }}
-          />
-        ))}
+          {/*
+            **`next/image`, not a CSS background.**
+
+            These were `backgroundImage: url(...)`, which is invisible to the
+            image pipeline — no WebP, no per-viewport resizing, no lazy
+            loading. Four images bypassed optimisation that way and accounted
+            for 2.2 MB of a 3 MB homepage, while the eight that *did* use
+            `next/image` came to 0.20 MB between them. On the mobile
+            connections most of this market browses on, that gap is the page.
+
+            The crossfade is unchanged: opacity still animates on the wrapper,
+            so the design is identical and only the delivery moved.
+          */}
+          {SLIDES.map((slide, index) => (
+            <div
+              key={slide.url}
+              className={`absolute inset-0 h-full w-full transition-opacity duration-1000 ease-in-out ${
+                index === current ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <Image
+                src={slide.url}
+                alt=""
+                fill
+                // Full-bleed, so the browser fetches a viewport-width variant
+                // rather than the largest one available.
+                sizes="100vw"
+                // Only the first slide is the LCP element. Marking them all
+                // priority would have them compete for bandwidth on load and
+                // delay the one the visitor can actually see.
+                priority={index === 0}
+                className="object-cover"
+                style={{ objectPosition: slide.position }}
+              />
+            </div>
+          ))}
 
         {/* Directional gradient — dark left where text lives, opens right */}
-        <div className="absolute inset-0 bg-linear-to-r from-[#080f0a]/90 via-[#080f0a]/55 to-[#080f0a]/20" />
+        <div className="absolute inset-0 bg-linear-to-r from-ink/90 via-ink/55 to-ink/20" />
         {/* Bottom fade for scroll cue area */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-[#080f0a]/60 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-ink/60 to-transparent" />
       </div>
 
       {/* subtle grid */}
@@ -110,7 +135,7 @@ export function Hero() {
       />
 
       {/* ── Content — left aligned ── */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-24 pb-20">
+      <div className="relative z-10 w-full max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16 pt-24 pb-20">
         <div className="max-w-2xl">
 
           {/* Eyebrow */}
@@ -119,7 +144,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-[11px] font-mono uppercase tracking-[0.28em] text-[#6b9d7a] mb-5"
+            className="text-[11px] font-mono uppercase tracking-[0.28em] text-primary mb-5"
           >
             {SLIDES[current].tagline}
           </motion.p>
@@ -136,7 +161,7 @@ export function Hero() {
             <span
               className="text-transparent bg-clip-text"
               style={{
-                backgroundImage: "linear-gradient(135deg, #6b9d7a 0%, #e8d5a3 100%)",
+                backgroundImage: "linear-gradient(135deg, var(--accent-green) 0%, var(--wheat) 100%)",
               }}
             >
               farming
@@ -166,7 +191,7 @@ export function Hero() {
           >
             <Link
               href="/categories"
-              className="group inline-flex items-center gap-2.5 bg-[#2d5f3f] hover:bg-[#4a7c59] text-white font-semibold px-8 py-4 rounded-full transition-all duration-300"
+              className="group inline-flex items-center gap-2.5 bg-primary hover:bg-secondary text-white font-semibold px-8 py-4 rounded-full transition-all duration-300"
               style={{ fontSize: "clamp(0.875rem, 1vw, 1rem)" }}
             >
               Explore Products
@@ -226,7 +251,7 @@ export function Hero() {
             <span className="font-serif text-2xl font-bold text-white leading-none">
               {stat.value}
             </span>
-            <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-white/40 mt-1">
+            <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-white/60 mt-1">
               {stat.label}
             </span>
           </div>
@@ -236,7 +261,7 @@ export function Hero() {
       {/* ── Scroll cue — bottom right ── */}
       <div className="absolute bottom-10 right-6 md:right-28 z-10 hidden flex-col items-center gap-2 sm:flex">
         <div className="w-px h-10 bg-linear-to-b from-transparent to-white/30" />
-        <span className="text-white/30 text-[10px] tracking-[0.2em] uppercase font-mono">
+        <span className="text-white/60 text-[10px] tracking-[0.2em] uppercase font-mono">
           Scroll
         </span>
       </div>

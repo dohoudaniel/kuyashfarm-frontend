@@ -125,9 +125,9 @@ export function ChatWidget() {
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Open chat"
-          className="group fixed bottom-4 right-4 z-50 flex min-h-11 items-center gap-2.5 rounded-full bg-[#080f0a] py-3 pl-4 pr-5 text-white shadow-xl transition-colors duration-300 hover:bg-[#2d5f3f] sm:bottom-6 sm:right-6"
+          className="group fixed bottom-4 right-4 z-50 flex min-h-11 items-center gap-2.5 rounded-full bg-ink py-3 pl-4 pr-5 text-white shadow-xl transition-colors duration-300 hover:bg-primary sm:bottom-6 sm:right-6"
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2d5f3f] transition-colors duration-300 group-hover:bg-white/20">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary transition-colors duration-300 group-hover:bg-white/20">
             <Leaf className="h-3.5 w-3.5 text-white" />
           </span>
           <span className="font-sans text-sm font-semibold">Chat with us</span>
@@ -137,7 +137,7 @@ export function ChatWidget() {
             message waiting — a badge that promises something to read and has
             nothing is a small dishonesty the whole site pays for.
           */}
-          <span className="h-2 w-2 rounded-full bg-[#6b9d7a]" />
+          <span className="h-2 w-2 rounded-full bg-accent" />
         </button>
       )}
 

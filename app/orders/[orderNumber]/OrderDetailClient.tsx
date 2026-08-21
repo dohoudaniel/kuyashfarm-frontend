@@ -78,7 +78,7 @@ export default function OrderDetailClient({ orderNumber }: { orderNumber: string
     return (
       <>
         <main className="flex min-h-screen items-center justify-center bg-gray-50">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
         </main>
       </>
     );

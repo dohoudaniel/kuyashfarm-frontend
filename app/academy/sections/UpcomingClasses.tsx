@@ -44,7 +44,7 @@ function when(iso: string): string {
 export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
   return (
     <section id="classes" className="bg-white py-28 md:py-36">
-      <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-6 md:px-12 lg:px-16">
         {/* Header */}
         <div className="mb-16 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
@@ -52,7 +52,7 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-accent"
+              className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-primary"
             >
               Upcoming Classes
             </motion.p>
@@ -73,7 +73,7 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="max-w-xs font-sans text-sm leading-relaxed text-gray-400"
+            className="max-w-xs font-sans text-sm leading-relaxed text-gray-500"
           >
             All classes are held on our working farm in Lagos. Register early to secure your seat.
           </motion.p>
@@ -142,7 +142,7 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
                     {cls.description}
                   </p>
 
-                  <div className="mb-6 space-y-2.5 border-t border-gray-50 pt-5 text-sm text-gray-400">
+                  <div className="mb-6 space-y-2.5 border-t border-gray-50 pt-5 text-sm text-gray-500">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 shrink-0 text-primary" />
                       <span>{when(cls.scheduled_date)}</span>
@@ -158,11 +158,11 @@ export function UpcomingClasses({ classes }: { classes: AcademyClass[] }) {
                       <p className="font-serif text-2xl font-bold text-ink">
                         {Number(cls.price) === 0 ? "Free" : formatPrice(Number(cls.price))}
                       </p>
-                      <p className="font-sans text-xs text-gray-400">per person</p>
+                      <p className="font-sans text-xs text-gray-500">per person</p>
                     </div>
 
                     {!cls.is_open_for_registration ? (
-                      <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gray-100 px-6 py-3 text-sm font-semibold text-gray-400">
+                      <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gray-100 px-6 py-3 text-sm font-semibold text-gray-500">
                         {cls.is_full ? "Sold out" : "Closed"}
                       </span>
                     ) : (

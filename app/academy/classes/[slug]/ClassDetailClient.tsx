@@ -252,7 +252,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                   },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label}>
-                    <div className="mb-1 flex items-center gap-2 text-xs text-gray-400">
+                    <div className="mb-1 flex items-center gap-2 text-xs text-gray-500">
                       <Icon className="h-5 w-5 text-primary" /> {label}
                     </div>
                     <p className="text-sm font-semibold text-primary-dark">{value}</p>
@@ -319,7 +319,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                     )}
                   </div>
                   <div>
-                    <p className="mb-1 text-xs uppercase tracking-wider text-gray-400">
+                    <p className="mb-1 text-xs uppercase tracking-wider text-gray-500">
                       Your instructor
                     </p>
                     <p className="font-serif font-bold text-primary-dark">{cls.instructor.name}</p>
@@ -336,7 +336,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                   <p className="font-serif text-4xl font-bold text-primary-dark">
                     {isFree ? "Free" : formatPrice(Number(cls.price))}
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">
+                  <p className="mt-1 text-xs text-gray-500">
                     per person{isFree ? "" : " · payment on arrival"}
                   </p>
                   {!cls.is_full && cls.seats_left <= 8 && (
@@ -420,7 +420,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         className={fieldClass("email")}
                       />
                       {isAuthenticated && (
-                        <p className="mt-1 text-xs text-gray-400">
+                        <p className="mt-1 text-xs text-gray-500">
                           Leave blank to use {user?.email}.
                         </p>
                       )}
@@ -512,7 +512,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                       {submitting ? "Reserving your seat…" : "Confirm registration"}
                     </button>
 
-                    <p className="text-center text-xs text-gray-400">
+                    <p className="text-center text-xs text-gray-500">
                       {isFree
                         ? "This class is free. Your seat is confirmed straight away."
                         : `Payment of ${formatPrice(Number(cls.price))} is made on arrival at the farm.`}

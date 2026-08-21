@@ -21,6 +21,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Runs before the tests, deliberately.
+      #
+      # `npm ci` reproduces the lockfile exactly — the point of a lockfile, and
+      # also why a dependency that develops a CVE stays installed indefinitely
+      # while CI reports success. Eight had accumulated this way, one of them
+      # reaching the production bundle.
+      #
+      # `--omit=dev` is NOT used: a compromised build-time package can rewrite
+      # the bundle it produces, so a dev-only advisory is still a supply-chain
+      # risk for whatever ships. `--audit-level=high` keeps the gate on real
+      # problems rather than failing the build on every transitive low.
+      - name: Audit dependencies for known vulnerabilities
+        run: npm audit --audit-level=high
+
       - name: Lint
         run: npx eslint .
 

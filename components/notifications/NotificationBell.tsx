@@ -195,7 +195,7 @@ export function NotificationBell() {
 
           {loading ? (
             <p className="py-10 text-center">
-              <Loader2 className="mx-auto h-5 w-5 animate-spin text-gray-400" />
+              <Loader2 className="mx-auto h-5 w-5 animate-spin text-gray-500" />
             </p>
           ) : items.length === 0 ? (
             <p className="px-4 py-10 text-center text-sm text-gray-500">Nothing yet.</p>
@@ -213,7 +213,7 @@ export function NotificationBell() {
                       {item.title}
                     </p>
                     <p className="mt-0.5 text-xs text-gray-500">{item.message}</p>
-                    <p className="mt-1 text-[11px] text-gray-400">
+                    <p className="mt-1 text-[11px] text-gray-500">
                       {new Date(item.created_at).toLocaleString("en-NG", {
                         day: "numeric",
                         month: "short",

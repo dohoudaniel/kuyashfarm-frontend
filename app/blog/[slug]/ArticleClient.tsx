@@ -36,7 +36,7 @@ export function ArticleClient({ post, live }: { post: BlogPost; live: boolean })
   const blocks = paragraphs(post.body);
 
   return (
-    <article className="bg-[#faf8f5]">
+    <article className="bg-cream">
       {/* Same wording as the listing, because it is the same situation and a
           reader hitting both should not have to work out whether they are two
           different problems. */}
@@ -46,7 +46,7 @@ export function ArticleClient({ post, live }: { post: BlogPost; live: boolean })
         </p>
       )}
 
-      <header className="relative bg-[#080f0a] overflow-hidden">
+      <header className="relative bg-ink overflow-hidden">
         {post.cover_image && (
           <div className="absolute inset-0 z-0">
             <Image
@@ -57,19 +57,19 @@ export function ArticleClient({ post, live }: { post: BlogPost; live: boolean })
               className="object-cover opacity-25"
               priority
             />
-            <div className="absolute inset-0 bg-linear-to-t from-[#080f0a] to-[#080f0a]/60" />
+            <div className="absolute inset-0 bg-linear-to-t from-ink to-ink/60" />
           </div>
         )}
 
         <div className="relative z-10 mx-auto max-w-3xl px-6 py-20 md:px-12">
           <Link
             href="/blog"
-            className="mb-8 inline-flex items-center gap-2 text-xs font-medium text-[#6b9d7a] transition-colors hover:text-white"
+            className="mb-8 inline-flex items-center gap-2 text-xs font-medium text-accent transition-colors hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" /> All articles
           </Link>
 
-          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.25em] text-[#6b9d7a]">
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.25em] text-primary">
             {post.category_label || post.category}
           </p>
 
@@ -89,7 +89,7 @@ export function ArticleClient({ post, live }: { post: BlogPost; live: boolean })
               <span className="flex items-center gap-1.5">
                 <User className="h-3.5 w-3.5" />
                 {post.author_name}
-                {post.author_role && <span className="text-white/30">· {post.author_role}</span>}
+                {post.author_role && <span className="text-white/60">· {post.author_role}</span>}
               </span>
             )}
             {post.published_at && (
@@ -142,7 +142,7 @@ export function ArticleClient({ post, live }: { post: BlogPost; live: boolean })
         <footer className="mt-16 border-t border-gray-200 pt-8">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#2d5f3f] hover:underline"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" /> Back to the blog
           </Link>

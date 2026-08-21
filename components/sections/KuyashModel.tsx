@@ -58,11 +58,11 @@ function LeafIcon({ cx, cy, size = 18 }: { cx: number; cy: number; size?: number
       <path
         d="M12 2C8 2 4 6 4 11c0 3.5 2 6.5 5 8l-1 3h8l-1-3c3-1.5 5-4.5 5-8 0-5-4-9-8-9zm0 2c2.5 2 5 5 5 7a5 5 0 0 1-10 0c0-2 2.5-5 5-7z"
         fill="none"
-        stroke="#2d5f3f"
+        stroke="var(--primary-green)"
         strokeWidth="1.4"
         strokeLinejoin="round"
       />
-      <line x1="12" y1="13" x2="12" y2="22" stroke="#2d5f3f" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="12" y1="13" x2="12" y2="22" stroke="var(--primary-green)" strokeWidth="1.4" strokeLinecap="round" />
     </g>
   );
 }
@@ -74,11 +74,11 @@ function CowIcon({ cx, cy, size = 18 }: { cx: number; cy: number; size?: number 
     <g transform={`translate(${cx - s}, ${cy - s}) scale(${size / 24})`}>
       <path
         d="M4 6 C2 6 2 10 4 10 L4 14 C4 18 8 20 12 20 C16 20 20 18 20 14 L20 10 C22 10 22 6 20 6 L18 6 C17 4 15 3 12 3 C9 3 7 4 6 6 Z"
-        fill="none" stroke="#2d5f3f" strokeWidth="1.4" strokeLinejoin="round"
+        fill="none" stroke="var(--primary-green)" strokeWidth="1.4" strokeLinejoin="round"
       />
-      <circle cx="9" cy="12" r="1.2" fill="#2d5f3f" />
-      <circle cx="15" cy="12" r="1.2" fill="#2d5f3f" />
-      <path d="M10 16 Q12 17.5 14 16" fill="none" stroke="#2d5f3f" strokeWidth="1.2" strokeLinecap="round" />
+      <circle cx="9" cy="12" r="1.2" fill="var(--primary-green)" />
+      <circle cx="15" cy="12" r="1.2" fill="var(--primary-green)" />
+      <path d="M10 16 Q12 17.5 14 16" fill="none" stroke="var(--primary-green)" strokeWidth="1.2" strokeLinecap="round" />
     </g>
   );
 }
@@ -90,10 +90,10 @@ function FishIcon({ cx, cy, size = 18 }: { cx: number; cy: number; size?: number
     <g transform={`translate(${cx - s}, ${cy - s}) scale(${size / 24})`}>
       <path
         d="M2 12 C2 12 6 5 14 5 C14 5 20 5 21 12 C20 19 14 19 14 19 C6 19 2 12 2 12Z"
-        fill="none" stroke="#2d5f3f" strokeWidth="1.4" strokeLinejoin="round"
+        fill="none" stroke="var(--primary-green)" strokeWidth="1.4" strokeLinejoin="round"
       />
-      <path d="M21 12 L24 9 M21 12 L24 15" fill="none" stroke="#2d5f3f" strokeWidth="1.4" strokeLinecap="round" />
-      <circle cx="8" cy="11" r="1.3" fill="#2d5f3f" />
+      <path d="M21 12 L24 9 M21 12 L24 15" fill="none" stroke="var(--primary-green)" strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="8" cy="11" r="1.3" fill="var(--primary-green)" />
     </g>
   );
 }
@@ -103,10 +103,10 @@ function GearIcon({ cx, cy, size = 18 }: { cx: number; cy: number; size?: number
   const s = size / 2;
   return (
     <g transform={`translate(${cx - s}, ${cy - s}) scale(${size / 24})`}>
-      <circle cx="12" cy="12" r="3.5" fill="none" stroke="#2d5f3f" strokeWidth="1.4" />
+      <circle cx="12" cy="12" r="3.5" fill="none" stroke="var(--primary-green)" strokeWidth="1.4" />
       <path
         d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18.01 18.01l1.77 1.77M2 12h2.5M19.5 12H22M4.22 19.78l1.77-1.77M18.01 5.99l1.77-1.77"
-        stroke="#2d5f3f" strokeWidth="1.4" strokeLinecap="round"
+        stroke="var(--primary-green)" strokeWidth="1.4" strokeLinecap="round"
       />
     </g>
   );
@@ -119,15 +119,15 @@ function PlantIcon({ cx, cy, size = 18 }: { cx: number; cy: number; size?: numbe
     <g transform={`translate(${cx - s}, ${cy - s}) scale(${size / 24})`}>
       <path
         d="M12 22 L12 10"
-        stroke="#2d5f3f" strokeWidth="1.4" strokeLinecap="round"
+        stroke="var(--primary-green)" strokeWidth="1.4" strokeLinecap="round"
       />
       <path
         d="M12 10 C12 10 6 10 5 5 C5 5 11 4 12 10Z"
-        fill="none" stroke="#2d5f3f" strokeWidth="1.4" strokeLinejoin="round"
+        fill="none" stroke="var(--primary-green)" strokeWidth="1.4" strokeLinejoin="round"
       />
       <path
         d="M12 14 C12 14 18 13 19 8 C19 8 13 7 12 14Z"
-        fill="none" stroke="#2d5f3f" strokeWidth="1.4" strokeLinejoin="round"
+        fill="none" stroke="var(--primary-green)" strokeWidth="1.4" strokeLinejoin="round"
       />
     </g>
   );
@@ -139,15 +139,15 @@ function CenterLeaf({ cx, cy }: { cx: number; cy: number }) {
     <g>
       <path
         d={`M${cx} ${cy - 4} C${cx - 8} ${cy - 16} ${cx - 14} ${cy - 28} ${cx} ${cy - 34} C${cx + 14} ${cy - 28} ${cx + 8} ${cy - 16} ${cx} ${cy - 4}Z`}
-        fill="none" stroke="#2d5f3f" strokeWidth="1.8" strokeLinejoin="round"
+        fill="none" stroke="var(--primary-green)" strokeWidth="1.8" strokeLinejoin="round"
       />
       <path
         d={`M${cx} ${cy - 4} C${cx - 10} ${cy - 14} ${cx - 16} ${cy - 24} ${cx - 4} ${cy - 32}`}
-        fill="none" stroke="#2d5f3f" strokeWidth="1.2" strokeLinecap="round"
+        fill="none" stroke="var(--primary-green)" strokeWidth="1.2" strokeLinecap="round"
         strokeDasharray="0"
         opacity="0.5"
       />
-      <line x1={cx} y1={cy - 4} x2={cx} y2={cy + 6} stroke="#2d5f3f" strokeWidth="1.6" strokeLinecap="round" />
+      <line x1={cx} y1={cy - 4} x2={cx} y2={cy + 6} stroke="var(--primary-green)" strokeWidth="1.6" strokeLinecap="round" />
     </g>
   );
 }
@@ -239,7 +239,7 @@ export function KuyashModel() {
 
   return (
     <section id="projects" className="bg-white py-24 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
           {/* ── LEFT — copy ── */}
@@ -249,11 +249,11 @@ export function KuyashModel() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#2d5f3f] mb-4">
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary mb-4">
               The Kuyash Model
             </p>
             <h2
-              className="font-serif font-bold text-[#080f0a] leading-[1.08] mb-5"
+              className="font-serif font-bold text-ink leading-[1.08] mb-5"
               style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)" }}
             >
               An Integrated<br />Farming System
@@ -265,7 +265,7 @@ export function KuyashModel() {
             </p>
             <Link
               href="/services/crop-vegetable-production"
-              className="inline-flex items-center gap-2 border border-[#c6dece] text-[#2d5f3f] font-semibold text-sm px-6 py-3 rounded-full hover:bg-[#eef5f1] transition-colors duration-200"
+              className="inline-flex items-center gap-2 border border-edge text-primary font-semibold text-sm px-6 py-3 rounded-full hover:bg-mist transition-colors duration-200"
             >
               Discover The Model <ArrowRight className="w-4 h-4" />
             </Link>
@@ -290,7 +290,7 @@ export function KuyashModel() {
                   key={i}
                   d={d}
                   fill="none"
-                  stroke="#c6dece"
+                  stroke="var(--edge)"
                   strokeWidth="1.2"
                 />
               ))}
@@ -308,7 +308,7 @@ export function KuyashModel() {
               <circle
                 cx={CX} cy={CY} r={CENTER_R}
                 fill="white"
-                stroke="#2d5f3f"
+                stroke="var(--primary-green)"
                 strokeWidth="1.2"
               />
               <CenterLeaf cx={CX} cy={CY} />
@@ -321,8 +321,8 @@ export function KuyashModel() {
                 remembering for any future rename: a name broken across
                 elements is invisible to grep and visible to every customer.
               */}
-              <text x={CX} y={CY + 22} textAnchor="middle" fontFamily="'Georgia', serif" fontWeight="700" fontSize="11" fill="#2d5f3f" letterSpacing="1.5">KUYASH</text>
-              <text x={CX} y={CY + 36} textAnchor="middle" fontFamily="'Georgia', serif" fontWeight="700" fontSize="11" fill="#2d5f3f" letterSpacing="1.5">FARMS</text>
+              <text x={CX} y={CY + 22} textAnchor="middle" fontFamily="'Georgia', serif" fontWeight="700" fontSize="11" fill="var(--primary-green)" letterSpacing="1.5">KUYASH</text>
+              <text x={CX} y={CY + 36} textAnchor="middle" fontFamily="'Georgia', serif" fontWeight="700" fontSize="11" fill="var(--primary-green)" letterSpacing="1.5">FARMS</text>
 
               {/* ── nodes ── */}
               {NODES.map((node, i) => {
@@ -348,7 +348,7 @@ export function KuyashModel() {
                     <circle
                       cx={nx} cy={ny} r={NODE_R}
                       fill="white"
-                      stroke="#2d5f3f"
+                      stroke="var(--primary-green)"
                       strokeWidth="1.2"
                     />
                     {/* icon */}
@@ -361,7 +361,7 @@ export function KuyashModel() {
                       fontFamily="'Georgia', serif"
                       fontWeight="700"
                       fontSize="11.5"
-                      fill="#1a3d2b"
+                      fill="var(--primary-dark)"
                       letterSpacing="0.8"
                     >
                       {node.label}

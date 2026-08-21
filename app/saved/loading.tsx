@@ -4,7 +4,7 @@
 export default function Loading() {
   return (
     <main className="min-h-screen bg-cream pb-24 pt-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-4 sm:px-6 lg:px-8">
         <div className="mb-8 h-10 w-48 animate-pulse rounded-lg bg-gray-200" />
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (

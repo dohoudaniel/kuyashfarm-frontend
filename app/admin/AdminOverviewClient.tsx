@@ -80,7 +80,7 @@ export default function AdminOverviewClient() {
 
       {loading && !data ? (
         <p className="py-16 text-center">
-          <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-400" />
+          <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-500" />
         </p>
       ) : (
         <>

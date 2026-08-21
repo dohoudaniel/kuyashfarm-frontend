@@ -54,7 +54,7 @@ export default function OrdersClient() {
 
           {authLoading || loading ? (
             <div className="flex justify-center py-16">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
             </div>
           ) : !isAuthenticated ? (
             <div className="rounded-2xl bg-white p-10 text-center shadow-sm">

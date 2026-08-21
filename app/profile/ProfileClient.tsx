@@ -210,7 +210,7 @@ export default function ProfileClient() {
     return (
       <>
         <main className="flex min-h-screen items-center justify-center bg-gray-50">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
         </main>
       </>
     );
@@ -429,7 +429,7 @@ export default function ProfileClient() {
                             </div>
                           )}
 
-                          <p className="mt-1 text-xs text-gray-400">
+                          <p className="mt-1 text-xs text-gray-500">
                             Submitted{" "}
                             {new Date(application.submitted_at).toLocaleDateString("en-NG", {
                               day: "numeric",

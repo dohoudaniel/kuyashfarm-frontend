@@ -9,7 +9,7 @@ import { ACADEMY_PARTNERS } from "@/lib/data/academy";
 export function AcademyPartners() {
   return (
     <section className="bg-white py-20 border-t border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -31,7 +31,7 @@ export function AcademyPartners() {
             >
               {/* Monochrome logo placeholder — elegant typographic representation */}
               <div className="w-full h-14 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center px-3 group-hover:border-primary/20 group-hover:bg-mist transition-all duration-300">
-                <span className="font-sans font-bold text-[10px] text-gray-400 text-center leading-tight uppercase tracking-wider group-hover:text-primary transition-colors duration-300">
+                <span className="font-sans font-bold text-[10px] text-gray-500 text-center leading-tight uppercase tracking-wider group-hover:text-primary transition-colors duration-300">
                   {partner.name}
                 </span>
               </div>

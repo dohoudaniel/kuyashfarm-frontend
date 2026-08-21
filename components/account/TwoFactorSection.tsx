@@ -126,7 +126,7 @@ export function TwoFactorSection() {
         {status?.enabled ? (
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
         ) : (
-          <ShieldOff className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" />
+          <ShieldOff className="mt-0.5 h-5 w-5 shrink-0 text-gray-500" />
         )}
         <div>
           <h2 className="font-semibold text-gray-900">Two-factor authentication</h2>

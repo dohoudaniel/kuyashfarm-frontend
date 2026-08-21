@@ -276,7 +276,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
   if (authLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
       </div>
     );
   }
@@ -543,12 +543,12 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
             </p>
 
             {states.length === 0 ? (
-              <p className="text-sm text-gray-400">Loading states…</p>
+              <p className="text-sm text-gray-500">Loading states…</p>
             ) : (
               <div className="space-y-5">
                 {statesByZone.map(([zone, zoneStates]) => (
                   <div key={zone}>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
                       {zone.replace(/_/g, " ").toLowerCase()}
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -680,7 +680,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
           {submitting ? "Submitting…" : "Submit application"}
         </button>
 
-        <p className="text-center text-xs text-gray-400">
+        <p className="text-center text-xs text-gray-500">
           We usually review within two business days. You&apos;ll hear from us by email either way.
         </p>
       </form>
@@ -724,7 +724,7 @@ function SubmittedPanel({
         <p className="mb-1 text-gray-500">
           {application.business_name} — we usually review within two business days.
         </p>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-500">
           We&apos;ll email {application.contact_email} with the decision.
         </p>
       </div>

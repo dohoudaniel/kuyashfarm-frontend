@@ -15,7 +15,7 @@ const STATS = [
 export function ImpactNumbers() {
   return (
     <section className="bg-white py-24 border-t border-gray-100 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
 
         {/* header row */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-16">
@@ -25,11 +25,11 @@ export function ImpactNumbers() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55 }}
           >
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#2d5f3f] mb-3">
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary mb-3">
               Our Impact
             </p>
             <h2
-              className="font-serif font-bold text-[#080f0a] leading-[1.08]"
+              className="font-serif font-bold text-ink leading-[1.08]"
               style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)" }}
             >
               Our work creates impact<br />beyond the farm.
@@ -43,7 +43,7 @@ export function ImpactNumbers() {
           >
             <Link
               href="/about"
-              className="inline-flex items-center gap-2 text-[#2d5f3f] font-semibold text-sm hover:gap-3 transition-all duration-200 shrink-0"
+              className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all duration-200 shrink-0"
             >
               See Full Impact Report <ArrowRight className="w-4 h-4" />
             </Link>
@@ -62,15 +62,15 @@ export function ImpactNumbers() {
               className="lg:px-8 first:lg:pl-0 last:lg:pr-0 flex flex-col"
             >
               {/* accent line */}
-              <div className="w-8 h-0.5 bg-[#2d5f3f] mb-5" />
+              <div className="w-8 h-0.5 bg-primary mb-5" />
               <p
-                className="font-serif font-bold text-[#080f0a] leading-none mb-1"
+                className="font-serif font-bold text-ink leading-none mb-1"
                 style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)" }}
               >
                 {stat.value}
               </p>
-              <p className="font-sans font-semibold text-sm text-[#2d5f3f] mb-0.5">{stat.label}</p>
-              <p className="font-sans text-xs text-gray-400">{stat.sub}</p>
+              <p className="font-sans font-semibold text-sm text-primary mb-0.5">{stat.label}</p>
+              <p className="font-sans text-xs text-gray-500">{stat.sub}</p>
             </motion.div>
           ))}
         </div>

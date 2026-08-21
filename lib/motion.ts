@@ -36,33 +36,7 @@ export const EASE = {
   back: [0.34, 1.4, 0.64, 1] as const,
 };
 
-/**
- * Rise-and-fade, the workhorse.
- *
- * 8px, not 40px. A long travel distance is what makes scroll animation feel
- * like a slideshow — the eye tracks the movement instead of reading the
- * content it is supposed to be introducing.
- */
-export const rise = {
-  hidden: { opacity: 0, y: 8 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: DURATION.base, ease: EASE.out },
-  },
-};
 
-/**
- * A list whose children arrive in sequence.
- *
- * 40ms apart. Enough to read as ordered rather than simultaneous; short enough
- * that a twelve-item grid finishes in half a second rather than making the
- * last card arrive after the customer has already looked at it.
- */
-export const staggerChildren = (stagger = 0.04) => ({
-  hidden: {},
-  visible: { transition: { staggerChildren: stagger } },
-});
 
 /**
  * The one deliberate overshoot: a count that has just changed.

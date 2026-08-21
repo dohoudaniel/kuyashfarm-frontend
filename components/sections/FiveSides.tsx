@@ -47,8 +47,8 @@ export function FiveSides() {
   return (
     // `id="services"`: what we grow and offer, which is where the nav's
     // Services link lands.
-    <section id="services" className="bg-[#faf8f5] py-24">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+    <section id="services" className="bg-cream py-24">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
 
         {/* Header */}
         <motion.div
@@ -58,10 +58,10 @@ export function FiveSides() {
           transition={{ duration: 0.5 }}
           className="mb-12 text-center"
         >
-          <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#2d5f3f] mb-3">
+          <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary mb-3">
             Our Operations
           </p>
-          <h2 className="font-serif font-bold text-[#080f0a] leading-tight"
+          <h2 className="font-serif font-bold text-ink leading-tight"
             style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)" }}>
             Five Sides of One Farm
           </h2>
@@ -81,7 +81,7 @@ export function FiveSides() {
               >
                 <Link
                   href={op.href}
-                  className="group flex flex-col bg-white border border-gray-100 hover:border-[#c6dece] hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 h-full"
+                  className="group flex flex-col bg-white border border-gray-100 hover:border-edge hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 h-full"
                 >
                   {/* image */}
                   <div className="relative h-44 overflow-hidden shrink-0">
@@ -94,20 +94,20 @@ export function FiveSides() {
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
                     {/* icon badge */}
-                    <div className="absolute bottom-3 left-3 w-8 h-8 rounded-lg bg-[#2d5f3f] flex items-center justify-center">
+                    <div className="absolute bottom-3 left-3 w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                       <Icon className="w-4 h-4 text-white" />
                     </div>
                   </div>
 
                   {/* content */}
                   <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-serif font-bold text-[#080f0a] text-base mb-2 group-hover:text-[#2d5f3f] transition-colors duration-200">
+                    <h3 className="font-serif font-bold text-ink text-base mb-2 group-hover:text-primary transition-colors duration-200">
                       {op.label}
                     </h3>
-                    <p className="text-xs text-gray-400 font-sans leading-relaxed flex-1">
+                    <p className="text-xs text-gray-500 font-sans leading-relaxed flex-1">
                       {op.description}
                     </p>
-                    <div className="flex items-center gap-1 mt-4 text-[#2d5f3f] text-xs font-semibold group-hover:gap-2 transition-all duration-200">
+                    <div className="flex items-center gap-1 mt-4 text-primary text-xs font-semibold group-hover:gap-2 transition-all duration-200">
                       Read More <ArrowRight className="w-3 h-3" />
                     </div>
                   </div>

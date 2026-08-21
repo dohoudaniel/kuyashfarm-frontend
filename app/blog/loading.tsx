@@ -1,9 +1,9 @@
 export default function BlogLoading() {
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
+    <div className="min-h-screen bg-cream">
       {/* Hero skeleton */}
-      <div className="bg-[#080f0a] py-24 md:py-32 px-6 md:px-12 lg:px-16">
-        <div className="max-w-7xl mx-auto space-y-5">
+      <div className="bg-ink py-24 md:py-32 px-6 md:px-12 lg:px-16">
+        <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto space-y-5">
           <div className="w-64 h-3 bg-white/10 rounded animate-pulse" />
           <div className="space-y-3">
             <div className="w-2/3 h-14 bg-white/10 rounded-xl animate-pulse" />
@@ -15,7 +15,7 @@ export default function BlogLoading() {
       </div>
 
       {/* Body skeleton */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-14">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16 py-14">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
           {/* Left */}
           <div className="space-y-8">
@@ -83,12 +83,12 @@ export default function BlogLoading() {
               ))}
             </div>
 
-            <div className="bg-[#080f0a] rounded-2xl p-6 space-y-4">
+            <div className="bg-ink rounded-2xl p-6 space-y-4">
               <div className="w-24 h-3 bg-white/10 rounded animate-pulse" />
               <div className="w-48 h-5 bg-white/10 rounded animate-pulse" />
               <div className="w-full h-3 bg-white/10 rounded animate-pulse" />
               <div className="w-full h-11 bg-white/10 rounded-xl animate-pulse" />
-              <div className="w-full h-11 bg-[#2d5f3f]/50 rounded-xl animate-pulse" />
+              <div className="w-full h-11 bg-primary/50 rounded-xl animate-pulse" />
             </div>
           </aside>
         </div>

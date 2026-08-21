@@ -27,12 +27,6 @@ export const SOCIAL_LINKS: { instagram?: string; facebook?: string; youtube?: st
     // whatsapp: "https://wa.me/234XXXXXXXXXX",
   };
 
-export const STATS = [
-  { value: "5000+", label: "Farmers Connected" },
-  { value: "90%", label: "Yield Improvement" },
-  { value: "50+", label: "Agriculture Experts" },
-  { value: "98%", label: "Positive Impact" },
-] as const;
 
 export const SERVICES = [
   {
@@ -73,23 +67,6 @@ export const SERVICES = [
   },
 ] as const;
 
-export const GOALS = [
-  {
-    id: 1,
-    value: "2B",
-    label: "Liters of water conserved annually through smart irrigation",
-  },
-  {
-    id: 2,
-    value: "2B",
-    label: "Collaborate on policy 2 billion liters of water annually through efficient water-saving practices",
-  },
-  {
-    id: 3,
-    value: "100M",
-    label: "People impacted through sustainable farming, supporting livelihoods globally",
-  },
-] as const;
 
 /**
  * Primary navigation — the frontend redesign's set, with every link resolving.
@@ -131,35 +108,3 @@ export const NAV_LINKS = [
 // kept selling it, at whatever price the constant said. The bulk tiers here
 // were also the source of the pricing bug in audit §3.7.
 
-export const FOOTER_LINKS = {
-  product: [
-    { label: "Features", href: "#" },
-    { label: "Pricing", href: "#" },
-    { label: "Case Studies", href: "#" },
-    { label: "Reviews", href: "#" },
-  ],
-  company: [
-    { label: "About", href: "#" },
-    { label: "Team", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Contact", href: "#" },
-  ],
-  services: [
-    { label: "Soil Enrichment", href: "#" },
-    { label: "Water Management", href: "#" },
-    { label: "Crop Consultation", href: "#" },
-    { label: "Organic Farming", href: "#" },
-  ],
-  innovations: [
-    { label: "Smart Irrigation", href: "#" },
-    { label: "Precision Agriculture", href: "#" },
-    { label: "Sustainable Practices", href: "#" },
-    { label: "AI Solutions", href: "#" },
-  ],
-  successStories: [
-    { label: "Farmer Testimonials", href: "#" },
-    { label: "Community Impact", href: "#" },
-    { label: "Case Studies", href: "#" },
-    { label: "Research Papers", href: "#" },
-  ],
-} as const;

@@ -18,7 +18,7 @@ export default function AcademyLoading() {
       </div>
 
       {/* Cards skeleton */}
-      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-6 py-12 lg:px-8">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">

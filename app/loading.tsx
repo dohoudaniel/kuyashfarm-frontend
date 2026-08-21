@@ -41,7 +41,7 @@ export default function Loading() {
       </div>
 
       {/* Stats band */}
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-6 py-16 md:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl 2xl:max-w-[1536px] grid-cols-2 gap-8 px-6 py-16 md:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="flex animate-pulse flex-col items-center gap-2">
             <div className="h-9 w-24 rounded bg-primary/15" />
@@ -51,7 +51,7 @@ export default function Loading() {
       </div>
 
       {/* Card grid */}
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 pb-24 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto grid max-w-7xl 2xl:max-w-[1536px] grid-cols-1 gap-6 px-6 pb-24 sm:grid-cols-2 lg:grid-cols-3">
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="animate-pulse overflow-hidden rounded-2xl bg-white shadow-sm">
             <div className="h-48 w-full bg-gray-200" />

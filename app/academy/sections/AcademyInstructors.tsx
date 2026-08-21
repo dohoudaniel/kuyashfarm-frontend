@@ -32,7 +32,7 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
 
   return (
     <section className="bg-white py-28 md:py-36">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
           <div className="max-w-xl">
@@ -40,7 +40,7 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-xs font-mono uppercase tracking-[0.2em] text-accent mb-4"
+              className="text-xs font-mono uppercase tracking-[0.2em] text-primary mb-4"
             >
               The Faculty
             </motion.p>
@@ -99,7 +99,7 @@ export function AcademyInstructors({ instructors }: { instructors: Instructor[] 
               <h3 className="font-serif text-lg font-bold text-ink leading-tight mb-0.5">{inst.name}</h3>
               <p className="text-sm font-semibold text-primary mb-1">{inst.title}</p>
               {inst.bio && (
-                <p className="text-gray-400 text-xs font-sans mb-5 line-clamp-3">{inst.bio}</p>
+                <p className="text-gray-500 text-xs font-sans mb-5 line-clamp-3">{inst.bio}</p>
               )}
 
               {/* Credentials */}

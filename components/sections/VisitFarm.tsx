@@ -17,17 +17,17 @@ export function VisitFarm() {
         sizes="100vw"
         priority={false}
       />
-      <div className="absolute inset-0 bg-[#080f0a]/65" />
+      <div className="absolute inset-0 bg-ink/65" />
 
       {/* content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-20">
+      <div className="relative z-10 w-full max-w-7xl 2xl:max-w-[1536px] mx-auto px-6 md:px-12 lg:px-16 py-20">
         <div className="max-w-xl">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5 }}
-            className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#6b9d7a] mb-4"
+            className="text-[10px] font-mono uppercase tracking-[0.25em] text-primary mb-4"
           >
             Come See What We Are Growing
           </motion.p>
@@ -41,7 +41,7 @@ export function VisitFarm() {
             style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}
           >
             Come See What<br />We Are Growing.
-            <span className="inline-block ml-2 text-[#6b9d7a]">
+            <span className="inline-block ml-2 text-accent">
               <svg viewBox="0 0 24 24" className="inline w-7 h-7 fill-none stroke-current stroke-[1.5]">
                 <path d="M12 2C9 2 6 5 6 9c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-.5-7.5C16.5 13.5 18 11.5 18 9c0-4-3-7-6-7z" />
               </svg>
@@ -67,7 +67,7 @@ export function VisitFarm() {
           >
             <Link
               href="/contact"
-              className="group inline-flex items-center gap-2.5 bg-[#2d5f3f] hover:bg-[#4a7c59] text-white font-semibold text-sm px-7 py-3.5 rounded-full transition-all duration-300"
+              className="group inline-flex items-center gap-2.5 bg-primary hover:bg-secondary text-white font-semibold text-sm px-7 py-3.5 rounded-full transition-all duration-300"
             >
               Visit The Farm
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
@@ -89,7 +89,7 @@ export function VisitFarm() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="mt-16 flex items-center gap-2.5"
           >
-            <div className="w-6 h-6 rounded-md bg-[#2d5f3f] flex items-center justify-center">
+            <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
               <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-white stroke-[1.5]">
                 <path d="M12 2C9 2 6 5 6 9c0 2.5 1.5 4.5 3.5 5.5L9 22h6l-.5-7.5C16.5 13.5 18 11.5 18 9c0-4-3-7-6-7z" />
               </svg>

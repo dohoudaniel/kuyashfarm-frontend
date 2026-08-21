@@ -99,7 +99,7 @@ export default function DriverClient() {
   if (authLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
       </main>
     );
   }
@@ -144,7 +144,7 @@ export default function DriverClient() {
 
         {loading ? (
           <p className="py-16 text-center">
-            <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-400" />
+            <Loader2 className="mx-auto h-6 w-6 animate-spin text-gray-500" />
           </p>
         ) : active.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center text-sm text-gray-500">
@@ -206,7 +206,7 @@ export default function DriverClient() {
                       </div>
 
                       <p className="mb-1 flex items-start gap-2 text-sm text-gray-700">
-                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-500" />
                         {stop.address}
                       </p>
 

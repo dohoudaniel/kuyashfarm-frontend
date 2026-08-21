@@ -8,7 +8,7 @@
 export default function ShopLoading() {
   return (
     <div className="min-h-screen bg-cream pt-20">
-      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+      <div className="mx-auto max-w-7xl 2xl:max-w-[1536px] px-6 py-10 lg:px-8">
         {/* Header */}
         <div className="mb-8 space-y-2">
           <div className="h-3 w-20 animate-pulse rounded-full bg-gray-200" />

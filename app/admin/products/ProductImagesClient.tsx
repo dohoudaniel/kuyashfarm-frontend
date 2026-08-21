@@ -378,7 +378,7 @@ export default function ProductImagesClient() {
                           disabled={busy}
                           onClick={() => void onDelete(image)}
                           aria-label="Delete photograph"
-                          className="text-gray-400 hover:text-red-600 disabled:opacity-50"
+                          className="text-gray-500 hover:text-red-600 disabled:opacity-50"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>

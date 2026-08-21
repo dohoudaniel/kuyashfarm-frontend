@@ -376,7 +376,7 @@ export const ACADEMY_INSTRUCTORS: AcademyInstructor[] = [
     experience: "15 years",
     credentials: ["PhD Agronomy, University of Ibadan", "FAO Certified Agronomist", "IITA Research Fellow"],
     initials: "CO",
-    color: "#2d5f3f",
+    color: "var(--primary-green)",
   },
   {
     id: 2,
@@ -386,7 +386,7 @@ export const ACADEMY_INSTRUCTORS: AcademyInstructor[] = [
     experience: "20 years",
     credentials: ["BVM&S, ABU Zaria", "MRCVS Registered", "National Livestock Development Board"],
     initials: "MG",
-    color: "#4a7c59",
+    color: "var(--secondary-green)",
   },
   {
     id: 3,
@@ -506,11 +506,30 @@ export const CURRICULUM_ITEMS = [
   "Market access & pricing",
 ];
 
+/**
+ * Facts, not claims.
+ *
+ * This previously read "500+ Graduates Trained", "98% Satisfaction Rate" and
+ * "89% Employment Rate". The academy has run no cohorts — the database holds
+ * zero registrations — so those were not unverified figures, they contradicted
+ * the system by three orders of magnitude. Anyone who asked a single question
+ * about them would have found that out, and the people most likely to ask are
+ * investors and prospective students.
+ *
+ * What replaces them is only what is checkable: the size of the farm the
+ * campus sits on, the number of screen houses, and how the teaching works.
+ * Nothing here is an outcome, because there are no outcomes yet.
+ *
+ * **When cohorts start, these should come from the API, not from this file.**
+ * A graduate count typed into a constant is the same failure as the
+ * free-shipping threshold that read N80,000 on checkout and N200,000 in the
+ * chatbot: two copies of one number, drifting.
+ */
 export const ACADEMY_STATS = [
-  { value: 500, suffix: "+", label: "Graduates Trained" },
-  { value: 12, suffix: "+", label: "Certified Programs" },
-  { value: 98, suffix: "%", label: "Satisfaction Rate" },
-  { value: 10, suffix: "+", label: "Expert Instructors" },
   { value: 40, suffix: " acres", label: "Working Farm Campus" },
-  { value: 85, suffix: "%", label: "Employment Rate" },
+  { value: 56, suffix: " ha", label: "Total Farm Site" },
+  { value: 13, suffix: "", label: "Screen Houses" },
+  { value: 8, suffix: "", label: "Programmes Offered" },
+  { value: 100, suffix: "%", label: "Hands-on Teaching" },
+  { value: 65, suffix: "+", label: "Farm Staff On Site" },
 ];

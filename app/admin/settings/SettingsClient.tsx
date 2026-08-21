@@ -227,7 +227,7 @@ export default function SettingsClient() {
                   type="button"
                   aria-label={`Delete ${rule.name}`}
                   onClick={() => void run(() => deleteShippingRule(rule.id), "Rule removed.")}
-                  className="text-gray-400 hover:text-red-600"
+                  className="text-gray-500 hover:text-red-600"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -337,7 +337,7 @@ export default function SettingsClient() {
                     type="button"
                     aria-label={`Delete ${category.name}`}
                     onClick={() => void run(() => deleteCategory(category.slug), "Category removed.")}
-                    className="text-gray-400 hover:text-red-600"
+                    className="text-gray-500 hover:text-red-600"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

@@ -97,7 +97,7 @@ export function CartDrawer({ isOpen, onClose }: Props) {
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {isLoading && !cart ? (
             <div className="flex h-full items-center justify-center">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
             </div>
           ) : items.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
