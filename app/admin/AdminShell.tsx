@@ -23,7 +23,9 @@ import {
   Package,
   PenLine,
   SlidersHorizontal,
+  TrendingUp,
   Truck,
+  UserCog,
   Users,
 } from "lucide-react";
 
@@ -41,6 +43,7 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { href: "/admin", label: "Overview", icon: BarChart3 },
+  { href: "/admin/analytics", label: "Analytics", icon: TrendingUp },
   { href: "/admin/orders", label: "Orders", icon: ClipboardList },
   { href: "/admin/products", label: "Products & photos", icon: ImageIcon },
   { href: "/admin/inventory", label: "Inventory", icon: Boxes },
@@ -49,7 +52,10 @@ const NAV: NavItem[] = [
   { href: "/admin/academy", label: "Academy", icon: GraduationCap },
   { href: "/admin/blog", label: "Blog", icon: PenLine },
   { href: "/admin/subscribers", label: "Newsletter", icon: Mail },
-  { href: "/admin/staff", label: "Staff", icon: Users, adminOnly: true },
+  // Read-only, so staff as well as administrators. It shows nothing the order
+  // screen does not already show about a customer.
+  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/staff", label: "Staff", icon: UserCog, adminOnly: true },
   { href: "/admin/settings", label: "Settings", icon: SlidersHorizontal, adminOnly: true },
 ];
 

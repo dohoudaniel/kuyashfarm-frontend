@@ -17,7 +17,7 @@
  */
 
 import { apiClient } from "./client";
-import type { Paginated, Product } from "./types";
+import type { AccountType, Paginated, Product, Role } from "./types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Product photography
@@ -352,6 +352,217 @@ export function getSales(params?: { start?: string; end?: string }): Promise<
 
   const suffix = query.toString() ? `?${query}` : "";
   return apiClient.get(`/staff/analytics/sales/${suffix}`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The platform snapshot
+//
+// Typed properly rather than as `Record<string, unknown>`, unlike the older
+// analytics calls above. Every field below is money-as-a-string or a plain
+// count, and the distinction matters at the call site: `total_spent` must
+// reach `formatPrice` and must never reach `Number()`.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Counts by role and by account type, kept apart because they are apart. */
+export interface PeopleSnapshot {
+  total: number;
+  customers: number;
+  staff: number;
+  admins: number;
+  retail: number;
+  wholesale_pending: number;
+  wholesale_verified: number;
+  distributor_pending: number;
+  distributor_verified: number;
+  verified: number;
+  unverified: number;
+  deactivated: number;
+  with_photograph: number;
+  joined_last_30_days: number;
+  joined_last_7_days: number;
+  have_ordered: number;
+  /** A percentage — the one legitimate float in the payload. */
+  verified_rate: number;
+}
+
+export interface GrowthPoint {
+  month: string;
+  joined: number;
+  /** Cumulative, and it starts from everyone who predates the window. */
+  total: number;
+}
+
+export interface SalesPoint {
+  month: string;
+  /** Decimal string. */
+  revenue: string;
+  orders: number;
+  items: number;
+}
+
+export interface TopCustomer {
+  id: string;
+  email: string;
+  full_name: string;
+  account_type: AccountType;
+  /** Decimal string. */
+  revenue: string;
+  orders: number;
+  last_order: string | null;
+}
+
+export interface PlatformSnapshot {
+  computed_at: string;
+  cached: boolean;
+  stale_after_seconds: number;
+
+  commerce: {
+    gross_revenue: string;
+    refunds: string;
+    net_revenue: string;
+    paid_orders: number;
+    pending_orders: number;
+    cancelled_orders: number;
+    average_order_value: string;
+    items_sold: number;
+    distinct_customers: number;
+    currency: string;
+  };
+  people: PeopleSnapshot;
+  user_growth: GrowthPoint[];
+  top_customers: TopCustomer[];
+  segments: { account_type: string; revenue: string; orders: number; customers: number }[];
+  orders: {
+    by_status: Record<string, number>;
+    by_payment: Record<string, number>;
+    paid_and_awaiting_action: number;
+  };
+  catalogue: {
+    products: { total: number; listed: number; unlisted: number; without_photograph: number };
+    categories: number;
+    inventory: {
+      units_on_hand: number;
+      units_reserved: number;
+      low_stock: number;
+      out_of_stock: number;
+    };
+    /** Decimal string, at retail — not a profit figure. */
+    stock_value_at_retail: string;
+  };
+  sales: SalesPoint[];
+  top_products: { name: string; sku: string; quantity: number; revenue: string }[];
+  categories: { name: string; revenue: string; quantity: number }[];
+  academy: {
+    registrations: Record<string, number>;
+    /** What confirmed and attended seats are worth, however they were settled. */
+    booked_value: string;
+    /** What this system actually watched arrive, via a signed webhook. */
+    collected_online: string;
+    programmes: number;
+    classes: number;
+    instructors: number;
+  };
+  applications: { pending: number; under_review: number; approved: number; rejected: number };
+  content: {
+    posts: { total: number; live: number; scheduled: number; drafts: number; featured: number };
+    subscribers: { pending: number; subscribed: number; unsubscribed: number };
+  };
+  delivery: {
+    runs: Record<string, number>;
+    stops: Record<string, number>;
+    drivers: number;
+  };
+}
+
+/** Everything about the platform, in one round trip. Cached for a minute. */
+export function getPlatformSnapshot(): Promise<PlatformSnapshot> {
+  return apiClient.get<PlatformSnapshot>("/staff/analytics/platform/");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The user directory
+//
+// Read-only by design. `role` is granted by invitation and `account_type` is
+// computed when an application is approved — there is deliberately no endpoint
+// to set either from this screen, so there is deliberately no binding for it.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface StaffUser {
+  id: string;
+  email: string;
+  full_name: string;
+  phone: string;
+  avatar: string | null;
+  role: Role;
+  account_type: AccountType;
+  is_email_verified: boolean;
+  is_active: boolean;
+  date_joined: string;
+  order_count: number;
+  /** Decimal string. Never `Number()` it. */
+  total_spent: string;
+  last_order_at: string | null;
+}
+
+export interface StaffUserDetail extends StaffUser {
+  applications: {
+    id: string;
+    application_type: string;
+    business_name: string;
+    status: string;
+    submitted_at: string;
+  }[];
+  academy_registrations: {
+    id: string;
+    reference: string;
+    status: string;
+    registered_at: string;
+  }[];
+}
+
+/** The chips above the directory. One query server-side, not one per chip. */
+export interface UserSummary {
+  total: number;
+  role_customer: number;
+  role_staff: number;
+  role_admin: number;
+  type_retail: number;
+  type_wholesale_pending: number;
+  type_wholesale_verified: number;
+  type_distributor_pending: number;
+  type_distributor_verified: number;
+  verified: number;
+  deactivated: number;
+}
+
+export function listStaffUsers(params?: {
+  role?: string;
+  account_type?: string;
+  is_email_verified?: boolean;
+  is_active?: boolean;
+  search?: string;
+  ordering?: string;
+  page?: number;
+}): Promise<Paginated<StaffUser>> {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params ?? {})) {
+    // `false` is a meaningful filter value here — "show me the unverified" —
+    // so only null and undefined are dropped. A plain truthiness check would
+    // silently turn that filter into "no filter".
+    if (value !== undefined && value !== null && value !== "") {
+      query.set(key, String(value));
+    }
+  }
+  const suffix = query.toString() ? `?${query}` : "";
+  return apiClient.get<Paginated<StaffUser>>(`/staff/users/${suffix}`);
+}
+
+export function getStaffUser(id: string): Promise<StaffUserDetail> {
+  return apiClient.get<StaffUserDetail>(`/staff/users/${id}/`);
+}
+
+export function getUserSummary(): Promise<UserSummary> {
+  return apiClient.get<UserSummary>("/staff/users/summary/");
 }
 
 /** Clear the sixty-second cache, for when a figure needs to be current now. */
