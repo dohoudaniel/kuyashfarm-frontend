@@ -14,7 +14,7 @@
  * type into says more clearly than any label that it is derived.
  */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 import { FormField } from "@/components/ui/FormField";
@@ -24,10 +24,12 @@ import { ApiError } from "@/lib/api/client";
 import {
   createProduct,
   updateProduct,
+  uploadProductImage,
   type ProductInput,
   type StaffCategory,
   type StaffProduct,
 } from "@/lib/api/admin";
+import { PhotoPicker, type StagedPhoto } from "./PhotoPicker";
 import {
   fromApiFieldErrors,
   isValid,
@@ -51,34 +53,57 @@ interface Props {
   /** Absent when creating. */
   product?: StaffProduct;
   categories: StaffCategory[];
-  onSaved: (product: StaffProduct) => void;
+  /**
+   * `note` carries what happened to the photographs, because the caller shows
+   * the banner and only this component knows how many uploaded.
+   *
+   * It is separate from throwing on failure for a reason that matters: by the
+   * time an upload can fail, **the product already exists on the server**. A
+   * thrown error would leave the form open over a product that had been
+   * created, and pressing the button again would try to create it a second
+   * time and fail on the duplicate SKU — with the first, real product still
+   * sitting there unphotographed and unmentioned.
+   */
+  onSaved: (product: StaffProduct, note?: string) => void;
   onCancel: () => void;
 }
 
+/**
+ * **This component is mounted under a `key`** — see `ProductImagesClient`, which
+ * passes the product's slug, or `"new"`. Switching what is being edited
+ * therefore remounts it and everything below starts empty.
+ *
+ * It used to reset itself in an effect on `[product]` instead, and that had a
+ * real hole in it that only appeared once this form held staged photographs:
+ * the effect reset the *fields*, because those were all there was to reset.
+ * Choose three photographs while editing tilapia, press Cancel, press New
+ * product — the same component instance stays mounted, the effect refills the
+ * fields, and the three tilapia photographs are still staged, ready to be
+ * uploaded onto whatever is created next. A remount cannot have that class of
+ * bug, and it does not need a line adding to it every time this form gains a
+ * piece of state.
+ */
 export function ProductForm({ product, categories, onSaved, onCancel }: Props) {
-  const [form, setForm] = useState<ProductInput>(EMPTY);
+  const [form, setForm] = useState<ProductInput>(() =>
+    product
+      ? {
+          sku: product.sku,
+          name: product.name,
+          category: product.category,
+          unit: product.unit,
+          base_price: product.base_price,
+          description: product.description,
+          long_description: product.long_description,
+          is_active: product.is_active,
+        }
+      : EMPTY,
+  );
+  const [photos, setPhotos] = useState<StagedPhoto[]>([]);
   const [busy, setBusy] = useState(false);
+  /** What the button says while it works — creating, then uploading which one. */
+  const [stage, setStage] = useState("");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-
-  useEffect(() => {
-    setForm(
-      product
-        ? {
-            sku: product.sku,
-            name: product.name,
-            category: product.category,
-            unit: product.unit,
-            base_price: product.base_price,
-            description: product.description,
-            long_description: product.long_description,
-            is_active: product.is_active,
-          }
-        : EMPTY,
-    );
-    setFieldErrors({});
-    setError("");
-  }, [product]);
 
   const rules = {
     name: (value: string) => validateMeaningfulText(value, { minimum: 2, field: "Name" }),
@@ -111,11 +136,14 @@ export function ProductForm({ product, categories, onSaved, onCancel }: Props) {
     }
 
     setBusy(true);
+
+    // ── 1. The product ───────────────────────────────────────────────────
+    // On its own, because everything after this point happens to a product
+    // that exists, and must not be able to send us back here.
+    let saved: StaffProduct;
+    setStage(product ? "Saving…" : "Creating…");
     try {
-      const saved = product
-        ? await updateProduct(product.slug, form)
-        : await createProduct(form);
-      onSaved(saved);
+      saved = product ? await updateProduct(product.slug, form) : await createProduct(form);
     } catch (caught) {
       if (caught instanceof ApiError) {
         setError(caught.message);
@@ -123,9 +151,53 @@ export function ProductForm({ product, categories, onSaved, onCancel }: Props) {
       } else {
         setError("Could not save that product.");
       }
-    } finally {
       setBusy(false);
+      setStage("");
+      return;
     }
+
+    // ── 2. The photographs ───────────────────────────────────────────────
+    const note = photos.length ? await uploadStaged(saved) : undefined;
+
+    setBusy(false);
+    setStage("");
+    onSaved(saved, note);
+  }
+
+  /**
+   * Upload the staged photographs against the product that now exists.
+   *
+   * **Sequential, never `Promise.all`.** Each upload asks the server what is
+   * already there to decide whether it is the first — and therefore the
+   * primary, card image. Fired together, they all read an empty gallery, and
+   * which one ends up on the card becomes a race between four HTTP requests.
+   * The existing gallery uploader has the same comment for the same reason.
+   * Sequential also means the order shown in the picker is the order stored.
+   *
+   * **A failure here never rethrows.** The product has already been created.
+   * Reporting this as a failed save would be a lie, and would invite a second
+   * press of a button that can now only fail on a duplicate SKU — while the
+   * real product sits in the catalogue with no photograph and nothing said
+   * about it. So it returns a sentence instead, and the caller shows it and
+   * opens the product's gallery, where the remaining files can be retried.
+   */
+  async function uploadStaged(saved: StaffProduct): Promise<string> {
+    let uploaded = 0;
+
+    for (const [index, photo] of photos.entries()) {
+      setStage(`Uploading ${index + 1} of ${photos.length}…`);
+      try {
+        await uploadProductImage(saved.slug, photo.file, { altText: saved.name });
+        uploaded += 1;
+      } catch (caught) {
+        const why = caught instanceof ApiError ? caught.message : "the upload failed";
+        return uploaded === 0
+          ? `${saved.name} was created, but no photograph could be uploaded — ${why}. Add them below.`
+          : `${saved.name} was created with ${uploaded} of ${photos.length} photographs — ${why}. Add the rest below.`;
+      }
+    }
+
+    return `${saved.name} created with ${uploaded} photograph${uploaded === 1 ? "" : "s"}.`;
   }
 
   return (
@@ -185,6 +257,15 @@ export function ProductForm({ product, categories, onSaved, onCancel }: Props) {
         value={form.long_description ?? ""} rows={4} maxLength={2000}
         onChange={(e) => set("long_description", e.target.value)} />
 
+      {/* Creating only. While editing, the gallery below this form is the
+          real one — it can reorder, re-primary and delete against images that
+          already exist, none of which a staging list can do. Two upload
+          controls on one screen would just raise the question of which is
+          which. */}
+      {!product && (
+        <PhotoPicker photos={photos} onChange={setPhotos} disabled={busy} />
+      )}
+
       <label className="flex items-center gap-2 text-sm text-gray-700">
         <input type="checkbox" checked={form.is_active ?? true}
           onChange={(e) => set("is_active", e.target.checked)} />
@@ -195,7 +276,11 @@ export function ProductForm({ product, categories, onSaved, onCancel }: Props) {
         <button type="submit" disabled={busy}
           className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-secondary disabled:opacity-60">
           {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-          {product ? "Save changes" : "Create product"}
+          {/* The stage, not just a spinner. Creating a product with four
+              photographs on a slow connection is a genuinely long wait, and a
+              button that says only "Create product" for twenty seconds is one
+              somebody presses again. */}
+          {busy && stage ? stage : product ? "Save changes" : "Create product"}
         </button>
         <button type="button" onClick={onCancel}
           className="rounded-full px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900">

@@ -259,14 +259,24 @@ export default function ProductImagesClient() {
         <section className="rounded-2xl bg-white p-6 shadow-sm">
           {editing ? (
             <ProductForm
+              /* Remounts when the target changes, so nothing carries over
+                 between one product and the next — including photographs
+                 staged for a product that was never created. See the note on
+                 `ProductForm` itself. */
+              key={editing === "new" ? "new" : editing.slug}
               product={editing === "new" ? undefined : editing}
               categories={categories}
               onCancel={() => setEditing(null)}
-              onSaved={(saved) => {
+              onSaved={(saved, note) => {
                 setEditing(null);
-                setMessage(`${saved.name} saved.`);
+                // The form's own note when it has one — it is the only thing
+                // that knows how many photographs went up, and whether they
+                // all did. `openProduct` clears the banner, so this is set
+                // after it rather than before.
                 void loadProducts();
-                void openProduct(saved);
+                void openProduct(saved).then(() =>
+                  setMessage(note ?? `${saved.name} saved.`),
+                );
               }}
             />
           ) : !selected ? (
