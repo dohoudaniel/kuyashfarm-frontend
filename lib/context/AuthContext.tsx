@@ -61,6 +61,15 @@ interface AuthContextValue {
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   updateProfile: (input: { full_name?: string; phone?: string }) => Promise<User>;
+  /**
+   * Replace or remove the profile photograph.
+   *
+   * Both live here rather than in the page because the avatar is rendered in
+   * the navbar too, and a page that owned this state would leave the header
+   * showing the previous photograph until the next full page load.
+   */
+  setAvatar: (file: File) => Promise<User>;
+  clearAvatar: () => Promise<User>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -226,6 +235,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return updated;
   }, []);
 
+  const setAvatar = useCallback(async (file: File) => {
+    const updated = await authApi.uploadAvatar(file);
+    setUser(updated);
+    return updated;
+  }, []);
+
+  const clearAvatar = useCallback(async () => {
+    const updated = await authApi.removeAvatar();
+    setUser(updated);
+    return updated;
+  }, []);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -240,6 +261,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logout,
       refresh,
       updateProfile,
+      setAvatar,
+      clearAvatar,
     }),
     [
       user,
@@ -251,6 +274,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logout,
       refresh,
       updateProfile,
+      setAvatar,
+      clearAvatar,
     ],
   );
 

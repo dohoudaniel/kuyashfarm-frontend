@@ -44,9 +44,33 @@ export function AcademyHero() {
               <br />
               Africa&apos;s Next
               <br />
+              {/*
+                `var(--accent-green)`, not `var(--accent)`.
+
+                There is no `--accent`. The token is `--accent-green` in
+                `:root`, re-exported to Tailwind as `--color-accent` by
+                `@theme inline` — and `--color-accent` is what the *class*
+                `text-accent` compiles to, which is why the name looked right.
+
+                An undefined `var()` with no fallback makes the whole
+                `linear-gradient()` invalid, so the browser drops the entire
+                `background-image` declaration. `text-transparent` then has
+                nothing behind it and the word renders in transparent ink: it
+                is laid out, it takes its space, it is selectable and readable
+                to a screen reader, and a mouse drag over it reveals it in the
+                selection highlight. Every single check except looking at the
+                page says it is fine.
+
+                `BlogClient.tsx` renders the same treatment on the word
+                "grows" and spells the token correctly, so the two are worth
+                keeping identical.
+              */}
               <span
                 className="text-transparent bg-clip-text"
-                style={{ backgroundImage: "linear-gradient(135deg, var(--accent) 0%, var(--wheat) 100%)" }}
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, var(--accent-green) 0%, var(--wheat) 100%)",
+                }}
               >
                 Generation
               </span>

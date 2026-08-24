@@ -15,25 +15,76 @@ import type { NextConfig } from "next";
  * `/media/` in development, which is a *different origin* to the Next dev
  * server. Deriving it from `NEXT_PUBLIC_API_URL` keeps the two in step,
  * including under WSL where that value is the VM's IP rather than localhost.
+ *
+ * **In development, the configured value alone is not enough.** It is read
+ * once at startup, so editing `.env.local` while the server runs leaves this
+ * list describing the previous value — and pointing the app at `localhost`,
+ * which is an entirely ordinary thing to do, drops the VM's own address even
+ * after a restart. Either way the optimiser answers `400 "url" parameter is
+ * not allowed`: a status that names the *query string* for what is really a
+ * configuration mismatch, on a request the page made rather than one anybody
+ * typed. Development therefore allows every address this machine answers on,
+ * which is the same set `allowedDevOrigins` needs and is not a widening —
+ * these are addresses the API is already reachable at.
+ *
+ * Production gets the configured host and nothing else. `next build` bakes it
+ * in, there is no `.env.local` to drift, and a deployment's API host is not a
+ * property of the machine Next happens to run on.
  */
 function apiImagePatterns(): NonNullable<NextConfig["images"]>["remotePatterns"] {
   const configured = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
 
+  let api: URL;
   try {
-    const api = new URL(configured);
-    return [
-      {
-        protocol: api.protocol.replace(":", "") as "http" | "https",
-        hostname: api.hostname,
-        port: api.port,
-        pathname: "/**",
-      },
-    ];
+    api = new URL(configured);
   } catch {
     // A malformed value must not take the build down over image config;
     // `resolveApiBaseUrl` in lib/api/client.ts already fails loudly for it.
     return [];
   }
+
+  const protocol = api.protocol.replace(":", "") as "http" | "https";
+  const patterns = [{ protocol, hostname: api.hostname, port: api.port, pathname: "/**" }];
+
+  // In development, the same host list `devOrigins()` builds, on the API's
+  // port. See the note below on why the configured value alone is not enough.
+  if (process.env.NODE_ENV !== "production") {
+    for (const hostname of localHostnames()) {
+      if (hostname !== api.hostname) {
+        patterns.push({ protocol, hostname, port: api.port, pathname: "/**" });
+      }
+    }
+  }
+
+  return patterns;
+}
+
+/**
+ * Every address this machine answers on: loopback plus each non-internal IPv4.
+ *
+ * Shared by `apiImagePatterns` and `devOrigins` because they are two halves of
+ * one question — which addresses a browser might legitimately reach this
+ * machine at — and the bug both exist to prevent is the *same* bug, which has
+ * now been fixed twice.
+ *
+ * A network address is a fact about the machine, so it is asked of the
+ * machine. This also survives the WSL IP changing on every Windows reboot,
+ * which a hardcoded value does not.
+ */
+function localHostnames(): string[] {
+  const hosts = new Set(["localhost", "127.0.0.1"]);
+
+  for (const addresses of Object.values(networkInterfaces())) {
+    for (const address of addresses ?? []) {
+      // Non-internal IPv4 only: under WSL that is the VM address Windows
+      // reaches this machine on, which is exactly the one being blocked.
+      if (address.family === "IPv4" && !address.internal) {
+        hosts.add(address.address);
+      }
+    }
+  }
+
+  return [...hosts];
 }
 
 /**
@@ -67,25 +118,37 @@ function apiImagePatterns(): NonNullable<NextConfig["images"]>["remotePatterns"]
  * addresses this host already answers on.
  */
 function devOrigins(): string[] {
-  const origins = new Set(["localhost", "127.0.0.1"]);
-
-  for (const addresses of Object.values(networkInterfaces())) {
-    for (const address of addresses ?? []) {
-      // Non-internal IPv4 only: under WSL that is the VM address Windows
-      // reaches the dev server on, which is exactly the origin being blocked.
-      if (address.family === "IPv4" && !address.internal) {
-        origins.add(address.address);
-      }
-    }
-  }
-
-  return [...origins];
+  return localHostnames();
 }
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: devOrigins(),
 
   images: {
+    /*
+     * Next 16 refuses to optimise an image hosted on a private IP, and answers
+     * **400 Bad Request** when you ask it to. It is an SSRF defence and a good
+     * one: the optimiser fetches any URL a page hands it, so on a deployed
+     * service that is a way to make the server read things on its own network
+     * and hand them back.
+     *
+     * In development it is also unconditionally wrong. The API is Django on
+     * `localhost:8000`, or under WSL on the VM's `172.30.x.x` — both private
+     * by definition — so *every* uploaded photograph fails, and it fails
+     * looking like something else entirely. The optimiser answers
+     * `"url" parameter is not allowed`, which names the query string and
+     * reads exactly like a `remotePatterns` mismatch; hours can go into
+     * checking a hostname list that was correct all along. The behaviour is
+     * new in 16.0.0, so it also arrives as a regression on an upgrade rather
+     * than as something that never worked.
+     *
+     * `NODE_ENV`, not an environment variable of our own. There is no
+     * legitimate production deployment where the API is on a private address
+     * this server can reach, so this must not be switchable by getting a
+     * variable wrong — and `next build` sets NODE_ENV=production itself.
+     */
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
+
     remotePatterns: [
       ...(apiImagePatterns() ?? []),
       // Supabase Storage, when product media is served straight from the

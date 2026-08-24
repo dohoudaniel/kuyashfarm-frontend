@@ -7,12 +7,16 @@
  * registered, and does **not** sign you in. Both are deliberate: saying
  * "that email is taken" would turn this form into an account-enumeration
  * oracle, which is exactly what the API refuses to be.
+ *
+ * The layout comes from `AuthShell`, which carries the reasoning about why
+ * this is a split panel and why the panel disappears below 1024px.
  */
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/context/AuthContext";
-import { UserPlus, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from "lucide-react";
+import { Mail, Lock, User, Phone, AlertCircle, ArrowRight, Check } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
+import { AuthField, AuthHeading, AuthShell } from "@/components/auth/AuthShell";
 import {
   fromApiFieldErrors,
   isValid,
@@ -23,6 +27,20 @@ import {
   validatePhone,
   type FieldErrors,
 } from "@/lib/validation";
+
+/**
+ * The rules the server actually enforces, from `AUTH_PASSWORD_VALIDATORS`.
+ *
+ * The previous list promised uppercase, lowercase, a number and a special
+ * character — none of which is checked anywhere, so it demanded work of the
+ * customer for nothing and misdescribed the real rejections.
+ */
+const PASSWORD_RULES = [
+  "At least 8 characters",
+  "Not entirely numbers",
+  "Not a commonly used password",
+  "Not too similar to your name or email",
+];
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -126,309 +144,174 @@ export default function RegisterPage() {
     setFieldErrors((current) => ({ ...current, [e.target.name]: "" }));
   };
 
+  const panel = {
+    eyebrow: "Join Kuyash Farms",
+    headline: "Good food starts at the",
+    highlight: "source.",
+    points: [
+      "Order fresh produce, eggs, fish and poultry direct from the farm",
+      "Apply for wholesale or distributor pricing from your account",
+      "Book academy classes on a working 40-acre farm",
+    ],
+  };
+
   // Deliberately identical whether or not the address was already registered.
   // Saying "welcome!" for a new account and "that email is taken" for an
   // existing one would make this form an account-enumeration oracle, which is
   // exactly what the API now refuses to be.
   if (submitted) {
     return (
-      <>
-        <main className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50 pt-24 pb-16">
-          <div className="mx-auto max-w-md px-4 sm:px-6 lg:px-8">
-            <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-lg">
-              <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <Mail className="h-8 w-8 text-green-600" />
-              </div>
-              <h1 className="mb-2 font-serif text-3xl font-bold text-gray-900">
-                Check your email
-              </h1>
-              <p className="mb-6 text-gray-600">
-                We&apos;ve sent a message to{" "}
-                <span className="font-semibold">{formData.email}</span>. Open the link inside to
-                confirm your address, then sign in.
-              </p>
-              <p className="mb-8 text-sm text-gray-500">
-                Nothing arrived? Check your spam folder. If you already had an account with us,
-                the email explains how to get back in.
-              </p>
-              <Link
-                href="/login"
-                className="inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-secondary"
-              >
-                Go to sign in
-              </Link>
-            </div>
+      <AuthShell {...panel}>
+        <div className="py-6 text-center">
+          <div className="mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-mist text-primary">
+            <Mail className="h-8 w-8" />
           </div>
-        </main>
-      </>
+          <h1 className="font-serif text-3xl font-bold text-ink">Check your email</h1>
+          <p className="mt-3 text-sm leading-relaxed text-gray-600">
+            We&apos;ve sent a message to{" "}
+            <span className="font-semibold text-ink">{formData.email}</span>. Open the link
+            inside to confirm your address, then sign in.
+          </p>
+          <p className="mt-4 rounded-xl bg-mist/50 p-3 text-xs leading-relaxed text-gray-600">
+            Nothing arrived? Check your spam folder. If you already had an account with us, the
+            email explains how to get back in.
+          </p>
+          <Link
+            href="/login"
+            className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 font-semibold text-white transition-colors duration-200 hover:bg-secondary"
+          >
+            Go to sign in <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </AuthShell>
     );
   }
 
   return (
-    <>
-      <main className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50 pt-24 pb-16">
-        <div className="mx-auto max-w-md px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-              <UserPlus className="w-8 h-8 text-green-600" />
-            </div>
-            <h1 className="font-serif text-4xl font-bold text-gray-900 mb-2">
-              Create Account
-            </h1>
-            <p className="text-gray-600">Join Kuyash Farms community today</p>
-          </div>
+    <AuthShell {...panel}>
+      <AuthHeading title="Create your account">
+        It takes a minute, and it is free.
+      </AuthHeading>
 
-          {/* Register Form */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-800">{error}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Name Field */}
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Full Name *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-500" />
-                  </div>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur("name")}
-                    aria-invalid={!!fieldErrors.name}
-                    aria-describedby={fieldErrors.name ? "name-error" : undefined}
-                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
-                      fieldErrors.name
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-green-500"
-                    }`}
-                    placeholder="John Doe"
-                  />
-                </div>
-                  {fieldErrors.name && (
-                    <p id="name-error" role="alert" className="mt-1 text-sm text-red-600">
-                      {fieldErrors.name}
-                    </p>
-                  )}
-              </div>
-
-              {/* Email Field */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-500" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur("email")}
-                    aria-invalid={!!fieldErrors.email}
-                    aria-describedby={fieldErrors.email ? "email-error" : undefined}
-                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
-                      fieldErrors.email
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-green-500"
-                    }`}
-                    placeholder="you@example.com"
-                  />
-                </div>
-                  {fieldErrors.email && (
-                    <p id="email-error" role="alert" className="mt-1 text-sm text-red-600">
-                      {fieldErrors.email}
-                    </p>
-                  )}
-              </div>
-
-              {/* Phone Field */}
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Phone Number (Optional)
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Phone className="h-5 w-5 text-gray-500" />
-                  </div>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur("phone")}
-                    aria-invalid={!!fieldErrors.phone}
-                    aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
-                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
-                      fieldErrors.phone
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-green-500"
-                    }`}
-                    placeholder="+234 800 000 0000"
-                  />
-                </div>
-                  {fieldErrors.phone && (
-                    <p id="phone-error" role="alert" className="mt-1 text-sm text-red-600">
-                      {fieldErrors.phone}
-                    </p>
-                  )}
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Password *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-500" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur("password")}
-                    aria-invalid={!!fieldErrors.password}
-                    aria-describedby={fieldErrors.password ? "password-error" : undefined}
-                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
-                      fieldErrors.password
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-green-500"
-                    }`}
-                    placeholder="••••••••"
-                  />
-                </div>
-                  {fieldErrors.password && (
-                    <p id="password-error" role="alert" className="mt-1 text-sm text-red-600">
-                      {fieldErrors.password}
-                    </p>
-                  )}
-              </div>
-
-              {/* Confirm Password Field */}
-              <div>
-                <label
-                  htmlFor="confirmPassword"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Confirm Password *
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-500" />
-                  </div>
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    required
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur("confirmPassword")}
-                    aria-invalid={!!fieldErrors.confirmPassword}
-                    aria-describedby={fieldErrors.confirmPassword ? "confirmPassword-error" : undefined}
-                    className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:ring-2 focus:border-transparent transition-all ${
-                      fieldErrors.confirmPassword
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-green-500"
-                    }`}
-                    placeholder="••••••••"
-                  />
-                </div>
-                  {fieldErrors.confirmPassword && (
-                    <p id="confirmPassword-error" role="alert" className="mt-1 text-sm text-red-600">
-                      {fieldErrors.confirmPassword}
-                    </p>
-                  )}
-              </div>
-
-              {/* Password Requirements */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-xs font-medium text-gray-700 mb-2">
-                  Password must contain:
-                </p>
-                {/* These are the rules the server actually enforces, from
-                    AUTH_PASSWORD_VALIDATORS. The previous list promised
-                    uppercase, lowercase, a number and a special character —
-                    none of which is checked anywhere, so it demanded work of
-                    the customer for nothing and misdescribed the real
-                    rejections. */}
-                <ul className="space-y-1 text-xs text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-3 h-3 text-green-600" />
-                    At least 8 characters
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-3 h-3 text-green-600" />
-                    Not entirely numbers
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-3 h-3 text-green-600" />
-                    Not a commonly used password
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="w-3 h-3 text-green-600" />
-                    Not too similar to your name or email
-                  </li>
-                </ul>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-secondary focus:ring-4 focus:ring-accent/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              >
-                {isLoading ? "Creating account..." : "Create Account"}
-              </button>
-            </form>
-
-            {/* Divider */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="font-semibold text-green-600 hover:text-green-700"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </div>
+      {error && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4"
+        >
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+          <p className="text-sm text-red-800">{error}</p>
         </div>
-      </main>
-    </>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <AuthField
+          id="name"
+          name="name"
+          type="text"
+          label="Full name"
+          icon={User}
+          required
+          autoComplete="name"
+          value={formData.name}
+          onChange={handleChange}
+          onBlur={() => handleBlur("name")}
+          error={fieldErrors.name}
+          placeholder="Ada Okafor"
+        />
+
+        <AuthField
+          id="email"
+          name="email"
+          type="email"
+          label="Email address"
+          icon={Mail}
+          required
+          autoComplete="email"
+          value={formData.email}
+          onChange={handleChange}
+          onBlur={() => handleBlur("email")}
+          error={fieldErrors.email}
+          placeholder="you@example.com"
+        />
+
+        <AuthField
+          id="phone"
+          name="phone"
+          type="tel"
+          label="Phone number"
+          icon={Phone}
+          autoComplete="tel"
+          value={formData.phone}
+          onChange={handleChange}
+          onBlur={() => handleBlur("phone")}
+          error={fieldErrors.phone}
+          placeholder="08039876543"
+          action={<span className="text-xs text-gray-400">Optional</span>}
+        />
+
+        <AuthField
+          id="password"
+          name="password"
+          type="password"
+          label="Password"
+          icon={Lock}
+          required
+          autoComplete="new-password"
+          value={formData.password}
+          onChange={handleChange}
+          onBlur={() => handleBlur("password")}
+          error={fieldErrors.password}
+          placeholder="••••••••"
+        />
+
+        <AuthField
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          label="Confirm password"
+          icon={Lock}
+          required
+          autoComplete="new-password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          onBlur={() => handleBlur("confirmPassword")}
+          error={fieldErrors.confirmPassword}
+          placeholder="••••••••"
+        />
+
+        <ul className="grid gap-1.5 rounded-xl bg-mist/50 p-4 sm:grid-cols-2">
+          {PASSWORD_RULES.map((rule) => (
+            <li key={rule} className="flex items-center gap-2 text-xs text-gray-600">
+              <Check className="h-3 w-3 shrink-0 text-primary" />
+              {rule}
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 font-semibold text-white transition-colors duration-200 hover:bg-secondary focus:ring-4 focus:ring-accent/40 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isLoading ? (
+            "Creating account…"
+          ) : (
+            <>
+              Create account <ArrowRight className="h-4 w-4" />
+            </>
+          )}
+        </button>
+      </form>
+
+      <p className="mt-8 text-center text-sm text-gray-600">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="font-semibold text-primary transition-colors duration-200 hover:text-secondary"
+        >
+          Sign in
+        </Link>
+      </p>
+    </AuthShell>
   );
 }

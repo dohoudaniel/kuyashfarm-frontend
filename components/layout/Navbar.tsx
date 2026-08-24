@@ -41,6 +41,7 @@ import { useAuth } from "@/lib/context/AuthContext";
 import { useCartStore } from "@/lib/store/useCartStore";
 import CartButton from "@/components/cart/CartButton";
 import CartDrawer from "@/components/cart/CartDrawer";
+import { Avatar } from "@/components/account/Avatar";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -91,13 +92,6 @@ export function Navbar() {
   // Anchors resolve against the homepage when you are not on it.
   const hrefFor = (link: { label: string; href: string }) =>
     link.href.startsWith("#") ? (onHomepage ? link.href : `/${link.href}`) : link.href;
-
-  const initials = (user?.full_name || user?.email || "?")
-    .split(/[\s@.]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]!.toUpperCase())
-    .join("");
 
   async function handleSignOut() {
     setUserMenuOpen(false);
@@ -182,9 +176,12 @@ export function Navbar() {
                     aria-haspopup="menu"
                     className="flex min-h-11 items-center gap-2.5 rounded-full border border-white/15 bg-white/8 px-3 backdrop-blur-sm transition-colors hover:bg-white/14"
                   >
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-                      {initials}
-                    </span>
+                    <Avatar
+                      src={user?.avatar}
+                      name={user?.full_name}
+                      email={user?.email}
+                      size={24}
+                    />
                     <span className="max-w-[100px] truncate font-sans text-sm font-medium text-white">
                       {user?.full_name || user?.email}
                     </span>

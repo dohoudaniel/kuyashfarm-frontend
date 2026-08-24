@@ -51,6 +51,16 @@ export interface User {
   email: string;
   full_name: string;
   phone: string;
+  /**
+   * An absolute URL, or null when none has been uploaded.
+   *
+   * Null rather than `""` on purpose — the account menu switches on it to
+   * choose between the photograph and the initials, and an empty string is a
+   * confusing thing to have to remember is falsy. The server builds the
+   * absolute form; a relative `/media/...` path would resolve against *this*
+   * origin, where nothing is listening.
+   */
+  avatar: string | null;
   role: Role;
   account_type: AccountType;
   is_email_verified: boolean;

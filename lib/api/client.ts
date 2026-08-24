@@ -379,21 +379,31 @@ export class ApiClient {
   }
 
   /**
-   * POST a file upload.
+   * Send a file upload.
    *
    * Kept apart from `post` because multipart cannot go through the JSON path:
    * `JSON.stringify(formData)` yields `{}`, and setting `Content-Type`
    * ourselves omits the boundary the browser generates, so the server sees an
    * unparseable body. It still refreshes on 401 like every other call.
+   *
+   * The method is a parameter because not every upload is a POST. Adding one
+   * photograph to a product gallery appends to a collection; setting a profile
+   * photograph replaces the one thing there is, which is a PUT — and PUT is
+   * what makes a retry after a dropped connection safe rather than a second
+   * copy of the file.
    */
-  async postForm<T>(path: string, body: FormData, retrying = false): Promise<T> {
+  async sendForm<T>(
+    path: string,
+    body: FormData,
+    { method = "POST", retrying = false }: { method?: "POST" | "PUT"; retrying?: boolean } = {},
+  ): Promise<T> {
     const headers: Record<string, string> = {};
     if (this.accessToken) headers["Authorization"] = `Bearer ${this.accessToken}`;
 
     let response: Response;
     try {
       response = await fetch(this.buildUrl(path), {
-        method: "POST",
+        method,
         headers,
         body,
         credentials: "include",
@@ -404,13 +414,18 @@ export class ApiClient {
 
     if (response.status === 401 && !retrying) {
       if (await this.refreshAccessToken()) {
-        return this.postForm<T>(path, body, true);
+        return this.sendForm<T>(path, body, { method, retrying: true });
       }
       this.accessToken = null;
       this.onUnauthenticated?.();
     }
 
     return this.unwrap<T>(response);
+  }
+
+  /** The common case. */
+  postForm<T>(path: string, body: FormData): Promise<T> {
+    return this.sendForm<T>(path, body, { method: "POST" });
   }
 }
 

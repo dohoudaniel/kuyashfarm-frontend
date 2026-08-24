@@ -75,6 +75,27 @@ export function updateProfile(input: { full_name?: string; phone?: string }): Pr
   return apiClient.patch<User>("/auth/me/", { ...input });
 }
 
+/**
+ * Replace the profile photograph.
+ *
+ * PUT rather than POST: there is exactly one, so sending it twice has to leave
+ * one — which matters on a mobile connection, where a dropped response is not
+ * the same thing as a failed upload.
+ *
+ * Returns the whole user rather than just the URL, so the auth context can be
+ * refreshed from the response instead of following it with a second `/me/`.
+ */
+export function uploadAvatar(file: File): Promise<User> {
+  const form = new FormData();
+  form.append("file", file);
+  return apiClient.sendForm<User>("/auth/me/avatar/", form, { method: "PUT" });
+}
+
+/** Remove it, falling the account back to initials. Idempotent. */
+export function removeAvatar(): Promise<User> {
+  return apiClient.delete<User>("/auth/me/avatar/");
+}
+
 export function changePassword(input: {
   current_password: string;
   new_password: string;

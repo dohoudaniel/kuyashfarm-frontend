@@ -346,7 +346,25 @@ export default function ServicePage({ params }: ServicePageProps) {
 
         {/* CTA */}
         <section className="relative overflow-hidden bg-gradient-to-br from-primary via-secondary to-primary py-24">
-          <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-5" />
+          {/* Texture, drawn rather than fetched.
+
+              This was `bg-[url('/images/pattern.svg')]`, and that file has
+              never existed in `public/images/` — the request 404s on every
+              render of every service page. At `opacity-5` the missing texture
+              is invisible either way, so the only symptom was a red line in
+              the console that looked like it belonged to something else.
+
+              Two crossed gradients give the same faint weave with no network
+              request and nothing to keep in sync. Same technique as the grid
+              behind the academy hero. */}
+          <div
+            className="absolute inset-0 opacity-5"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
           <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
               <Leaf className="h-4 w-4 text-white" />
