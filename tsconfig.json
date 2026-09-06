@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  // vitest.config.ts is build tooling, not application code. It imports
+  // `defineConfig` from "vitest/config", whose type entry re-exports itself by
+  // package name — which "moduleResolution": "bundler" cannot resolve from this
+  // tsconfig. Vitest validates its own config at startup, so excluding it here
+  // costs nothing: a mistake in it fails `npm test` immediately.
+  "exclude": ["node_modules", "vitest.config.ts"]
+}

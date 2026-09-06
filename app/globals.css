@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+:root {
+  /*
+   * The brand palette. All of it.
+   *
+   * Five of these existed; the rest were loose hex literals repeated across
+   * the components — 521 of them, in 20 distinct greens, with three
+   * near-identical off-whites (#faf8f5, #f7f5f0, #f9f8f6) and two pale greens
+   * (#eef5f1, #f0f7f3) that no eye could tell apart but that made a rebrand a
+   * find-and-replace across the whole codebase.
+   *
+   * The near-duplicates are collapsed here rather than preserved. If a shade
+   * genuinely needs to differ it earns a name; otherwise it is the same
+   * colour, and saying so once is the only way it stays that way.
+   */
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* Greens, dark to light. */
+  --primary-dark: #1a3d2b;  /* Deep. Hero overlays, footer, pressed states. */
+  --primary-green: #2d5f3f; /* The brand. Buttons, links, headings. */
+  --secondary-green: #4a7c59;
+  --accent-green: #6b9d7a;
+  --mist: #eef5f1;          /* Pale green wash behind cards and chips. */
+  --edge: #c6dece;          /* The border that goes with --mist. */
+
+  /* Ink and paper. */
+  --ink: #080f0a;           /* Headings. Near-black with a green cast. */
+  --cream: #faf8f5;         /* Page background on marketing sections. */
+  --light-gray: #f5f5f5;
+
+  /* Harvest accents. */
+  --earth-brown: #8b6f47;
+  --wheat: #e8d5a3;
+
+  /* Font Variables */
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary-green);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary-green);
+  --color-accent: var(--accent-green);
+  --color-mist: var(--mist);
+  --color-edge: var(--edge);
+  --color-ink: var(--ink);
+  --color-earth: var(--earth-brown);
+  --color-wheat: var(--wheat);
+  --color-cream: var(--cream);
+
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-fraunces);
+
+  /*
+   * Motion, as tokens.
+   *
+   * There were 158 `transition-*` classes in the codebase and exactly **two**
+   * `ease-*` specifications, so 156 of them ran on the browser default. That
+   * is most of why the interface felt cheap: real things accelerate and settle
+   * like objects with weight, and linear motion reads as machinery.
+   *
+   * Three durations and three easings, and nothing invents its own. The scale
+   * is deliberately fast — this is a shop people use weekly, and motion you
+   * *watch* becomes motion you resent on the tenth visit.
+   */
+  --ease-out-quick: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@theme {
+  /* Exposed as `duration-quick`, `duration-base`, `duration-slow`. */
+  --animate-duration-quick: 120ms;
+  --animate-duration-base: 220ms;
+  --animate-duration-slow: 400ms;
+}
+
+/*
+ * Smooth scrolling on the *root*, not on every element.
+ *
+ * `* { scroll-behavior: smooth }` applies to every scroll container in the
+ * document, including the cart drawer and the admin tables, so programmatic
+ * scrolls inside them animate when they should jump.
+ */
+html {
+  scroll-behavior: smooth;
+  /* The header is fixed, so an anchor would otherwise land underneath it. */
+  scroll-padding-top: 5rem;
+}
+
+/*
+ * Keyboard focus, which had no styling anywhere in the application.
+ *
+ * `:focus-visible` rather than `:focus`, so a mouse click does not leave a
+ * ring behind but a Tab key does. Applied globally rather than per component,
+ * because the failure mode of the per-component approach is a control that
+ * quietly has none — which is exactly what happened here across 100+ controls.
+ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-green);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/*
+ * Honour the operating system's reduced-motion setting.
+ *
+ * There was no handling of this anywhere before, while the academy pages
+ * animated freely. Scroll-triggered movement is a genuine trigger for
+ * vestibular disorders, so this had to land *before* motion was added
+ * elsewhere rather than after.
+ *
+ * Motion is reduced to a near-instant cross-fade instead of being removed
+ * outright: an element that appears with no transition at all can be more
+ * disorienting than one that fades. `scroll-behavior: auto` matters too —
+ * a smooth-scrolled jump is exactly the sustained movement being asked about.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
+}
+
+/*
+ * Display typography.
+ *
+ * Two things were wrong and they compounded. Playfair was set at every size
+ * with *default tracking* — large display serifs need negative letter-spacing
+ * or the words look loose and the lines rag — and it was used for every job,
+ * so nothing had hierarchy; it was all just "big serif".
+ *
+ * Tracking here is applied by size rather than by element, because the amount
+ * a face needs is a function of how large it is set, not of whether it happens
+ * to be an h1. Applied through a utility so it cannot be forgotten: any
+ * heading using `font-serif` at display size gets it.
+ */
+.font-serif {
+  font-family: var(--font-fraunces), Georgia, serif;
+  /* Optical sizing is the point of a variable face: heavier strokes and
+     tighter fit at display sizes, more generous at small ones. */
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 12, "WONK" 1;
+}
+
+/* The scale. Each step is what a display serif needs at that size. */
+.display-xl { font-size: clamp(2.75rem, 7vw, 5rem);    line-height: 0.98; letter-spacing: -0.03em; }
+.display-lg { font-size: clamp(2.25rem, 5vw, 3.5rem);  line-height: 1.04; letter-spacing: -0.025em; }
+.display-md { font-size: clamp(1.75rem, 3.5vw, 2.5rem); line-height: 1.12; letter-spacing: -0.02em; }
+.display-sm { font-size: clamp(1.35rem, 2.5vw, 1.75rem); line-height: 1.2;  letter-spacing: -0.015em; }
+
+/* Hide scrollbar for horizontal scroll (Prime Video style) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-green);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-green);
+}
+
+/* Notification toast animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}

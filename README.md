@@ -1,168 +1,314 @@
-#  - Farming for a Future
+# Kuyash Farms — Frontend
 
-A modern, professional farming website landing page built with Next.js 16, TypeScript, and Tailwind CSS.
+The customer-facing web app: shop, checkout, orders, wholesale and distributor
+applications, and the Kuyash Farms Academy. Next.js 16 (App Router), React 19,
+TypeScript and Tailwind v4.
 
-## 🌟 Features
+This repository is **frontend only**. The API is a separate Django project in
+[`kuyashfarm-backend`](https://github.com/dohoudaniel/kuyashfarm-backend). An
+Express + Mongoose backend used to live in this repo; it has been removed.
 
-- **Fully Responsive**: Optimized for mobile, tablet, and desktop
-- **Modern Design**: Clean, elegant, nature-oriented aesthetic
-- **Performance Optimized**: Built with Next.js 16 and Turbopack
-- **Type Safe**: Full TypeScript implementation
-- **SEO Ready**: Semantic HTML and proper metadata
-- **Smooth Animations**: Hover effects and transitions throughout
-- **Professional Structure**: Modular, maintainable codebase
-
-## 🎨 Design Highlights
-
-### Color Palette
-- Primary Green: `#2d5f3f`
-- Secondary Green: `#4a7c59`
-- Accent Green: `#6b9d7a`
-- Earth Brown: `#8b6f47`
-- Cream: `#faf8f5`
-
-### Typography
-- **Headings**: Playfair Display (Serif)
-- **Body**: Inter (Sans-serif)
-
-## 📁 Project Structure
-
-```
-frontend/
-├── app/                    # Next.js App Router
-├── components/
-│   ├── ui/                # Reusable UI components
-│   ├── layout/            # Navbar, Footer
-│   └── sections/          # Page sections
-├── lib/                   # Utils and constants
-├── types/                 # TypeScript definitions
-└── public/                # Static assets
-```
-
-See [PROJECT_STRUCTURE.md](frontend/PROJECT_STRUCTURE.md) for detailed documentation.
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-
-### Installation
+## Quick start
 
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-
-# Navigate to frontend
-cd kuyashfarm/frontend
-
-# Install dependencies
 npm install
-
-# Start development server
-npm run dev
+cp .env.example .env.local     # NEXT_PUBLIC_API_URL is required
+npm run dev                    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+The app lives at the repo root. It used to sit in a `frontend/` subdirectory;
+that was flattened on 2026-07-28.
 
-## 📦 Built With
+**The API must be running first.** Beyond the obvious — nothing loads without
+it — `/categories` and the academy class pages are prerendered at build time,
+so `npm run build` fails with `ECONNREFUSED` if the backend is down. Start the
+backend, then build.
 
-- **Next.js 16** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS v4** - Styling
-- **Playfair Display & Inter** - Typography
-- **clsx & tailwind-merge** - Class management
+## Scripts
 
-## 🎯 Sections
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server with Turbopack |
+| `npm run build` | Production build (needs the API up) |
+| `npm start` | Serve the production build |
+| `npm run lint` | eslint — currently 0 errors, 0 warnings |
+| `npm test` | Vitest, 182 specs |
+| `npm run test:watch` | Vitest in watch mode |
+| `npm run check:bundle` | After a build: fails if anything secret-shaped reached the client JS |
+| `npm run test:e2e` | Playwright, 24 specs — needs the API running |
+| `npm run test:e2e:ui` | Playwright in watch/inspector mode |
+| `npx tsc --noEmit` | Typecheck |
 
-1. **Hero** - Full-screen hero with background image
-2. **Stats** - Key metrics grid
-3. **Mission** - Two-column mission statement
-4. **Services** - Services grid with hover effects
-5. **Collaboration** - Full-width collaboration section
-6. **Blog** - Blog preview cards
-7. **Goals** - Impact metrics
-8. **Footer** - Links and social media
+All of these run on every push — see `.github/workflows/ci.yml`.
 
-## 🛠️ Development
+## How it talks to the API
 
-### Available Scripts
+Everything goes through `lib/api/`. There is no second data plane — products,
+carts, orders, applications and bookings all live on the server.
 
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
+- **`client.ts`** is the only place that calls `fetch` for authenticated
+  traffic. It holds the access token **in memory** (never `localStorage`, which
+  any injected script can read), appends the trailing slash Django requires,
+  unwraps the `{success, message, data, errors}` envelope, and refreshes
+  **single-flight** on a 401 — refresh tokens rotate and blacklist on use, so
+  two concurrent refreshes would invalidate each other and sign the user out at
+  random.
+- **`fetchPublic()`** is what Server Components use. It is deliberately separate:
+  the `apiClient` singleton lives in module scope, and on the server module
+  scope is shared across concurrent requests, so using it for user data would
+  leak one visitor's session into another visitor's page.
+- The refresh token is an **HttpOnly cookie**, so every request sends
+  `credentials: 'include'`.
+
+Things the client must not do, because the server already does them: compute a
+price, add up a cart, decide whether stock is available, or decide what a user
+is entitled to. `unit_price` in a response is already what *that* caller pays.
+
+### Environment
+
+`NEXT_PUBLIC_API_URL` is required for a production build — there is no fallback,
+because a silent default to localhost means a misconfigured deploy boots happily
+and fails in front of a customer. Development keeps the convenience default.
+
+Nothing secret belongs in a `NEXT_PUBLIC_*` variable. Next.js inlines them into
+the JavaScript every visitor downloads, regardless of which component reads the
+value or who that component renders for. `npm run check:bundle` enforces this
+after a build; it exists because `NEXT_PUBLIC_ADMIN_URL` once shipped the
+back-office path to every anonymous visitor, even though the link itself was
+rendered only for staff.
+
+### Money
+
+Amounts arrive as decimal strings (`"7500.00"`) because a float cannot
+represent ₦0.10. Render with `formatPrice()`; never sum them as numbers.
+
+### Guest storage
+
+Only three keys are written, and each earns its place:
+
+| Key | Store | Why |
+|---|---|---|
+| `kuyash-cart-storage` | local | zustand cache of the server cart, so the badge paints instantly |
+| `kuyash_guest_order` | **session** | a guest returning from Paystack has no session; the API needs the email to prove the order is theirs |
+| `kuyash_guest_registration` | **session** | the same, for an academy booking |
+
+The two guest keys are `sessionStorage` on purpose — they die with the tab
+rather than leaving an email address on a shared machine.
+
+## Routes
+
+```
+/                                    landing
+/categories                          category index
+/shop/[category]                     product listing (SSR)
+/shop/[category]/[product]           product detail
+/checkout                            quote-driven; no card fields ever
+/checkout/confirm                    where Paystack returns the customer
+/orders  ·  /orders/[orderNumber]    history and detail (guests use ?email=)
+/login  ·  /register                 
+/forgot-password  ·  /reset-password verified against the API, not the client
+/verify-email                        
+/profile                             profile, addresses, applications, bookings
+/become-wholesaler                   wholesale application
+/become-distributor                  distributor application
+/academy                             programmes and the live class schedule
+/academy/classes/[slug]              class detail and seat booking
+/academy/registrations/[reference]   booking receipt
+/services/[slug]
+/admin  ·  /admin/*                  React back office (staff only)
+/driver                              delivery run, built for a phone
+/accept-invitation                   staff invitation
+/newsletter/confirm  ·  /unsubscribe double opt-in
+/privacy  ·  /terms  ·  /cookies     legal
 ```
 
-### Code Quality
+Interactive pages split into `page.tsx` (Server Component, metadata) and a
+`*Client.tsx`. Most routes carry sibling `loading.tsx` and `error.tsx` — keep
+them if you move a route.
 
-- **ESLint**: Next.js recommended config
-- **TypeScript**: Strict mode enabled
-- **Component Documentation**: JSDoc comments
+**The header and footer are mounted once, in the root layout**, by
+`components/layout/SiteChrome.tsx`. Do not add `<Navbar />` or `<Footer />` to
+a page. They used to live in twenty-four pages, and because a component inside
+a page remounts on every client-side navigation, the Navbar refetched the cart
+on *every page view* and the header re-animated each time. `SiteChrome` renders
+nothing on `/admin` and `/driver`, which bring their own chrome.
 
-## 🎨 Customization
+`/admin` is guarded by `AdminGuard`, which is **not** a security boundary and
+says so in its own docstring — it exists so a customer who wanders there sees
+an explanation rather than a page full of 403s. Every `/staff/*` endpoint
+enforces permissions server-side, and that is what protects the data.
 
-### Updating Content
+## Design tokens
 
-Edit constants in `frontend/lib/constants.ts`:
-- Navigation links
-- Stats data
-- Services information
-- Footer links
+Tailwind v4 via `@import "tailwindcss"`; there is no `tailwind.config`. Tokens
+are CSS variables in `app/globals.css`, exposed through `@theme inline`.
 
-### Changing Colors
+| Token | Value | Used for |
+|---|---|---|
+| `primary-dark` | `#1a3d2b` | Hero overlays, footer, pressed states |
+| `primary` | `#2d5f3f` | The brand. Buttons, links, headings |
+| `secondary` | `#4a7c59` | Hover on primary |
+| `accent` | `#6b9d7a` | Supporting marks, quiet text on dark |
+| `mist` | `#eef5f1` | Pale green wash behind cards and chips |
+| `edge` | `#c6dece` | The border that goes with `mist` |
+| `ink` | `#080f0a` | Headings. Near-black with a green cast |
+| `cream` | `#faf8f5` | Page background on marketing sections |
+| `earth` | `#8b6f47` | Harvest accent |
+| `wheat` | `#e8d5a3` | Harvest accent, light |
 
-Update CSS variables in `frontend/app/globals.css`:
-```css
-:root {
-  --primary-green: #2d5f3f;
-  --secondary-green: #4a7c59;
-  /* ... */
-}
-```
+Headings use Playfair Display, body uses Inter. Combine classes with `cn()`
+(clsx + tailwind-merge).
 
-### Adding New Sections
+**Use the token, never the hex.** There were 521 hex literals across the
+components in twenty distinct greens — including three off-whites and four
+dark greens no eye could tell apart — which made a rebrand a find-and-replace
+across the whole codebase. There are now none outside `app/globals.css`, and
+the only exceptions are deliberate and commented:
 
-1. Create component in `components/sections/`
-2. Import in `app/page.tsx`
-3. Add to component tree
+- `app/opengraph-image.tsx` and `app/manifest.ts` — these render outside a
+  browser (Satori, or a JSON manifest), where CSS custom properties do not
+  exist.
 
-## 📱 Responsive Breakpoints
+### The tab icons are static PNGs, on purpose
 
-- **Mobile**: < 640px (1 column)
-- **Tablet**: 640px - 1024px (2 columns)
-- **Desktop**: > 1024px (3-4 columns)
+`app/icon.png` (32×32) and `app/apple-icon.png` (180×180) are committed
+binaries rather than `ImageResponse` routes.
 
-## ⚡ Performance Features
+They *were* generated — a `#2d5f3f` square with a `#e8d5a3` serif "K", sized
+against cap height so the glyph fills the square at 16px. The rendered output
+is byte-identical to what those routes produced; only the delivery changed.
 
-- Image optimization with Next.js Image
-- Font optimization with next/font
-- Automatic code splitting
-- Turbopack for fast development
+**Why they stopped being generated.** A browser requests the favicon on every
+single page load, so an `ImageResponse` route is a Satori render per page view
+in development and a build-time render in production — real cost for an image
+that never changes. Worse, under `next dev` with Turbopack the route fails
+outright: `@vercel/og` throws `Input buffer contains unsupported image format`
+after the first compile, and the route returns a 500 for the rest of the
+session. Production builds prerendered it correctly the whole time, which is
+what made it easy to dismiss as cosmetic — it is not, it is every tab in
+development showing a broken icon and every page view logging a stack trace.
 
-## 🔒 Best Practices
+To change the mark, render a new PNG at these two sizes and replace the files.
+The palette values are `--primary-green` and `--wheat` from `app/globals.css`;
+keep them in step by hand, which is the one thing the generated version did
+for free.
+- `components/auth/GoogleSignInButton.tsx` — Google's own mark, which their
+  branding guidelines do not permit recolouring.
 
-✅ Component modularity
-✅ TypeScript type safety
-✅ Semantic HTML
-✅ Accessibility considerations
-✅ Consistent naming conventions
-✅ Clean code organization
-✅ Reusable utilities
+**Semantic colour is not brand colour**, and the distinction is deliberate.
+Success banners stay Tailwind's `green-50/800`, errors stay red, and the
+approve/reject pair in the back office stays green/red — that pair has to read
+as go/stop. Recolouring feedback to brand green would make "saved" and "buy"
+look identical.
 
-## 📄 License
+## Tests
 
-MIT License - feel free to use for your projects
+`npm test` runs Vitest + React Testing Library over the parts where a
+regression would be expensive and invisible:
 
-## 🤝 Contributing
+- the HTTP client — trailing slashes, envelope unwrapping, error mapping, and
+  single-flight refresh under concurrent 401s;
+- guest-ownership storage, including that it refuses to hand back an email for
+  a *different* order reference;
+- money formatting;
+- the class booking form — a full class renders no form at all.
 
-Contributions welcome! Please follow the existing code style and structure.
+`npm run test:e2e` drives a real browser against a real API — nothing mocked.
+It needs the backend running, and the API must allow `http://127.0.0.1:3100`
+in `CORS_ALLOWED_ORIGINS` (that is the port Playwright serves the build on).
 
-## 📧 Contact
+Fourteen specs across four files:
 
-For questions or feedback, reach out to your development team.
+- **checkout** — browse, add to basket, place a cash-on-delivery order, and
+  confirm the item on the order is the item that went into the basket. Plus:
+  an empty basket offers no way to pay.
+- **disclosure** — signing up says exactly the same thing for a new and an
+  existing address, and does not sign you in; a failed sign-in and a password
+  reset are equally uninformative; the admin path is in no script an anonymous
+  visitor downloads.
+- **academy** — booking a seat decrements the class, issues a server-side
+  reference, and a stranger with the reference still cannot open the booking.
+- **signed-in** — a basket filled as a guest survives signing in (the merge is
+  best-effort in the client, so a merge that stopped working would look like
+  nothing at all); a signed-in customer is not asked to retype their email and
+  their order reaches their history; signing out genuinely ends the session,
+  which the prototype's did not.
+
+Two things to know before believing a failure:
+
+- If a spec fails right after you have edited source, `rm -rf .next` and rebuild.
+  An incremental Next build can leave stale chunks that Playwright then serves,
+  producing timeouts that look like product bugs.
+- Filter locators on `:visible` when a page can be mid-navigation. React
+  briefly holds both the outgoing and incoming trees in the DOM, so plain
+  selectors intermittently match twice and trip strict mode. Scoping to a
+  parent does *not* fix it — the duplicate simply moves up a level. Visibility
+  is what distinguishes them, because the outgoing tree is hidden while it
+  unmounts. This is a transition artefact, not a duplicate id: the served HTML
+  has exactly one.
+
+Writing these found two production bugs that every other gate had missed —
+see the note in `e2e/checkout.spec.ts`.
+
+## Security headers
+
+Set in `next.config.ts` under `headers()`, on **every** route — a header that
+applies to most routes protects nothing, because an attacker picks the route it
+does not apply to.
+
+| Header | What it stops |
+|---|---|
+| `Content-Security-Policy` | Injected script phoning home; `/admin` being framed |
+| `X-Frame-Options: DENY` | The same, for browsers predating `frame-ancestors` |
+| `X-Content-Type-Options` | A browser second-guessing a declared type on an upload |
+| `Referrer-Policy` | Order references and reset tokens leaking in `Referer` |
+| `Permissions-Policy` | Embedded content asking for camera, mic or location |
+| `Strict-Transport-Security` | Downgrade to plain HTTP |
+
+### Two things to know before you touch the CSP
+
+**A CSP is the only header here that can break the product, and it breaks it
+invisibly.** The App Router streams its RSC payload through inline `<script>`
+tags. Under `script-src 'self'` the browser blocks every one of them: the HTML
+paints, React fails to hydrate with error #412, and every button on the page is
+dead while the page looks perfectly fine. **`curl` cannot see this** — only a
+browser enforces CSP. `e2e/security-headers.spec.ts` drives a real one and
+fails on any violation or page error; run it after any change here.
+
+`'unsafe-inline'` on `script-src` is therefore deliberate, and the full
+reasoning is in `next.config.ts` rather than summarised away. A per-request
+nonce from middleware is the alternative and was rejected because middleware
+makes every matched route render dynamically, and most of this site is static
+marketing meant to be served from cache. Revisit that if a third-party script
+or a rich-text field is ever introduced — either changes the calculation.
+
+**`upgrade-insecure-requests` is emitted only when the API is HTTPS.** It
+rewrites every `http://` subresource, including API calls. A production build
+pointed at an http API — which is exactly what the Playwright suite and any
+staging smoke test do — would have every request upgraded to a port nothing is
+listening on, surfacing as an unexplained network error rather than a policy
+decision.
 
 ---
 
-**Built with ❤️ for sustainable farming**
+## Known gaps
+
+- The end-to-end suite covers guest, signed-in, staff and driver journeys, plus
+  the security headers. It does not cover the Paystack card flow — that leaves
+  our origin entirely and cannot be driven from here.
+- **69 images are Unsplash hotlinks** awaiting owned photography. They are
+  photographs of somebody else's farm, served from a third party we do not
+  control, with no commercial licence. This is the largest remaining gap and it
+  is a legal one, not a cosmetic one.
+- **The landing page has not been redesigned.** What was demonstrably fake was
+  removed — another company's name in a source comment, three invented blog
+  articles with dead links, five create-next-app SVGs — but the page is still
+  eight stacked marketing sections rather than one clear promise and one
+  action. That is a design decision, not a cleanup.
+- **`SOCIAL_LINKS` is empty**, so the footer renders no social icons. Fill in
+  `lib/constants.ts` with the real accounts and they appear. It was four
+  `href="#"` links; an icon that goes nowhere is worse than an absent one.
+- **The legal pages await legal review.** `/privacy`, `/terms` and `/cookies`
+  describe accurately what this system does, checked against the code, and each
+  carries a visible banner saying so. They are documentation of the software,
+  not lawyer-drafted policy.

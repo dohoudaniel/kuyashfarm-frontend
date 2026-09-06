@@ -1,0 +1,21 @@
+/**
+ * Confirm an email address from an emailed link.
+ */
+
+import type { Metadata } from "next";
+import { Suspense } from "react";
+
+import VerifyEmailClient from "./VerifyEmailClient";
+
+export const metadata: Metadata = {
+  title: "Verify your email",
+  robots: { index: false, follow: false },
+};
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense>
+      <VerifyEmailClient />
+    </Suspense>
+  );
+}
