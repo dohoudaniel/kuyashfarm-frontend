@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+
+import { ApiError } from "@/lib/api/client";
 import userEvent from "@testing-library/user-event";
 
 /**
@@ -120,19 +122,54 @@ describe("Avatar", () => {
 });
 
 describe("AvatarUploader", () => {
-  it("refuses a file over 2 MB without uploading it", async () => {
+  it("accepts a file a phone would actually produce", async () => {
+    // The limit used to be 2 MB, which rejected the ordinary case: a
+    // photograph straight off a modern phone is routinely 4-8 MB.
+    setAvatar.mockResolvedValue({ ...BASE_USER, avatar: "https://example.com/a.jpg" });
+    render(<AvatarUploader onMessage={vi.fn()} />);
+
+    await userEvent.upload(
+      screen.getByLabelText("Upload a profile photograph"),
+      fileOf("phone.jpg", "image/jpeg", 6 * 1024 * 1024),
+    );
+
+    await waitFor(() => expect(setAvatar).toHaveBeenCalledTimes(1));
+  });
+
+  it("refuses a file over 10 MB without uploading it, and says how big it is", async () => {
     const onMessage = vi.fn();
     render(<AvatarUploader onMessage={onMessage} />);
 
     await userEvent.upload(
       screen.getByLabelText("Upload a profile photograph"),
-      fileOf("huge.jpg", "image/jpeg", 5 * 1024 * 1024),
+      fileOf("huge.jpg", "image/jpeg", 12 * 1024 * 1024),
     );
 
-    // The point is the *second* assertion. The server would refuse this too,
-    // but only after the whole 5 MB had been sent.
-    expect(onMessage).toHaveBeenCalledWith(expect.stringContaining("2 MB"), true);
+    // The second assertion is the point. The server refuses this too, but only
+    // after the whole 12 MB has been sent.
+    expect(onMessage).toHaveBeenCalledWith(
+      expect.stringContaining("12.0 MB"),
+      true,
+    );
+    expect(onMessage).toHaveBeenCalledWith(expect.stringContaining("10 MB"), true);
     expect(setAvatar).not.toHaveBeenCalled();
+  });
+
+  it("tells the customer to retry when storage is unavailable", async () => {
+    // 503 is the server saying a dependency is down, not that we have a bug.
+    // "Something went wrong" would invite a bug report for an outage.
+    const onMessage = vi.fn();
+    setAvatar.mockRejectedValue(new ApiError("File storage is temporarily unavailable.", 503));
+    render(<AvatarUploader onMessage={onMessage} />);
+
+    await userEvent.upload(
+      screen.getByLabelText("Upload a profile photograph"),
+      fileOf("face.jpg", "image/jpeg", 400_000),
+    );
+
+    await waitFor(() =>
+      expect(onMessage).toHaveBeenCalledWith(expect.stringMatching(/try again/i), true),
+    );
   });
 
   it("does not offer SVG in the file picker, and refuses one anyway", async () => {

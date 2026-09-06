@@ -22,11 +22,43 @@ import { Avatar } from "@/components/account/Avatar";
 import { ApiError } from "@/lib/api/client";
 import { useAuth } from "@/lib/context/AuthContext";
 
-/** Two megabytes, matching `MAX_AVATAR_BYTES` in `accounts/views.py`. */
-const MAX_BYTES = 2 * 1024 * 1024;
+/**
+ * Ten megabytes, matching `MAX_AVATAR_BYTES` in `accounts/views.py`.
+ *
+ * Checked here as well as there, and the reason is the wait rather than the
+ * security. The server is the authority and refuses the same thing — but only
+ * after the whole file has been uploaded, which on a Nigerian mobile
+ * connection is a minute the customer does not get back before being told no.
+ */
+const MAX_BYTES = 10 * 1024 * 1024;
 
 /** Matching `ALLOWED_IMAGE_TYPES` in `core/uploads.py`. SVG is deliberately absent. */
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+
+/**
+ * What to tell somebody when an upload or a removal fails.
+ *
+ * Three cases, because they call for three different actions:
+ *
+ * **503** — object storage is unwell, not us and not them. The server returns
+ * this rather than a 500 precisely so the answer can be "try again shortly"
+ * instead of "something went wrong", which invites a bug report for an outage
+ * nobody here can fix.
+ *
+ * **Any other `ApiError`** — the server said something specific about this
+ * file. Show its words: it knows why, and paraphrasing loses the reason.
+ *
+ * **Anything else** — the request never got an answer. Usually the connection.
+ */
+function uploadProblem(caught: unknown, verb: "upload" | "remove" = "upload"): string {
+  if (caught instanceof ApiError) {
+    if (caught.status === 503) {
+      return "Photo storage is temporarily unavailable. Please try again in a moment.";
+    }
+    return caught.message;
+  }
+  return `Could not ${verb} that photograph. Check your connection and try again.`;
+}
 
 export function AvatarUploader({ onMessage }: { onMessage: (text: string, bad?: boolean) => void }) {
   const { user, setAvatar, clearAvatar } = useAuth();
@@ -45,7 +77,10 @@ export function AvatarUploader({ onMessage }: { onMessage: (text: string, bad?: 
       return;
     }
     if (file.size > MAX_BYTES) {
-      onMessage("That photograph is over 2 MB. Choose a smaller one.", true);
+      // Says how big it actually is. "Too large" leaves somebody guessing
+      // whether trimming a little will do.
+      const mb = (file.size / 1024 / 1024).toFixed(1);
+      onMessage(`That photograph is ${mb} MB. The limit is 10 MB.`, true);
       return;
     }
 
@@ -54,10 +89,7 @@ export function AvatarUploader({ onMessage }: { onMessage: (text: string, bad?: 
       await setAvatar(file);
       onMessage("Photograph updated.");
     } catch (caught) {
-      onMessage(
-        caught instanceof ApiError ? caught.message : "Could not upload that photograph.",
-        true,
-      );
+      onMessage(uploadProblem(caught), true);
     } finally {
       setBusy(false);
     }
@@ -69,10 +101,7 @@ export function AvatarUploader({ onMessage }: { onMessage: (text: string, bad?: 
       await clearAvatar();
       onMessage("Photograph removed.");
     } catch (caught) {
-      onMessage(
-        caught instanceof ApiError ? caught.message : "Could not remove that photograph.",
-        true,
-      );
+      onMessage(uploadProblem(caught, "remove"), true);
     } finally {
       setBusy(false);
     }
