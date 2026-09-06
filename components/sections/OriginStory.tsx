@@ -60,7 +60,7 @@ export function OriginStory() {
             style={{ aspectRatio: "4/3" }}
           >
             <Image
-              src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1600"
+              src="/images/stock/mixed-vegetables.webp"
               alt="Kuyash Farms aerial view"
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-105"

@@ -60,7 +60,7 @@ export interface ServiceContent {
 
 export const SERVICE_CONTENT: Record<string, ServiceContent> = {
   "crop-vegetable-production": {
-    heroImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070",
+    heroImage: "/images/stock/maize-seedlings.webp",
     heroVideo: "/videos/farm-hero.mp4",
     shopHref: "/shop/vegetables",
     overview:
@@ -131,23 +131,23 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
       "Support for innovation in sustainable agriculture",
     ],
     beforeAfter: {
-      before: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2070",
-      after: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070",
+      before: "/images/stock/wheat-field-sunset.webp",
+      after: "/images/stock/maize-seedlings.webp",
       title: "Sustainable Transformation",
       description: "See how our innovative farming practices transformed conventional farmland into a thriving organic ecosystem in just 18 months.",
     },
     gallery: [
-      "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070",
-      "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=2069",
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=2070",
-      "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=2070",
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=2070",
-      "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=2070",
+      "/images/stock/maize-seedlings.webp",
+      "/images/stock/field-aerial.webp",
+      "/images/stock/mixed-vegetables.webp",
+      "/images/stock/seedling-trays.webp",
+      "/images/stock/soil-preparation.webp",
+      "/images/stock/harvest-workers.webp",
     ],
   },
 
   "livestock-poultry-farming": {
-    heroImage: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=2087",
+    heroImage: "/images/stock/free-range-hens.webp",
     shopHref: "/shop/poultry",
     overview:
       "At Kuyash Farms, we raise healthy, high-quality livestock and poultry using modern animal husbandry practices. From free-range chickens to well-fed cattle and sheep, every animal is cared for in a clean, humane, and stress-free environment — ensuring premium quality meat, eggs, and dairy for our customers.",
@@ -187,23 +187,23 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
       "Support for local farming communities and livelihoods",
     ],
     beforeAfter: {
-      before: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2070",
-      after: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=2087",
+      before: "/images/stock/wheat-field-sunset.webp",
+      after: "/images/stock/free-range-hens.webp",
       title: "Modern Animal Husbandry",
       description: "See how our technology-driven approach transformed traditional livestock rearing into a clean, efficient, and high-yield farming operation.",
     },
     gallery: [
-      "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=2087",
-      "https://images.unsplash.com/photo-1587593810167-a84920ea0781?q=80&w=2070",
-      "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?q=80&w=2070",
-      "https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=2073",
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=2070",
-      "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=2074",
+      "/images/stock/free-range-hens.webp",
+      "/images/stock/whole-chicken.webp",
+      "/images/stock/brown-eggs.webp",
+      "/images/stock/piglet-in-straw.webp",
+      "/images/stock/mixed-vegetables.webp",
+      "/images/stock/crop-rows.webp",
     ],
   },
 
   "fish-farming": {
-    heroImage: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=2070",
+    heroImage: "/images/stock/clownfish.webp",
     shopHref: "/shop/fishery",
     overview:
       "Kuyash Farms operates a sustainable aquaculture system that produces fresh, high-quality fish year-round. Using recirculating aquaculture systems (RAS) and natural pond farming, we raise tilapia, catfish, and other species in a clean, controlled environment — ensuring premium freshness and flavour for every customer.",
@@ -243,23 +243,23 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
       "Support for sustainable aquaculture and food security",
     ],
     beforeAfter: {
-      before: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2070",
-      after: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=2070",
+      before: "/images/stock/wheat-field-sunset.webp",
+      after: "/images/stock/clownfish.webp",
       title: "From Traditional Ponds to Smart Aquaculture",
       description: "See how we transformed conventional open-pond fish farming into a high-yield, technology-driven aquaculture operation with superior water efficiency and output.",
     },
     gallery: [
-      "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=2070",
-      "https://images.unsplash.com/photo-1544943910-4c1dc44aab44?q=80&w=2074",
-      "https://images.unsplash.com/photo-1497290756760-23ac55edf36f?q=80&w=2067",
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070",
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=2070",
-      "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?q=80&w=2074",
+      "/images/stock/clownfish.webp",
+      "/images/stock/betta-fish.webp",
+      "/images/stock/still-water-horizon.webp",
+      "/images/stock/mountains-above-cloud.webp",
+      "/images/stock/mixed-vegetables.webp",
+      "/images/stock/red-apples.webp",
     ],
   },
 
   "palm-oil-production": {
-    heroImage: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?q=80&w=2070",
+    heroImage: "/images/stock/potatoes.webp",
     shopHref: "/shop",
     overview:
       "Kuyash Farms cultivates oil palm plantations using responsible, high-yield agronomic practices. We produce premium-grade crude palm oil (CPO) and palm kernel oil (PKO) through modern milling and extraction processes — balancing productivity with environmental stewardship and community development.",
@@ -299,18 +299,18 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
       "Outgrower support empowering local smallholder farmers",
     ],
     beforeAfter: {
-      before: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2070",
-      after: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?q=80&w=2070",
+      before: "/images/stock/wheat-field-sunset.webp",
+      after: "/images/stock/potatoes.webp",
       title: "Responsible Palm Oil Farming",
       description: "See how our precision agronomy and responsible land management transformed underutilised land into a thriving, high-yield palm oil plantation.",
     },
     gallery: [
-      "https://images.unsplash.com/photo-1518977676601-b53f82aba655?q=80&w=2070",
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=2070",
-      "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=2070",
-      "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070",
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=2070",
-      "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?q=80&w=2074",
+      "/images/stock/potatoes.webp",
+      "/images/stock/mixed-vegetables.webp",
+      "/images/stock/seedling-trays.webp",
+      "/images/stock/maize-seedlings.webp",
+      "/images/stock/soil-preparation.webp",
+      "/images/stock/red-apples.webp",
     ],
   },
 };

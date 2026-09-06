@@ -51,7 +51,7 @@ export function ThereIsMoreToGrow() {
             style={{ aspectRatio: "16/7" }}
           >
             <Image
-              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600"
+              src="/images/stock/wheat-field-sunset.webp"
               alt="Kuyash Farms at sunset"
               fill
               className="object-cover"

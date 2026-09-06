@@ -201,7 +201,7 @@ export function BlogClient({
         {/* background image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=2070"
+            src="/images/stock/mixed-vegetables.webp"
             alt="Farm field"
             fill
             // Genuinely full-bleed, so 100vw is the honest answer rather than

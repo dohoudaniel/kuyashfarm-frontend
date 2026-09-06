@@ -62,7 +62,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "KR",
     date: "Aug 8, 2026",
     readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=1600",
+    image: "/images/stock/free-range-hens.webp",
     featured: true,
     popular: true,
   },
@@ -77,7 +77,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "MG",
     date: "Aug 6, 2026",
     readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=1600",
+    image: "/images/stock/cattle-at-sunset.webp",
     popular: false,
   },
   {
@@ -91,7 +91,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "CO",
     date: "Aug 5, 2026",
     readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1600",
+    image: "/images/stock/maize-seedlings.webp",
     popular: false,
   },
   {
@@ -105,7 +105,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "NE",
     date: "Aug 3, 2026",
     readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=1600",
+    image: "/images/stock/clownfish.webp",
     popular: false,
   },
   {
@@ -119,7 +119,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "CO",
     date: "Aug 1, 2026",
     readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1600",
+    image: "/images/stock/mixed-vegetables.webp",
     popular: false,
   },
   {
@@ -133,7 +133,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "KR",
     date: "Jul 25, 2026",
     readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=800",
+    image: "/images/stock/free-range-hens.webp",
     popular: true,
   },
   {
@@ -147,7 +147,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "CO",
     date: "Jul 20, 2026",
     readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=800",
+    image: "/images/stock/mixed-vegetables.webp",
     popular: true,
   },
   {
@@ -161,7 +161,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "NE",
     date: "Jul 18, 2026",
     readTime: "4 min read",
-    image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=800",
+    image: "/images/stock/clownfish.webp",
     popular: true,
   },
   {
@@ -175,7 +175,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "KR",
     date: "Jul 15, 2026",
     readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800",
+    image: "/images/stock/ploughing-paddy.webp",
     popular: true,
   },
   {
@@ -189,7 +189,7 @@ export const BLOG_POSTS: FallbackBlogPost[] = [
     authorInitials: "TA",
     date: "Jul 10, 2026",
     readTime: "9 min read",
-    image: "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=800",
+    image: "/images/stock/crop-rows.webp",
     popular: true,
   },
 ];
@@ -200,20 +200,20 @@ export const BLOG_GUIDE_SECTIONS = [
     description: "Step-by-step practical guides to help you solve common farming challenges.",
     cta: "Explore Guides",
     href: "/blog?category=farm-management",
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=600",
+    image: "/images/stock/maize-seedlings.webp",
   },
   {
     title: "Research & Insights",
     description: "Evidence-based research and insights to help you make better farming decisions.",
     cta: "Explore Insights",
     href: "/blog?category=research-insights",
-    image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=600",
+    image: "/images/stock/ploughing-paddy.webp",
   },
   {
     title: "Farm Management",
     description: "Tools, tips and strategies to help you run an efficient and profitable farm.",
     cta: "Learn More",
     href: "/blog?category=farm-management",
-    image: "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=600",
+    image: "/images/stock/crop-rows.webp",
   },
 ];

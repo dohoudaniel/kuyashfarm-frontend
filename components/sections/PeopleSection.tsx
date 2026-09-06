@@ -23,17 +23,17 @@ import Link from "next/link";
  */
 const TEAM_IMAGES = [
   {
-    src: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?q=80&w=800",
+    src: "/images/stock/recycling-bins.webp",
     alt: "Farm worker tending crops",
     className: "col-span-2 row-span-1",
   },
   {
-    src: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=800",
+    src: "/images/stock/harvest-workers.webp",
     alt: "Team members at harvest",
     className: "col-span-1 row-span-1",
   },
   {
-    src: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=800",
+    src: "/images/stock/cattle-at-sunset.webp",
     alt: "Workers on the farm",
     className: "col-span-1 row-span-1",
   },

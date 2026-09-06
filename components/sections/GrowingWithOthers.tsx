@@ -10,25 +10,25 @@ const PROGRAMMES = [
     icon: GraduationCap,
     title: "Farmer Training",
     description: "Practical training to build skills and confidence in modern farming techniques.",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800",
+    image: "/images/stock/children-smiling.webp",
   },
   {
     icon: Sprout,
     title: "Out-grower Support",
     description: "Helping farmers improve yields and income through structured out-grower schemes.",
-    image: "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=800",
+    image: "/images/stock/field-aerial.webp",
   },
   {
     icon: HandshakeIcon,
     title: "Field Demonstrations",
     description: "Learning by seeing and doing on the farm — hands-on knowledge transfer.",
-    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=800",
+    image: "/images/stock/soil-preparation.webp",
   },
   {
     icon: Users,
     title: "Community Impact",
     description: "Building stronger communities together through shared agricultural growth.",
-    image: "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?q=80&w=800",
+    image: "/images/stock/hands-together.webp",
   },
 ];
 

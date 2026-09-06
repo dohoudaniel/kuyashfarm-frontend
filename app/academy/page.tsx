@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     title: "Kuyash Farms Academy",
     description:
       "Building Africa's next generation of agricultural innovators. Hands-on training, smart farming tech, NABTEB certification, and career placement.",
-    images: [{ url: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1200" }],
+    images: [{ url: "/images/stock/mixed-vegetables.webp" }],
   },
 };
 

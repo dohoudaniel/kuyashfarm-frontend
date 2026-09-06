@@ -154,11 +154,21 @@ const nextConfig: NextConfig = {
       // Supabase Storage, when product media is served straight from the
       // bucket rather than proxied through Django.
       { protocol: "https", hostname: "*.supabase.co", pathname: "/**" },
-      // Marketing photography on the static pages. These are hotlinked
-      // placeholders of somebody else's farm and want replacing with real
-      // photographs — but removing the pattern before the images exist breaks
-      // every marketing section at once.
-      { protocol: "https", hostname: "images.unsplash.com", port: "", pathname: "/**" },
+      // `images.unsplash.com` used to be here. The marketing pages hotlinked
+      // 33 photographs from it across 92 references, and the optimiser fetched
+      // them on every cold render — so a slow Unsplash was a slow site, and an
+      // unreachable one meant `/_next/image` hung for ~50 seconds and then
+      // answered **500**. Next exposes no timeout for that fetch; the only
+      // bound available was to stop making the request.
+      //
+      // Those images now live in `public/images/stock/` as WebP, served from
+      // this origin. `MANIFEST.json` beside them records each file's Unsplash
+      // id and source URL, so they remain traceable for licensing and easy to
+      // swap out for owned photography.
+      //
+      // The pattern is removed rather than left harmlessly in place, because a
+      // hotlink added later would then work in development and fail the same
+      // way in production. With no pattern, `next/image` refuses it at once.
     ],
   },
 
@@ -281,7 +291,7 @@ function contentSecurityPolicy(): string {
     `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     // `data:` covers the inlined placeholders next/image generates.
-    `img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co ${apiOrigin}`,
+    `img-src 'self' data: blob: https://*.supabase.co ${apiOrigin}`,
     "font-src 'self' data:",
     `connect-src 'self' ${apiOrigin}${dev ? " ws: wss:" : ""}`,
     // Paystack is a full-page redirect, not an embed, so nothing needs to be
