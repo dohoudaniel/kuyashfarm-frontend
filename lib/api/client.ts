@@ -449,43 +449,138 @@ export const apiClient = new ApiClient(API_BASE_URL);
  * concurrent request. Using it for user data would leak one visitor's session
  * into another visitor's page. This helper sends no credentials and is for
  * public data only.
+ *
+ * ── `offlineFallback` means "this page can render without me" ───────────────
+ *
+ * Supplying one is the caller declaring that missing data is a degraded page
+ * rather than a broken one — a shop with no products still has a header, a
+ * footer, an About page and a way to get in touch.
+ *
+ * It used to cover only the case where `fetch` itself threw, and only when
+ * `NEXT_PRERENDER_OFFLINE` was set. That distinction turned out to be the
+ * wrong one. A Render free-tier service that has spun down does not refuse the
+ * connection — it answers **404** from the platform edge, which is a perfectly
+ * successful HTTP exchange. So the fallback never fired, `/categories` threw,
+ * and `Export encountered an error ... exiting the build` took down the entire
+ * deployment. Every page failed to ship because one page's data was missing,
+ * including the pages that need no data at all.
+ *
+ * Now any failure to obtain the data uses the fallback: a connection error, a
+ * non-2xx response, or a body that is not the envelope we expect. The three
+ * are the same event from the page's point of view.
+ *
+ * **What this deliberately does not do** is hide a failure. It is logged on the
+ * server, and `apiReachable()` lets the layout tell the visitor plainly that
+ * live data is unavailable rather than presenting an empty shop as though the
+ * farm had nothing to sell.
+ *
+ * Detail fetches — one product, one class, one article — supply no fallback on
+ * purpose. There is no meaningful degraded version of "this specific thing",
+ * and Next's `not-found` handling is the right answer there.
  */
 export async function fetchPublic<T>(
   path: string,
-  init?: { revalidate?: number; tags?: string[]; offlineFallback?: T },
+  init?: { revalidate?: number; tags?: string[]; offlineFallback?: T; timeoutMs?: number },
 ): Promise<T> {
   const base = API_BASE_URL.replace(/\/$/, "");
   const [pathname, query] = path.split("?");
   const normalised = pathname.endsWith("/") ? pathname : `${pathname}/`;
+  const url = `${base}${normalised}${query ? `?${query}` : ""}`;
+  const canDegrade = Boolean(init && "offlineFallback" in init);
+
+  const degrade = (reason: string): T => {
+    // `console.warn`, not silence. This runs on the server, so it lands in the
+    // platform log where somebody can see that a page went out incomplete.
+    console.warn(`[api] ${url} unavailable (${reason}) — rendering without it.`);
+    return init!.offlineFallback as T;
+  };
 
   let response: Response;
   try {
-    response = await fetch(`${base}${normalised}${query ? `?${query}` : ""}`, {
+    response = await fetch(url, {
       headers: { Accept: "application/json" },
       next: { revalidate: init?.revalidate ?? 60, tags: init?.tags },
+      // Bounded, because a page that can degrade must not hang while it waits
+      // to find out that it should. Measured at 5.7s for a dynamic route
+      // against an unresolvable host — that is a visitor staring at nothing
+      // before being shown a page that never needed the data.
+      //
+      // Eight seconds, matching PAYSTACK_TIMEOUT on the API side: long enough
+      // for a cold free-tier instance that is genuinely coming back, short
+      // enough that an outage is not also a hang.
+      signal: AbortSignal.timeout(init?.timeoutMs ?? 8000),
     });
   } catch (error) {
-    // CI builds the app with no API reachable, to check that it compiles and
-    // renders — not to check the data. `NEXT_PRERENDER_OFFLINE` lets those
-    // pages prerender empty instead of failing the build.
-    //
-    // It is deliberately narrow: it applies only when the caller supplied a
-    // fallback, only when the request could not be made at all, and only when
-    // the variable is set — which it never is in a real deployment, where an
-    // unreachable API *should* stop the release rather than quietly shipping an
-    // empty shop.
-    if (process.env.NEXT_PRERENDER_OFFLINE && init && "offlineFallback" in init) {
-      return init.offlineFallback as T;
-    }
+    if (canDegrade) return degrade("unreachable or too slow");
     throw error;
   }
 
   if (!response.ok) {
+    // A spun-down Render service answers 404 here; a crashed one 502 or 503.
+    // None of them is a page-level error when the caller can render without
+    // the data.
+    if (canDegrade) return degrade(`HTTP ${response.status}`);
     throw new ApiError(`Request failed (${response.status}).`, response.status);
   }
 
-  const envelope = (await response.json()) as ApiEnvelope<T>;
-  return envelope.data;
+  try {
+    const envelope = (await response.json()) as ApiEnvelope<T>;
+    return envelope.data;
+  } catch (error) {
+    // 200 with a body that is not JSON: a proxy's holding page, a login wall,
+    // an edge error rendered as HTML. Indistinguishable from an outage to the
+    // page, so treated as one.
+    if (canDegrade) return degrade("unreadable response");
+    throw error;
+  }
+}
+
+/**
+ * Is the API answering right now?
+ *
+ * For a Server Component that wants to *tell the visitor* the site is running
+ * without live data, rather than silently showing them an empty shop.
+ *
+ * **Cached for a minute, and that is load-bearing.** The obvious version uses
+ * `cache: "no-store"` for a fresh answer every time, and doing that in the root
+ * layout opts the *entire application* out of static rendering. It was
+ * measured: every route in the build output flipped from `○ (Static)` to
+ * `ƒ (Dynamic)`, turning a marketing site designed to be served from cache at
+ * five thousand concurrent users into one that renders every page per request.
+ * A banner is not worth that.
+ *
+ * A 60-second revalidate keeps the pages static and the staleness costs
+ * nothing real: a page rendered in the minute before an outage shows no
+ * banner, and `ApiStatusBanner` polls from the browser anyway. The reverse — a
+ * banner lingering a minute after recovery — is resolved by that same poll.
+ *
+ * The timeout is short because a cold free-tier instance can take tens of
+ * seconds to answer and no page may wait for that. An unknown answer counts as
+ * "down", which is the safe direction: the cost is a banner shown when it need
+ * not have been, rather than an empty shop shown with no explanation.
+ */
+/**
+ * The health endpoint's absolute URL, for a browser to poll.
+ *
+ * Exported rather than rebuilt in the component so there is one definition of
+ * where the API lives. `API_BASE_URL` already carries the `/api/v1` prefix.
+ */
+export function apiHealthUrl(): string {
+  return `${API_BASE_URL.replace(/\/$/, "")}/health/`;
+}
+
+export async function apiReachable(timeoutMs = 4000): Promise<boolean> {
+  const base = API_BASE_URL.replace(/\/$/, "");
+  try {
+    const response = await fetch(`${base}/health/`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(timeoutMs),
+      next: { revalidate: 60 },
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 export default apiClient;

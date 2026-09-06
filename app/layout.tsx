@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/layout/SiteChrome";
-import { fetchPublic } from "@/lib/api/client";
+import { apiReachable, fetchPublic } from "@/lib/api/client";
 import type { StoreConfig } from "@/lib/api/types";
 import { ClientProviders } from "@/components/providers/ClientProviders";
 
@@ -134,7 +134,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const config = await storeConfig();
+  // Both on the server, in parallel. `storeConfig` degrades to null when the
+  // API is unreachable, so a null config is *almost* the same signal — but not
+  // quite: a deployment could have no SiteSetting row at all, which is a
+  // healthy API returning nothing. Asking /health/ separately keeps "the API
+  // is down" distinct from "there is no configuration yet", and only the first
+  // deserves a banner.
+  const [config, reachable] = await Promise.all([storeConfig(), apiReachable()]);
 
   return (
     // `data-scroll-behavior="smooth"` tells the router that the smooth
@@ -152,7 +158,9 @@ export default async function RootLayout({
           {/* Header and footer live here, not in each page. Mounted inside a
               page they remount on every navigation, which made the Navbar
               refetch the cart on every page view. */}
-          <SiteChrome config={config}>{children}</SiteChrome>
+          <SiteChrome config={config} apiDown={!reachable}>
+            {children}
+          </SiteChrome>
         </ClientProviders>
       </body>
     </html>

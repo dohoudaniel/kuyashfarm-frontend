@@ -34,6 +34,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { RouteProgress } from "@/components/layout/RouteProgress";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { ApiStatusBanner } from "@/components/layout/ApiStatusBanner";
 import type { StoreConfig } from "@/lib/api/types";
 
 /**
@@ -49,6 +50,7 @@ const BARE = ["/admin", "/driver"];
 export function SiteChrome({
   children,
   config = null,
+  apiDown = false,
 }: {
   children: React.ReactNode;
   /**
@@ -60,6 +62,14 @@ export function SiteChrome({
    * perhaps monthly.
    */
   config?: StoreConfig | null;
+  /**
+   * Whether the API answered while the server rendered this page.
+   *
+   * Passed down rather than probed here for the same reason `config` is: this
+   * is a Client Component, and asking from the browser would mean a request
+   * per visitor per page load for something the server already knows.
+   */
+  apiDown?: boolean;
 }) {
   const pathname = usePathname();
   const bare = BARE.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
@@ -72,9 +82,15 @@ export function SiteChrome({
   // whole subtree into client rendering without a boundary — and that would
   // turn every static marketing page dynamic.
   const chrome = (
-    <Suspense fallback={null}>
-      <RouteProgress />
-    </Suspense>
+    <>
+      <Suspense fallback={null}>
+        <RouteProgress />
+      </Suspense>
+      {/* Above the navbar and inside the bare shells too: the back office and
+          the driver screen are *more* affected by a missing API than the
+          marketing pages, not less — every screen there is data. */}
+      <ApiStatusBanner initiallyDown={Boolean(apiDown)} />
+    </>
   );
 
   if (bare) {
