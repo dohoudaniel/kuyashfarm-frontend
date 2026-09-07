@@ -54,7 +54,7 @@
   --color-cream: var(--cream);
 
   --font-sans: var(--font-inter);
-  --font-serif: var(--font-fraunces);
+  --font-serif: var(--font-playfair);
 
   /*
    * Motion, as tokens.
@@ -156,11 +156,11 @@ body {
  * heading using `font-serif` at display size gets it.
  */
 .font-serif {
-  font-family: var(--font-fraunces), Georgia, serif;
-  /* Optical sizing is the point of a variable face: heavier strokes and
-     tighter fit at display sizes, more generous at small ones. */
-  font-optical-sizing: auto;
-  font-variation-settings: "SOFT" 12, "WONK" 1;
+  font-family: var(--font-playfair), Georgia, serif;
+  /* `SOFT` and `WONK` were Fraunces' axes and mean nothing to Playfair — a
+     browser ignores an unknown axis, so leaving them would have been harmless
+     and misleading. Playfair's only variable axis is weight, which Tailwind's
+     font-weight utilities already drive. */
 }
 
 /* The scale. Each step is what a display serif needs at that size. */
