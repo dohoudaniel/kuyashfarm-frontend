@@ -12,8 +12,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle2, Eye, EyeOff, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
+import { PasswordToggle } from "@/components/ui/PasswordToggle";
 import { ApiError } from "@/lib/api/client";
 import {
   fromApiFieldErrors,
@@ -157,14 +158,10 @@ export default function ResetPasswordClient() {
                           : "border-gray-300 focus:border-primary focus:ring-primary"
                       }`}
                     />
-                    <button
-                      type="button"
-                      onClick={() => setVisible((was) => !was)}
-                      aria-label={visible ? "Hide password" : "Show password"}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-600"
-                    >
-                      {visible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
+                    <PasswordToggle
+                      visible={visible}
+                      onToggle={() => setVisible((was) => !was)}
+                    />
                   </div>
                   {fieldErrors.new_password && (
                     <p id="password-error" role="alert" className="mt-1 text-xs text-red-600">

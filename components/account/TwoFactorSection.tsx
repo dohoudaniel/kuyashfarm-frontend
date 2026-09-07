@@ -25,6 +25,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { AlertTriangle, Check, Copy, Loader2, ShieldCheck, ShieldOff } from "lucide-react";
 
+import { PasswordToggle } from "@/components/ui/PasswordToggle";
 import { ApiError } from "@/lib/api/client";
 import {
   beginTwoFactorEnrolment,
@@ -38,6 +39,7 @@ import {
 
 export function TwoFactorSection() {
   const [status, setStatus] = useState<TwoFactorStatus | null>(null);
+  const [pwVisible, setPwVisible] = useState(false);
   const [enrolment, setEnrolment] = useState<TwoFactorEnrolment | null>(null);
   const [codes, setCodes] = useState<string[] | null>(null);
 
@@ -255,15 +257,21 @@ export function TwoFactorSection() {
               <label htmlFor="pw-2fa" className="mb-1 block text-sm font-medium text-gray-700">
                 Confirm your password
               </label>
-              <input
-                id="pw-2fa"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-                autoComplete="current-password"
-                className="rounded-lg border border-gray-300 px-4 py-2.5 focus:border-transparent focus:ring-2 focus:ring-green-500"
-              />
+              <div className="relative">
+                <input
+                  id="pw-2fa"
+                  type={pwVisible ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="w-full rounded-lg border border-gray-300 py-2.5 pl-4 pr-11 focus:border-transparent focus:ring-2 focus:ring-green-500"
+                />
+                <PasswordToggle
+                  visible={pwVisible}
+                  onToggle={() => setPwVisible((was) => !was)}
+                />
+              </div>
             </div>
             <button
               type="submit"
