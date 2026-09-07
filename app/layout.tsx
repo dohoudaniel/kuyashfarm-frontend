@@ -7,7 +7,7 @@
  */
 
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { apiReachable, fetchPublic } from "@/lib/api/client";
@@ -17,22 +17,26 @@ import { ClientProviders } from "@/components/providers/ClientProviders";
 /**
  * Display face.
  *
- * Fraunces replaces Playfair Display, which is the default "premium" pairing
- * on generated landing pages and was doing every job at every size with
- * default tracking. Fraunces is warmer and slightly irregular — it reads as a
- * food brand rather than a fashion house — and being variable it can be tuned
- * rather than merely chosen.
+ * **Playfair Display, by instruction.** An earlier pass had swapped this for
+ * Fraunces, on the reasoning that Playfair is the default "premium" pairing on
+ * generated landing pages and reads as a fashion house rather than a farm.
+ * That was a judgement call, and it has been overruled by the brand owner —
+ * which is the right way round: the typeface is theirs to choose.
  *
- * `SOFT` and `WONK` are what make it not-Playfair. Soft rounds the terminals;
- * wonk lets a few letterforms lean. Both are dialled low: enough character to
- * be recognisable, not so much that it becomes a novelty face nobody can read
- * at 14px.
+ * The *other* half of that earlier work stays, because it was not about which
+ * face to use. Playfair was previously set at every size with default
+ * tracking, and a display serif needs negative letter-spacing as it grows or
+ * the words look loose and the lines rag. The `.display-*` scale below still
+ * applies tracking by size, so this returns to Playfair without returning to
+ * the loose headings it had the first time.
+ *
+ * Variable across 400-900, so weight is a choice at every size rather than two
+ * separate downloads.
  */
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
   display: "swap",
-  axes: ["SOFT", "WONK", "opsz"],
 });
 
 const inter = Inter({
@@ -152,7 +156,7 @@ export default async function RootLayout({
     // part that was wanted.
     <html lang="en" data-scroll-behavior="smooth">
       <body
-        className={`${fraunces.variable} ${inter.variable} antialiased`}
+        className={`${playfair.variable} ${inter.variable} antialiased`}
       >
         <ClientProviders>
           {/* Header and footer live here, not in each page. Mounted inside a
