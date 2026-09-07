@@ -65,7 +65,7 @@ export default function ForgotPasswordClient() {
               <h1 className="mb-2 font-serif text-2xl font-bold text-gray-900">Check your email</h1>
               <p className="mb-6 text-gray-600">
                 If <span className="font-medium">{email}</span> has an account with us, a reset
-                link is on its way. It expires in one hour.
+                link is on its way. It expires in three days and can be used once.
               </p>
               <Link href="/login" className="text-sm font-semibold text-primary hover:underline">
                 Back to sign in
