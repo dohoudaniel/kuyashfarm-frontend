@@ -81,6 +81,9 @@ function formatWhen(iso: string): { date: string; time: string } {
 }
 
 export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
+  // `cls` is fixed for this route, so a plain flag is enough — a different
+  // class is a different page and remounts this component.
+  const [heroFailed, setHeroFailed] = useState(false);
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
 
@@ -203,7 +206,24 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
       <main className="min-h-screen bg-cream">
         {/* Hero */}
         <div className="relative h-72 w-full overflow-hidden md:h-96">
-          {cls.image ? (
+          {/*
+            The solid block is the fallback for *two* cases, not one: a class
+            with no photograph, and a photograph that will not load.
+
+            The second is not hypothetical. A class image is whatever URL is in
+            the database, and `next/image` refuses any host outside
+            `remotePatterns` with a 400 — correctly, since that list is what
+            stops the optimiser being pointed at arbitrary origins. Seeded
+            Unsplash URLs did exactly that in production after the images were
+            localised, and a failed `fill` image does not fail quietly: the
+            browser paints the alt text across the whole container, so the
+            class title sprawled over the hero and the page looked broken in a
+            way that suggested it had rendered twice.
+
+            Degrading to the block that already exists costs nothing and keeps
+            the title legible over it.
+          */}
+          {cls.image && !heroFailed ? (
             <Image
               src={cls.image}
               alt={cls.title}
@@ -211,6 +231,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
               priority
               sizes="100vw"
               className="object-cover"
+              onError={() => setHeroFailed(true)}
             />
           ) : (
             <div className="absolute inset-0 bg-primary-dark" />
