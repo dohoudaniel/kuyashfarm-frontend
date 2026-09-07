@@ -27,8 +27,11 @@
  * small-screen visitor nothing.
  */
 
+import { useState } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
+
+import { PasswordToggle } from "@/components/ui/PasswordToggle";
 
 /** The wordmark's leaf, so the panel is branded without shipping an image. */
 function Leaf({ className }: { className?: string }) {
@@ -167,6 +170,16 @@ export function AuthField({
   icon?: React.ComponentType<{ className?: string }>;
   action?: React.ReactNode;
 }) {
+  /*
+   * Sign-in and sign-up get the same show/hide control as everywhere else.
+   *
+   * It matters most here. Typing a password blind is the commonest reason a
+   * sign-in fails on a phone, and the natural response — try again, slowly —
+   * is precisely what the login throttle punishes at five attempts a minute.
+   */
+  const [revealed, setRevealed] = useState(false);
+  const isPassword = input.type === "password";
+
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between gap-3">
@@ -182,16 +195,23 @@ export function AuthField({
         <input
           id={id}
           {...input}
+          // After the spread, so a password field renders as text when
+          // revealed while `input.type` — and therefore the password
+          // manager's understanding of the field — stays "password".
+          type={isPassword && revealed ? "text" : input.type}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={`block w-full rounded-xl border bg-white py-3 pr-4 text-sm transition-colors duration-200 focus:border-transparent focus:ring-2 focus:outline-none ${
+          className={`block w-full rounded-xl border bg-white py-3 text-sm transition-colors duration-200 focus:border-transparent focus:ring-2 focus:outline-none ${
             Icon ? "pl-11" : "pl-4"
-          } ${
+          } ${isPassword ? "pr-11" : "pr-4"} ${
             error
               ? "border-red-400 focus:ring-red-500"
               : "border-edge hover:border-accent focus:ring-primary"
           }`}
         />
+        {isPassword && (
+          <PasswordToggle visible={revealed} onToggle={() => setRevealed((was) => !was)} />
+        )}
       </div>
       {error && (
         <p id={`${id}-error`} role="alert" className="mt-1.5 text-sm text-red-600">

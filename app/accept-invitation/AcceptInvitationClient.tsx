@@ -26,6 +26,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, ShieldCheck, ShieldX } from "lucide-react";
 
+import { PasswordToggle } from "@/components/ui/PasswordToggle";
 import { ApiError } from "@/lib/api/client";
 import { acceptInvitation } from "@/lib/api/auth";
 import {
@@ -44,6 +45,9 @@ export default function AcceptInvitationClient() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  // One toggle for both boxes: they are the same password, and revealing
+  // only half of a "type it twice" pair helps nobody.
+  const [visible, setVisible] = useState(false);
 
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -189,30 +193,36 @@ export default function AcceptInvitationClient() {
                   <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
                     Choose a password
                   </label>
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(event) => {
-                      setPassword(event.target.value);
-                      setFieldErrors((current) => ({ ...current, password: "" }));
-                    }}
-                    onBlur={() =>
-                      setFieldErrors((current) => ({
-                        ...current,
-                        password: validatePassword(password) ?? "",
-                      }))
-                    }
-                    required
-                    minLength={8}
-                    autoComplete="new-password"
-                    aria-invalid={!!fieldErrors.password}
-                    className={`w-full rounded-lg border px-4 py-3 focus:ring-1 ${
-                      fieldErrors.password
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:border-primary focus:ring-primary"
-                    }`}
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={visible ? "text" : "password"}
+                      value={password}
+                      onChange={(event) => {
+                        setPassword(event.target.value);
+                        setFieldErrors((current) => ({ ...current, password: "" }));
+                      }}
+                      onBlur={() =>
+                        setFieldErrors((current) => ({
+                          ...current,
+                          password: validatePassword(password) ?? "",
+                        }))
+                      }
+                      required
+                      minLength={8}
+                      autoComplete="new-password"
+                      aria-invalid={!!fieldErrors.password}
+                      className={`w-full rounded-lg border py-3 pl-4 pr-11 focus:ring-1 ${
+                        fieldErrors.password
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:border-primary focus:ring-primary"
+                      }`}
+                    />
+                    <PasswordToggle
+                      visible={visible}
+                      onToggle={() => setVisible((was) => !was)}
+                    />
+                  </div>
                   {fieldErrors.password && (
                     <p role="alert" className="mt-1 text-sm text-red-600">
                       {fieldErrors.password}
@@ -227,29 +237,35 @@ export default function AcceptInvitationClient() {
                   <label htmlFor="confirm" className="mb-1 block text-sm font-medium text-gray-700">
                     Confirm password
                   </label>
-                  <input
-                    id="confirm"
-                    type="password"
-                    value={confirm}
-                    onChange={(event) => {
-                      setConfirm(event.target.value);
-                      setFieldErrors((current) => ({ ...current, confirm: "" }));
-                    }}
-                    onBlur={() =>
-                      setFieldErrors((current) => ({
-                        ...current,
-                        confirm: validatePasswordConfirmation(password, confirm) ?? "",
-                      }))
-                    }
-                    required
-                    autoComplete="new-password"
-                    aria-invalid={!!fieldErrors.confirm}
-                    className={`w-full rounded-lg border px-4 py-3 focus:ring-1 ${
-                      fieldErrors.confirm
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:border-primary focus:ring-primary"
-                    }`}
-                  />
+                  <div className="relative">
+                    <input
+                      id="confirm"
+                      type={visible ? "text" : "password"}
+                      value={confirm}
+                      onChange={(event) => {
+                        setConfirm(event.target.value);
+                        setFieldErrors((current) => ({ ...current, confirm: "" }));
+                      }}
+                      onBlur={() =>
+                        setFieldErrors((current) => ({
+                          ...current,
+                          confirm: validatePasswordConfirmation(password, confirm) ?? "",
+                        }))
+                      }
+                      required
+                      autoComplete="new-password"
+                      aria-invalid={!!fieldErrors.confirm}
+                      className={`w-full rounded-lg border py-3 pl-4 pr-11 focus:ring-1 ${
+                        fieldErrors.confirm
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:border-primary focus:ring-primary"
+                      }`}
+                    />
+                    <PasswordToggle
+                      visible={visible}
+                      onToggle={() => setVisible((was) => !was)}
+                    />
+                  </div>
                   {fieldErrors.confirm && (
                     <p role="alert" className="mt-1 text-sm text-red-600">
                       {fieldErrors.confirm}
