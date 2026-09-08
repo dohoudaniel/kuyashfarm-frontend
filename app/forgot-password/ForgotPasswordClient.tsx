@@ -94,6 +94,7 @@ export default function ForgotPasswordClient() {
                   <input
                     id="email"
                     type="email"
+                    placeholder="e.g. adaeze@gmail.com"
                     value={email}
                     onChange={(event) => {
                       setEmail(event.target.value);

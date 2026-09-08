@@ -140,7 +140,7 @@ export default function UsersClient() {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Name, email or phone"
+            placeholder="Search: Adaeze, adaeze@gmail.com or 08039876543"
             aria-label="Search users"
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-green-500"
           />

@@ -109,7 +109,7 @@ export default function InventoryClient() {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Product or SKU"
+            placeholder="Search: Tomatoes or VEG-019"
             aria-label="Search inventory"
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-green-500"
           />

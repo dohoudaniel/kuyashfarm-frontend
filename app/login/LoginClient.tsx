@@ -207,7 +207,7 @@ export default function LoginClient() {
               onChange={handleChange}
               onBlur={() => handleBlur("email")}
               error={fieldErrors.email}
-              placeholder="you@example.com"
+              placeholder="e.g. adaeze@gmail.com"
             />
 
             <AuthField
@@ -222,7 +222,7 @@ export default function LoginClient() {
               onChange={handleChange}
               onBlur={() => handleBlur("password")}
               error={fieldErrors.password}
-              placeholder="••••••••"
+              placeholder="Your Kuyash Farms password"
               action={
                 <Link
                   href="/forgot-password"

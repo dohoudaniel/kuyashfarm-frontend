@@ -121,7 +121,7 @@ export default function AcademyClient() {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Name, email or reference"
+            placeholder="Search: Adaeze, adaeze@gmail.com or KFA-260726-X7K2"
             aria-label="Search bookings"
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-green-500"
           />

@@ -15,14 +15,13 @@ import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 
 import { ApiError } from "@/lib/api/client";
-import { verifyEmail } from "@/lib/api/auth";
 import { useAuth } from "@/lib/context/AuthContext";
 
 type State = "working" | "done" | "failed" | "missing";
 
 export default function VerifyEmailClient() {
   const params = useSearchParams();
-  const { refresh } = useAuth();
+  const { completeEmailVerification } = useAuth();
 
   const uid = params.get("uid");
   const token = params.get("token");
@@ -33,6 +32,10 @@ export default function VerifyEmailClient() {
 
   const [state, setState] = useState<State>(() => (linkComplete ? "working" : "missing"));
   const [message, setMessage] = useState("");
+  // Whether the link also signed us in. A link that has already been used
+  // verifies fine but issues no session, and telling that visitor they are
+  // signed in when they are not sends them to a page that bounces them back.
+  const [signedIn, setSignedIn] = useState(false);
   const attempted = useRef(false);
 
   useEffect(() => {
@@ -43,11 +46,10 @@ export default function VerifyEmailClient() {
     if (attempted.current) return;
     attempted.current = true;
 
-    verifyEmail(uid, token)
-      .then(async () => {
+    completeEmailVerification(uid, token)
+      .then((didSignIn) => {
+        setSignedIn(didSignIn);
         setState("done");
-        // Pull the updated user so is_email_verified is current everywhere.
-        await refresh();
       })
       .catch((error) => {
         setState("failed");
@@ -57,7 +59,7 @@ export default function VerifyEmailClient() {
             : "We couldn't verify that link. Please request a new one.",
         );
       });
-  }, [uid, token, refresh]);
+  }, [uid, token, completeEmailVerification]);
 
   return (
     <>
@@ -73,10 +75,19 @@ export default function VerifyEmailClient() {
           {state === "done" && (
             <>
               <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-green-600" />
-              <h1 className="mb-2 text-2xl font-bold text-gray-900">Email verified</h1>
-              <p className="mb-6 text-gray-600">Thank you — your address is confirmed.</p>
-              <Link href="/categories" className="inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-secondary">
-                Start shopping
+              <h1 className="mb-2 text-2xl font-bold text-gray-900">
+                {signedIn ? "You're all set" : "Email verified"}
+              </h1>
+              <p className="mb-6 text-gray-600">
+                {signedIn
+                  ? "Your address is confirmed and you are signed in. We have sent a confirmation to your inbox."
+                  : "Your address is already confirmed. Sign in to pick up where you left off."}
+              </p>
+              <Link
+                href={signedIn ? "/categories" : "/login"}
+                className="inline-block rounded-full bg-primary px-6 py-3 font-semibold text-white hover:bg-secondary"
+              >
+                {signedIn ? "Start shopping" : "Sign in"}
               </Link>
             </>
           )}

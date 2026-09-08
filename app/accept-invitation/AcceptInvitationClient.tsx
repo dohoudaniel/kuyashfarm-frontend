@@ -162,6 +162,7 @@ export default function AcceptInvitationClient() {
                   </label>
                   <input
                     id="full_name"
+                    placeholder="e.g. Adaeze Okonkwo"
                     value={fullName}
                     onChange={(event) => {
                       setFullName(event.target.value);
@@ -197,6 +198,7 @@ export default function AcceptInvitationClient() {
                     <input
                       id="password"
                       type={visible ? "text" : "password"}
+                      placeholder="At least 8 characters, not all numbers"
                       value={password}
                       onChange={(event) => {
                         setPassword(event.target.value);
@@ -241,6 +243,7 @@ export default function AcceptInvitationClient() {
                     <input
                       id="confirm"
                       type={visible ? "text" : "password"}
+                      placeholder="Type that same password again"
                       value={confirm}
                       onChange={(event) => {
                         setConfirm(event.target.value);

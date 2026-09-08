@@ -140,7 +140,7 @@ export default function SettingsClient() {
                 type="tel"
                 value={settings.support_phone}
                 onChange={(e) => field("support_phone", e.target.value)}
-                placeholder="08039876543"
+                placeholder="e.g. 08039876543"
               />
               <FormField
                 label="Support email"
@@ -246,7 +246,7 @@ export default function SettingsClient() {
               name="rule_name"
               value={newRule.name}
               onChange={(e) => setNewRule({ ...newRule, name: e.target.value })}
-              placeholder="Lagos same-day"
+              placeholder="e.g. Lagos same-day"
             />
             {states.length > 0 ? (
               <FormSelect
@@ -272,7 +272,7 @@ export default function SettingsClient() {
               name="rule_rate"
               value={newRule.flat_rate}
               onChange={(e) => setNewRule({ ...newRule, flat_rate: e.target.value })}
-              placeholder="2000.00"
+              placeholder="e.g. 2000.00"
             />
             <button
               type="button"
@@ -352,7 +352,7 @@ export default function SettingsClient() {
               name="category_name"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="Herbs & spices"
+              placeholder="e.g. Herbs & spices"
             />
             <button
               type="button"
@@ -422,14 +422,14 @@ export default function SettingsClient() {
               name="tax_name"
               value={newTax.name}
               onChange={(e) => setNewTax({ ...newTax, name: e.target.value })}
-              placeholder="VAT"
+              placeholder="e.g. VAT"
             />
             <FormField
               label="Rate (%)"
               name="tax_rate"
               value={newTax.rate}
               onChange={(e) => setNewTax({ ...newTax, rate: e.target.value })}
-              placeholder="7.5"
+              placeholder="e.g. 7.5"
             />
             <FormField
               label="Applies from"
@@ -437,7 +437,7 @@ export default function SettingsClient() {
               type="text"
               value={newTax.effective_from}
               onChange={(e) => setNewTax({ ...newTax, effective_from: e.target.value })}
-              placeholder="2026-01-01"
+              placeholder="YYYY-MM-DD, e.g. 2026-01-01"
             />
             <button
               type="button"

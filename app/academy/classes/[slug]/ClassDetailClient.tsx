@@ -410,7 +410,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         onChange={change}
                         onBlur={() => blur("full_name")}
                         required
-                        placeholder="Adaeze Okonkwo"
+                        placeholder="e.g. Adaeze Okonkwo"
                         aria-invalid={!!errors.full_name?.length}
                         className={fieldClass("full_name")}
                       />
@@ -437,7 +437,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         onBlur={() => blur("email")}
                         required={!isAuthenticated}
                         aria-invalid={!!errors.email?.length}
-                        placeholder={user?.email ?? "you@example.com"}
+                        placeholder={user?.email ?? "e.g. adaeze.okonkwo@gmail.com"}
                         className={fieldClass("email")}
                       />
                       {isAuthenticated && (
@@ -466,7 +466,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         onChange={change}
                         onBlur={() => blur("phone")}
                         required
-                        placeholder="08039876543"
+                        placeholder="e.g. 08039876543 or +2348039876543"
                         aria-invalid={!!errors.phone?.length}
                         className={fieldClass("phone")}
                       />
@@ -490,7 +490,7 @@ export function ClassDetailClient({ cls }: { cls: AcademyClassDetail }) {
                         value={form.occupation}
                         onChange={change}
                         onBlur={() => blur("occupation")}
-                        placeholder="e.g. Farmer, Student, Business owner"
+                        placeholder="e.g. Poultry farmer, Student, Shop owner"
                         aria-invalid={!!errors.occupation?.length}
                         className={fieldClass("occupation")}
                       />

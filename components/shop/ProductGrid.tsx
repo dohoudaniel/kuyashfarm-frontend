@@ -125,7 +125,7 @@ export function ProductGrid({ initialProducts, categorySlug }: Props) {
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search products…"
+          placeholder="Search products, e.g. tomatoes, catfish, eggs"
           aria-label="Search products"
           className="w-full rounded-full border border-gray-300 px-5 py-3 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600/20 sm:w-80"
         />

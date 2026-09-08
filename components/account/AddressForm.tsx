@@ -134,21 +134,22 @@ export function AddressForm({ onSaved }: { onSaved: (address: Address) => void }
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField label="Name for this address" name="label" value={form.label}
           onChange={(e) => set("label", e.target.value)} onBlur={() => blur("label")}
-          error={fieldErrors.label} required placeholder="Home" />
+          error={fieldErrors.label} required placeholder="e.g. Home, Office, Mum's place" />
 
         <FormField label="Recipient" name="recipient_name" value={form.recipient_name}
           onChange={(e) => set("recipient_name", e.target.value)}
           onBlur={() => blur("recipient_name")} error={fieldErrors.recipient_name}
-          required autoComplete="name" />
+          required autoComplete="name" placeholder="e.g. Adaeze Okonkwo" />
 
         <FormField label="Street address" name="street" value={form.street}
           onChange={(e) => set("street", e.target.value)} onBlur={() => blur("street")}
           error={fieldErrors.street} required className="sm:col-span-2"
-          autoComplete="street-address" />
+          autoComplete="street-address" placeholder="e.g. 12 Awolowo Road, Ikoyi" />
 
         <FormField label="City" name="city" value={form.city}
           onChange={(e) => set("city", e.target.value)} onBlur={() => blur("city")}
-          error={fieldErrors.city} required autoComplete="address-level2" />
+          error={fieldErrors.city} required autoComplete="address-level2"
+          placeholder="e.g. Ikeja" />
 
         {/* A select, not free text: shipping is matched on the exact state
             name, so a saved typo would misprice every order made with it. */}
@@ -162,16 +163,18 @@ export function AddressForm({ onSaved }: { onSaved: (address: Address) => void }
             error={fieldErrors.state} required />
         ) : (
           <FormField label="State" name="state" value={form.state}
-            onChange={(e) => set("state", e.target.value)} error={fieldErrors.state} required />
+            onChange={(e) => set("state", e.target.value)} error={fieldErrors.state} required
+            placeholder="e.g. Lagos" />
         )}
 
         <FormField label="Postal code (optional)" name="postal_code" value={form.postal_code}
           onChange={(e) => set("postal_code", e.target.value)} onBlur={() => blur("postal_code")}
-          error={fieldErrors.postal_code} autoComplete="postal-code" />
+          error={fieldErrors.postal_code} autoComplete="postal-code"
+          placeholder="e.g. 100001 (optional)" />
 
         <FormField label="Phone" name="phone" type="tel" value={form.phone}
           onChange={(e) => set("phone", e.target.value)} onBlur={() => blur("phone")}
-          error={fieldErrors.phone} required autoComplete="tel" placeholder="08039876543" />
+          error={fieldErrors.phone} required autoComplete="tel" placeholder="e.g. 08039876543" />
       </div>
 
       <label className="flex items-center gap-2 text-sm text-gray-700">

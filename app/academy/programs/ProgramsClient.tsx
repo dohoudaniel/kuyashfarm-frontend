@@ -359,7 +359,7 @@ export function ProgramsClient() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by program name, skill, instructor, certification, career path..."
+              placeholder="Search programmes, e.g. poultry, drip irrigation, Dr. Obi"
               className="w-full bg-cream border border-gray-200 rounded-xl pl-11 pr-12 py-3.5 text-sm font-sans text-ink placeholder:text-gray-500 focus:outline-none focus:border-primary focus:bg-white transition-all duration-200"
             />
             {query && (

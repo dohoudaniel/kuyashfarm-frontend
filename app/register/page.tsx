@@ -216,7 +216,7 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={() => handleBlur("name")}
           error={fieldErrors.name}
-          placeholder="Ada Okafor"
+          placeholder="e.g. Ada Okafor"
         />
 
         <AuthField
@@ -231,7 +231,7 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={() => handleBlur("email")}
           error={fieldErrors.email}
-          placeholder="you@example.com"
+          placeholder="e.g. ada.okafor@gmail.com"
         />
 
         <AuthField
@@ -245,7 +245,7 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={() => handleBlur("phone")}
           error={fieldErrors.phone}
-          placeholder="08039876543"
+          placeholder="e.g. 08039876543"
           action={<span className="text-xs text-gray-400">Optional</span>}
         />
 
@@ -261,7 +261,7 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={() => handleBlur("password")}
           error={fieldErrors.password}
-          placeholder="••••••••"
+          placeholder="At least 8 characters, not all numbers"
         />
 
         <AuthField
@@ -276,7 +276,7 @@ export default function RegisterPage() {
           onChange={handleChange}
           onBlur={() => handleBlur("confirmPassword")}
           error={fieldErrors.confirmPassword}
-          placeholder="••••••••"
+          placeholder="Type that same password again"
         />
 
         <ul className="grid gap-1.5 rounded-xl bg-mist/50 p-4 sm:grid-cols-2">

@@ -499,7 +499,7 @@ export default function ProfileClient() {
                     }
                     error={fieldErrors.phone}
                     autoComplete="tel"
-                    placeholder="08039876543"
+                    placeholder="e.g. 08039876543"
                   />
 
                   <p className="rounded-lg bg-mist/50 p-3 text-xs text-gray-600">
