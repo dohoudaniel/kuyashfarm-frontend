@@ -104,7 +104,7 @@ export function RefundDialog({ order, onDone, onCancel }: Props) {
             id="refund-amount"
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
-            placeholder="Everything still owed"
+            placeholder="e.g. 12500.00 — leave blank to refund everything still owed"
             inputMode="decimal"
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-green-500"
           />
@@ -121,7 +121,7 @@ export function RefundDialog({ order, onDone, onCancel }: Props) {
             rows={3}
             maxLength={500}
             required
-            placeholder="Two crates arrived damaged."
+            placeholder="e.g. Two crates arrived damaged — customer sent photos."
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-green-500"
           />
         </div>

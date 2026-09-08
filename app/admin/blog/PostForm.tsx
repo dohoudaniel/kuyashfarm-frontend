@@ -182,7 +182,7 @@ export function PostForm({ post, onSaved, onCancel }: Props) {
         onChange={(event) => set("title", event.target.value)}
         error={fieldErrors.title}
         required
-        placeholder="Raising broilers through the harmattan"
+        placeholder="e.g. Raising broilers through the harmattan"
       />
 
       {post && (
@@ -202,7 +202,7 @@ export function PostForm({ post, onSaved, onCancel }: Props) {
         onChange={(event) => set("excerpt", event.target.value)}
         error={fieldErrors.excerpt}
         required
-        placeholder="One or two sentences. This is what appears on the card and in search results."
+        placeholder="One or two sentences, e.g. Harmattan can halve broiler weight gain. Here is what we changed."
       />
 
       <FormTextarea
@@ -211,7 +211,7 @@ export function PostForm({ post, onSaved, onCancel }: Props) {
         value={form.body}
         rows={14}
         onChange={(event) => set("body", event.target.value)}
-        placeholder="The article itself."
+        placeholder="The article itself — this is what readers see on the post page."
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -246,7 +246,7 @@ export function PostForm({ post, onSaved, onCancel }: Props) {
           name="author_role"
           value={form.author_role}
           onChange={(event) => set("author_role", event.target.value)}
-          placeholder="Head of Poultry"
+          placeholder="e.g. Head of Poultry"
         />
       </div>
 
@@ -255,7 +255,7 @@ export function PostForm({ post, onSaved, onCancel }: Props) {
         name="cover_image"
         value={form.cover_image}
         onChange={(event) => set("cover_image", event.target.value)}
-        placeholder="https://…"
+        placeholder="e.g. https://kuyashfarms.com/images/broiler-house.jpg"
       />
       <p className="-mt-2 text-xs text-gray-500">
         Leave it empty and the card falls back to a placeholder. Only hosts listed in{" "}

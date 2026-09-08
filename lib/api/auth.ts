@@ -104,8 +104,33 @@ export function changePassword(input: {
   return apiClient.post<null>("/auth/change-password/", { ...input });
 }
 
-export function verifyEmail(uid: string, token: string): Promise<User> {
-  return apiClient.post<User>("/auth/verify-email/", { uid, token });
+/**
+ * The result of following a verification link.
+ *
+ * `access_token` is null when the address was already verified — a replayed
+ * link. The server mints a session only on the first successful use, so this
+ * is the one case where verification succeeds without signing anyone in.
+ */
+export interface VerifyEmailResult {
+  user: User;
+  access_token: string | null;
+}
+
+/**
+ * Confirm an address and, on the first use of the link, adopt the session the
+ * server issued with it.
+ *
+ * Setting the token here rather than in the caller keeps it beside `login` and
+ * `completeTwoFactorLogin`, which is the only place in this module that knows
+ * a response can carry a credential.
+ */
+export async function verifyEmail(uid: string, token: string): Promise<VerifyEmailResult> {
+  const result = await apiClient.post<VerifyEmailResult>("/auth/verify-email/", { uid, token });
+
+  if (result.access_token) {
+    apiClient.setAccessToken(result.access_token);
+  }
+  return result;
 }
 
 export function resendVerification(): Promise<null> {

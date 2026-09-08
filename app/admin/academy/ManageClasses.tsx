@@ -136,17 +136,19 @@ export function ManageClasses() {
             <FormField label="Date and time" name="scheduled_date" type="text"
               value={form.scheduled_date}
               onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })}
-              placeholder="2026-09-15T10:00" required />
+              placeholder="YYYY-MM-DDTHH:MM, e.g. 2026-09-15T10:00" required />
 
             <FormField label="Location" name="location" value={form.location}
-              onChange={(e) => setForm({ ...form, location: e.target.value })} required />
+              onChange={(e) => setForm({ ...form, location: e.target.value })} required
+              placeholder="e.g. Kuyash Farms, Km 12 Lagos-Ibadan Expressway" />
 
             <FormField label="Price (₦, 0 for free)" name="price" value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
-              placeholder="25000.00" required />
+              placeholder="e.g. 25000.00 (or 0)" required />
 
             <FormField label="Seats" name="total_seats" type="number" value={form.total_seats}
-              onChange={(e) => setForm({ ...form, total_seats: e.target.value })} required />
+              onChange={(e) => setForm({ ...form, total_seats: e.target.value })} required
+              placeholder="e.g. 30" />
           </div>
         )}
 
@@ -260,10 +262,10 @@ export function ManageClasses() {
         <div className="flex flex-wrap items-end gap-3">
           <FormField label="Name" name="instructor_name" value={newInstructor.name}
             onChange={(e) => setNewInstructor({ ...newInstructor, name: e.target.value })}
-            placeholder="Dr. Chukwuemeka Obi" />
+            placeholder="e.g. Dr. Chukwuemeka Obi" />
           <FormField label="Title" name="instructor_title" value={newInstructor.title}
             onChange={(e) => setNewInstructor({ ...newInstructor, title: e.target.value })}
-            placeholder="Soil Scientist" />
+            placeholder="e.g. Soil Scientist" />
           <button type="button" disabled={busy || newInstructor.name.trim().length < 2}
             onClick={() =>
               void run(async () => {

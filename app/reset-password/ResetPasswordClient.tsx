@@ -133,6 +133,7 @@ export default function ResetPasswordClient() {
                     <input
                       id="password"
                       type={visible ? "text" : "password"}
+                      placeholder="Your new password"
                       value={password}
                       onChange={(event) => {
                         setPassword(event.target.value);
@@ -180,6 +181,7 @@ export default function ResetPasswordClient() {
                   <input
                     id="confirm"
                     type={visible ? "text" : "password"}
+                    placeholder="Type that same password again"
                     value={confirm}
                     onChange={(event) => {
                       setConfirm(event.target.value);

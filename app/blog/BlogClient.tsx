@@ -266,7 +266,7 @@ export function BlogClient({
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search articles, guides, research..."
+              placeholder="Search articles, e.g. tomato blight, dry season, poultry feed"
               className="w-full pl-11 pr-4 py-4 bg-white/10 border border-white/15 backdrop-blur-md text-white placeholder:text-white/35 rounded-xl text-sm font-sans outline-none focus:border-accent focus:bg-white/15 transition-all duration-200"
             />
           </motion.div>
@@ -463,7 +463,7 @@ export function BlogClient({
                   <form onSubmit={handleSubscribe} className="space-y-2.5">
                     <input
                       type="email"
-                      placeholder="Enter your email address"
+                      placeholder="Your email address, e.g. adaeze@gmail.com"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       required

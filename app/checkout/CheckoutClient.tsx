@@ -346,25 +346,26 @@ export default function CheckoutClient() {
                     onChange={(e) => { setAddress({ ...address, recipient_name: e.target.value }); clearFieldError("recipient_name"); }}
                     onBlur={() => validateOnBlur("recipient_name", address.recipient_name)}
                     error={fieldErrors.recipient_name} required className="md:col-span-2"
-                    autoComplete="name" />
+                    autoComplete="name" placeholder="e.g. Adaeze Okonkwo" />
 
                   <FormField label="Email" name="email" type="email" value={email}
                     onChange={(e) => { setEmail(e.target.value); clearFieldError("email"); }}
                     onBlur={() => validateOnBlur("email", email)}
                     error={fieldErrors.email}
                     required disabled={isAuthenticated} className="md:col-span-2"
-                    autoComplete="email" />
+                    autoComplete="email" placeholder="e.g. adaeze@gmail.com" />
 
                   <FormField label="Street address" name="street" value={address.street}
                     onChange={(e) => { setAddress({ ...address, street: e.target.value }); clearFieldError("street"); }}
                     onBlur={() => validateOnBlur("street", address.street)}
                     error={fieldErrors.street} required className="md:col-span-2"
-                    autoComplete="street-address" />
+                    autoComplete="street-address" placeholder="e.g. 12 Awolowo Road, Ikoyi" />
 
                   <FormField label="City" name="city" value={address.city}
                     onChange={(e) => { setAddress({ ...address, city: e.target.value }); clearFieldError("city"); }}
                     onBlur={() => validateOnBlur("city", address.city)}
-                    error={fieldErrors.city} required autoComplete="address-level2" />
+                    error={fieldErrors.city} required autoComplete="address-level2"
+                    placeholder="e.g. Ikeja" />
 
                   {/* A select, not a text box: shipping is looked up by exact
                       state name, so a typo silently quotes the wrong fee. The
@@ -381,20 +382,20 @@ export default function CheckoutClient() {
                     <FormField label="State" name="state" value={address.state}
                       onChange={(e) => { setAddress({ ...address, state: e.target.value }); clearFieldError("state"); }}
                       error={fieldErrors.state} required autoComplete="address-level1"
-                      placeholder="Lagos" />
+                      placeholder="e.g. Lagos" />
                   )}
 
                   <FormField label="Postal code (optional)" name="postal_code" value={address.postal_code}
                     onChange={(e) => { setAddress({ ...address, postal_code: e.target.value }); clearFieldError("postal_code"); }}
                     onBlur={() => validateOnBlur("postal_code", address.postal_code)}
                     error={fieldErrors.postal_code}
-                    autoComplete="postal-code" />
+                    autoComplete="postal-code" placeholder="e.g. 100001 (optional)" />
 
                   <FormField label="Phone" name="phone" type="tel" value={address.phone}
                     onChange={(e) => { setAddress({ ...address, phone: e.target.value }); clearFieldError("phone"); }}
                     onBlur={() => validateOnBlur("phone", address.phone)}
                     error={fieldErrors.phone} required autoComplete="tel"
-                    placeholder="08039876543" />
+                    placeholder="e.g. 08039876543" />
                 </div>
               </section>
 
@@ -431,7 +432,7 @@ export default function CheckoutClient() {
               <section className="rounded-2xl bg-white p-6 shadow-sm">
                 <FormTextarea label="Order notes (optional)" name="notes" value={notes}
                   onChange={(e) => setNotes(e.target.value)} rows={3} maxLength={500}
-                  placeholder="Anything the driver should know?" />
+                  placeholder="e.g. Call when you reach the estate gate — blue gate opposite the pharmacy." />
               </section>
             </div>
 

@@ -117,7 +117,7 @@ export default function StaffClient() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
-                placeholder="name@kuyashfarms.com"
+                placeholder="e.g. adaeze@kuyashfarms.com"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-green-500"
               />
             </div>

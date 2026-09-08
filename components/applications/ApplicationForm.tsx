@@ -396,7 +396,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
                   onChange={change}
                   onBlur={() => blur("cac_number")}
                   aria-invalid={!!errors.cac_number?.length}
-                  placeholder="RC1234567"
+                  placeholder="e.g. RC1234567"
                   className={fieldClass("cac_number")}
                 />
                 <FieldErrors name="cac_number" />
@@ -525,7 +525,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
               value={form.warehouse_info}
               onChange={change}
               rows={2}
-              placeholder="Warehouse size, refrigeration, vehicles…"
+              placeholder="e.g. 200 sqm dry store in Ikeja, one 5-tonne cold room, two refrigerated vans."
               className={`${fieldClass("warehouse_info")} resize-none`}
             />
             <FieldErrors name="warehouse_info" />
@@ -656,7 +656,7 @@ export function ApplicationForm({ applicationType, title, intro }: Props) {
               value={form.trade_references}
               onChange={change}
               rows={3}
-              placeholder="Suppliers or buyers who can vouch for you — name, business, phone."
+              placeholder="e.g. Adaeze Okonkwo, Green Basket Foods, 08039876543 — buys from us weekly."
               className={`${fieldClass("trade_references")} resize-none`}
             />
             <FieldErrors name="trade_references" />

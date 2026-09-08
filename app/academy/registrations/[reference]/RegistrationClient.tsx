@@ -225,7 +225,7 @@ export default function RegistrationClient({ reference }: { reference: string })
                       setEmailError("");
                     }}
                     onBlur={() => setEmailError(validateEmail(emailInput) ?? "")}
-                    placeholder="you@example.com"
+                    placeholder="The email you booked with, e.g. adaeze.okonkwo@gmail.com"
                     aria-invalid={!!emailError}
                     aria-describedby={emailError ? "booking-email-error" : undefined}
                     className={`w-full rounded-lg border px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 ${

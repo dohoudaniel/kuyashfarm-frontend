@@ -124,7 +124,7 @@ export function AcademyNewsletter() {
                   <div className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="email"
-                    placeholder="Enter your email address"
+                    placeholder="Your email address, e.g. adaeze@gmail.com"
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);

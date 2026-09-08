@@ -218,7 +218,7 @@ export function ProductForm({ product, categories, onSaved, onCancel }: Props) {
 
         <FormField label="SKU" name="sku" value={form.sku ?? ""}
           onChange={(e) => set("sku", e.target.value)} error={fieldErrors.sku} required
-          placeholder="VEG-019" />
+          placeholder="e.g. VEG-019" />
 
         <FormSelect label="Category" name="category" value={form.category ?? ""}
           onChange={(e) => set("category", e.target.value)}
@@ -230,11 +230,11 @@ export function ProductForm({ product, categories, onSaved, onCancel }: Props) {
 
         <FormField label="Unit" name="unit" value={form.unit ?? ""}
           onChange={(e) => set("unit", e.target.value)} error={fieldErrors.unit} required
-          placeholder="per kg" />
+          placeholder="e.g. per kg, per crate, per dozen" />
 
         <FormField label="Price (₦)" name="base_price" value={form.base_price ?? ""}
           onChange={(e) => set("base_price", e.target.value)}
-          error={fieldErrors.base_price} required placeholder="3500.00" />
+          error={fieldErrors.base_price} required placeholder="e.g. 3500.00" />
 
         {/* Shown, not editable. Stock is the ledger's — Restock and Adjust on
             the inventory screen are the only ways in, so that every unit has a
@@ -251,7 +251,7 @@ export function ProductForm({ product, categories, onSaved, onCancel }: Props) {
 
       <FormField label="Short description" name="description" value={form.description ?? ""}
         onChange={(e) => set("description", e.target.value)}
-        placeholder="One line, shown on the product card." />
+        placeholder="One line for the product card, e.g. Sun-ripened and picked this morning." />
 
       <FormTextarea label="Full description" name="long_description"
         value={form.long_description ?? ""} rows={4} maxLength={2000}

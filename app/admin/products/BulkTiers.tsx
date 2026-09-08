@@ -169,7 +169,7 @@ export function BulkTiers({ slug, unit }: { slug: string; unit: string }) {
             value={quantity}
             onChange={(event) => setQuantity(event.target.value)}
             inputMode="numeric"
-            placeholder="10"
+            placeholder="e.g. 10"
             className="w-28 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-green-500"
           />
         </div>
@@ -182,7 +182,7 @@ export function BulkTiers({ slug, unit }: { slug: string; unit: string }) {
             value={price}
             onChange={(event) => setPrice(event.target.value)}
             inputMode="decimal"
-            placeholder="3200.00"
+            placeholder="e.g. 3200.00"
             className="w-32 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-green-500"
           />
         </div>

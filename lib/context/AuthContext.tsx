@@ -54,6 +54,12 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<LoginOutcome>;
   /** Finish a sign-in that stopped for a second factor. */
   completeTwoFactor: (challengeToken: string, code: string) => Promise<User>;
+  /**
+   * Confirm an email address from a link, and adopt the session that comes
+   * back with it. Resolves to `false` when the link had already been used, in
+   * which case the address is verified but nobody was signed in.
+   */
+  completeEmailVerification: (uid: string, token: string) => Promise<boolean>;
   /** Sign in with a Google authorization code. Same two outcomes as `login`. */
   signInWithGoogle: (code: string, redirectUri: string) => Promise<LoginOutcome>;
   /** Resolves when the request is accepted. Does not sign in — see below. */
@@ -197,6 +203,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 
   /**
+   * Confirm an email address and sign the person in.
+   *
+   * Routed through `afterSignIn` for the same reason Google sign-in is: this
+   * is a real sign-in, so the anonymous basket has to be merged and the guest
+   * cart session cleared. Skipping it would sign somebody in and silently drop
+   * whatever they had put in their basket before verifying.
+   *
+   * Returns false for an already-used link — verification still succeeded, but
+   * no session was issued and the page must not claim the visitor is signed in.
+   */
+  const completeEmailVerification = useCallback(
+    async (uid: string, token: string) => {
+      const { user: verified, access_token } = await authApi.verifyEmail(uid, token);
+
+      if (!access_token) return false;
+
+      await afterSignIn(verified);
+      return true;
+    },
+    [afterSignIn],
+  );
+
+  /**
    * Create an account. Deliberately does not sign the user in.
    *
    * The API returns no tokens, because a signed-in response would reveal that
@@ -255,6 +284,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       getsBulkPricing: user?.gets_bulk_pricing ?? false,
       isBackOffice: user?.is_back_office ?? false,
       completeTwoFactor,
+      completeEmailVerification,
       signInWithGoogle,
       login,
       register,
@@ -269,6 +299,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isLoading,
       login,
       completeTwoFactor,
+      completeEmailVerification,
       signInWithGoogle,
       register,
       logout,
